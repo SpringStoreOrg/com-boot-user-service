@@ -11,12 +11,10 @@ import com.boot.services.model.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 
 	public User getUserById(long id);
-
-	public User getUserByUserName(String userName);
 	
 	public User getUserByEmail(String email);
 
 	@Transactional
-	public void deleteByUserName(String userName);
+	public void deleteByEmail(String email);
 
 }

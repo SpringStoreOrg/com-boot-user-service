@@ -60,11 +60,11 @@ public class UserService {
 	@Autowired
 	private PasswordResetTokenRepository passwordReserTokenRepository;
 
-	public UserDTO addProductToUserFavorites(String userName, String productName) throws DuplicateEntryException {
+	public UserDTO addProductToUserFavorites(String email, String productName) throws DuplicateEntryException {
 
 		ProductDTO productDTO = productServiceClient.callGetProductByProductName(productName).getBody();
 
-		User user = userRepository.getUserByUserName(userName);
+		User user = userRepository.getUserByEmail(email);
 
 		UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
 
@@ -78,11 +78,11 @@ public class UserService {
 		}
 	}
 
-	public UserDTO removeProductFromUserFavorites(String userName, String productName) throws EntityNotFoundException {
+	public UserDTO removeProductFromUserFavorites(String email, String productName) throws EntityNotFoundException {
 
 		ProductDTO productDTO = productServiceClient.callGetProductByProductName(productName).getBody();
 
-		User user = userRepository.getUserByUserName(userName);
+		User user = userRepository.getUserByEmail(email);
 
 		UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
 
@@ -106,15 +106,7 @@ public class UserService {
 		if (!userValidator.isUserDataSizeCorrect(userDTO.getEmail(), 3, 30)) {
 			throw new InvalidInputDataException("Provided Email has to be between 3 and 30 characters long!");
 		}
-		if (!userValidator.isUsernameValid(userDTO.getUserName())) {
-			throw new InvalidInputDataException("invalid username format!");
-		}
-		if (!userValidator.isUsernamePresent(userDTO.getUserName())) {
-			throw new InvalidInputDataException("usename is already used!");
-		}
-		if (!userValidator.isUserDataSizeCorrect(userDTO.getUserName(), 3, 30)) {
-			throw new InvalidInputDataException("Username has to be between 3 and 30 characters long!");
-		}
+
 		if (!userValidator.isUserDataSizeCorrect(userDTO.getFirstName(), 3, 30)) {
 			throw new InvalidInputDataException("Name has to be between 3 and 30 characters long!");
 		}
@@ -160,16 +152,16 @@ public class UserService {
 				throw new UnableToModifyDataException("User was already confirmed!");
 			}
 			user.setActivated(true);
-			updateUserByUserName(user.getUserName(), user);
+			updateUserByEmail(user.getEmail(), user);
 
 		} else {
 			throw new EntityNotFoundException("Token not found!");
 		}
 	}
 
-	public UserDTO updateUserByUserName(String userName, UserDTO userDTO) throws InvalidInputDataException {
+	public UserDTO updateUserByEmail(String email, UserDTO userDTO) throws InvalidInputDataException {
 
-		User user = userRepository.getUserByUserName(userName);
+		User user = userRepository.getUserByEmail(email);
 
 		UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
 
@@ -181,16 +173,6 @@ public class UserService {
 			throw new InvalidInputDataException("Provided Email has to be between 3 and 30 characters long!");
 		}
 		userDTOMapped.setEmail(userDTO.getEmail());
-
-		if (!userValidator.isUsernameValid(userDTO.getUserName())) {
-			throw new InvalidInputDataException("invalid username format!");
-		}
-
-		if (!userValidator.isUserDataSizeCorrect(userDTO.getUserName(), 3, 30)) {
-			throw new InvalidInputDataException("Username has to be between 3 and 30 characters long!");
-		}
-
-		userDTOMapped.setUserName(userDTO.getUserName());
 
 		if (!userValidator.isUserDataSizeCorrect(userDTO.getFirstName(), 3, 30)) {
 			throw new InvalidInputDataException("Name has to be between 3 and 30 characters long!");
@@ -248,17 +230,6 @@ public class UserService {
 		return userDTOList;
 	}
 
-	public UserDTO getUserByUserName(String userName) throws EntityNotFoundException {
-		log.info("getUserByUserName - process started");
-		if (userValidator.isUsernamePresent(userName)) {
-			throw new EntityNotFoundException("UserName: " + userName + " not found in the Database!");
-		}
-
-		User user = userRepository.getUserByUserName(userName);
-		return UserMapper.UserEntityToDto(user);
-
-	}
-
 	public UserDTO getUserByEmail(String email) throws EntityNotFoundException {
 		log.info("getUserByEmail - process started");
 		if (userValidator.isEmailPresent(email)) {
@@ -276,17 +247,19 @@ public class UserService {
 		userRepository.deleteById(id);
 	}
 
-	public void deleteUserByUserName(String userName) throws EntityNotFoundException {
-		if (userValidator.isUsernamePresent(userName)) {
-			throw new EntityNotFoundException("UserName: " + userName + " not found in the Database!");
+	public void deleteUserByEmail(String email) throws EntityNotFoundException {
+		log.info("deleteUserByEmail - process started");
+		if (userValidator.isEmailPresent(email)) {
+			throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
 		}
-		UserDTO userDto = getUserByUserName(userName);
+		
+		UserDTO userDto = getUserByEmail(email);
 
 		userDto.getFavoriteProductList().clear();
 
-		cartServiceClient.callDeleteCartByUserName(userName);
+		cartServiceClient.callDeleteCartByEmail(email);
 
-		userRepository.deleteByUserName(userName);
+		userRepository.deleteByEmail(email);
 	}
 
 	public void requestResetPassword(String userEmail) throws EntityNotFoundException {
@@ -328,7 +301,7 @@ public class UserService {
 			}
 
 			userDto.setPassword(newPassword);
-			updateUserByUserName(userDto.getUserName(), userDto);
+			updateUserByEmail(userDto.getEmail(), userDto);
 
 		} else {
 			throw new EntityNotFoundException("Token not found!");

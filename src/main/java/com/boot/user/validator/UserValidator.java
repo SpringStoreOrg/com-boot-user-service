@@ -23,19 +23,6 @@ public class UserValidator {
 		if (email == null) return false;
 		return pat.matcher(email).matches();
 	}
-
-	public boolean isUsernameValid(String username) {
-		String usernameRegex = "[A-Za-z0-9_]+";
-
-		Pattern pat = Pattern.compile(usernameRegex);
-		if (username == null) return false;
-		return pat.matcher(username).matches();
-	}
-
-	public boolean isUsernamePresent(String username) {
-		if (userRepository.getUserByUserName(username) == null) return true;
-		return false;
-	}
 	
 	public boolean isEmailPresent(String email) {
 		if (userRepository.getUserByEmail(email) == null) return true;

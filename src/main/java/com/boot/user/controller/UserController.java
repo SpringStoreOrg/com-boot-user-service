@@ -38,26 +38,26 @@ public class UserController {
 		return new ResponseEntity<>(newUser, HttpStatus.CREATED);
 	}
 
-	@PutMapping("/addProductToUserFavorites/{userName}/{productName}")
-	public ResponseEntity<UserDTO> addProductToUserFavorites(@PathVariable("userName") String userName,
+	@PutMapping("/addProductToUserFavorites/{email}/{productName}")
+	public ResponseEntity<UserDTO> addProductToUserFavorites(@PathVariable("email") String email,
 			@PathVariable("productName") String productName)
 			throws EntityNotFoundException, InvalidInputDataException, DuplicateEntryException {
-		UserDTO user = userService.addProductToUserFavorites(userName, productName);
+		UserDTO user = userService.addProductToUserFavorites(email, productName);
 		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 
-	@PutMapping("/removeProductFromUserFavorites/{userName}/{productName}")
-	public ResponseEntity<UserDTO> removeProductFromUserFavorites(@PathVariable("userName") String userName,
+	@PutMapping("/removeProductFromUserFavorites/{email}/{productName}")
+	public ResponseEntity<UserDTO> removeProductFromUserFavorites(@PathVariable("email") String email,
 			@PathVariable("productName") String productName)
 			throws EntityNotFoundException, InvalidInputDataException, DuplicateEntryException {
-		UserDTO user = userService.removeProductFromUserFavorites(userName, productName);
+		UserDTO user = userService.removeProductFromUserFavorites(email, productName);
 		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 
-	@PutMapping("/updateUserByUserName/{userName}")
-	public ResponseEntity<UserDTO> updateUserByUsername(@RequestBody UserDTO userDTO,
-			@PathVariable("userName") String userName) throws EntityNotFoundException, InvalidInputDataException {
-		UserDTO user = userService.updateUserByUserName(userName, userDTO);
+	@PutMapping("/updateUserByEmail/{email}")
+	public ResponseEntity<UserDTO> updateUserByEmail(@RequestBody UserDTO userDTO,
+			@PathVariable("email") String email) throws EntityNotFoundException, InvalidInputDataException {
+		UserDTO user = userService.updateUserByEmail(email, userDTO);
 		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 
@@ -82,10 +82,10 @@ public class UserController {
 		return new ResponseEntity<>(userList, HttpStatus.OK);
 	}
 
-	@GetMapping("/getUserByUserName")
+	@GetMapping("/getUserByEmail")
 	@ResponseBody
-	public ResponseEntity<UserDTO> getUserByUsername(@RequestParam String userName) throws EntityNotFoundException {
-		UserDTO user = userService.getUserByUserName(userName);
+	public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) throws EntityNotFoundException {
+		UserDTO user = userService.getUserByEmail(email);
 		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 
@@ -95,10 +95,10 @@ public class UserController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@DeleteMapping("/deleteUserByUserName/{userName}")
-	public ResponseEntity<UserDTO> deleteUserByUserName(@PathVariable("userName") String userName)
+	@DeleteMapping("/deleteUserByEmail/{email}")
+	public ResponseEntity<UserDTO> deleteUserByByEmail(@PathVariable("email") String email)
 			throws EntityNotFoundException {
-		userService.deleteUserByUserName(userName);
+		userService.deleteUserByEmail(email);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

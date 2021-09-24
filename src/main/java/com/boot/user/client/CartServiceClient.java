@@ -14,9 +14,9 @@ public class CartServiceClient {
 	@Autowired
 	private RestTemplate restTemplate;
 
-	public void callDeleteCartByUserName(String userName) {
+	public void callDeleteCartByEmail(String email) {
 
-		restTemplate.exchange(Constants.DELETE_CART_BY_USER_NAME + userName, HttpMethod.DELETE,
+		restTemplate.exchange(Constants.DELETE_CART_BY_EMAIL + email, HttpMethod.DELETE,
 				new HttpEntity<>(UserDTO.class), String.class);
 	}
 }
