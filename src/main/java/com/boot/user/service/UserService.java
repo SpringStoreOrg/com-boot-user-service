@@ -115,7 +115,7 @@ public class UserService {
 		}
 
 		if (!userValidator.isUserDataSizeCorrect(userDTO.getDeliveryAddress(), 3, 300)) {
-			throw new InvalidInputDataException("Adress has to be between 3 and 300 characters long!");
+			throw new InvalidInputDataException("Address has to be between 3 and 300 characters long!");
 		}
 		if (!userValidator.isPhoneNumberValid(userDTO.getPhoneNumber())) {
 			throw new InvalidInputDataException("invalid phone number format!");
@@ -125,7 +125,9 @@ public class UserService {
 		}
 
 		userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-
+		
+		userDTO.setRole("USER");
+		
 		User user = userRepository.save(UserMapper.DtoToUserEntity(userDTO).setCreatedOn(LocalDate.now()));
 
 		ConfirmationToken confirmationToken = new ConfirmationToken(user);
