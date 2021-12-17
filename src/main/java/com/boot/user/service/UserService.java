@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -95,6 +96,15 @@ public class UserService {
 		} else {
 			throw new EntityNotFoundException("Product: " + productName + " was not found in the favorites list!");
 		}
+	}
+	
+	public Set<ProductDTO> getAllProductsFromUserFavorites(String email) throws EntityNotFoundException {
+
+		User user = userRepository.getUserByEmail(email);
+
+		UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
+
+		return userDTOMapped.getFavoriteProductList();
 	}
 
 	public UserDTO addUser(UserDTO userDTO) throws InvalidInputDataException {

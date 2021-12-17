@@ -2,6 +2,7 @@ package com.boot.user.controller;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.boot.services.dto.ProductDTO;
 import com.boot.services.dto.UserDTO;
 import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.exception.EntityNotFoundException;
@@ -54,9 +56,17 @@ public class UserController {
 		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 
+	@GetMapping("/getAllProductsFromUserFavorites/{email}")
+	@ResponseBody
+	public ResponseEntity<Set<ProductDTO>> getAllProductsFromUserFavorites(@PathVariable("email") String email)
+			throws EntityNotFoundException {
+		Set<ProductDTO> productList = userService.getAllProductsFromUserFavorites(email);
+		return new ResponseEntity<>(productList, HttpStatus.OK);
+	}
+
 	@PutMapping("/updateUserByEmail/{email}")
-	public ResponseEntity<UserDTO> updateUserByEmail(@RequestBody UserDTO userDTO,
-			@PathVariable("email") String email) throws EntityNotFoundException, InvalidInputDataException {
+	public ResponseEntity<UserDTO> updateUserByEmail(@RequestBody UserDTO userDTO, @PathVariable("email") String email)
+			throws EntityNotFoundException, InvalidInputDataException {
 		UserDTO user = userService.updateUserByEmail(email, userDTO);
 		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
