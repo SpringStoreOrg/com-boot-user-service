@@ -140,8 +140,6 @@
 					</execution>
 				</executions>
 				<configuration>
-				    <username>trifang</username>
-                    <password>qqqqq111</password>
 					<repository>trifang/user-service</repository>
 					<tag>${project.version}</tag>
 					<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
