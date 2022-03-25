@@ -50,15 +50,15 @@ public class AppConfig {
 //		mailSender.setPassword("paue+`A#AJY8!V##$324RWQEQWewsdas123");
 
 		mailSender.setHost("smtp.hostinger.com");
-		mailSender.setPort(465);
+		mailSender.setPort(587);
 
 		mailSender.setUsername("noreply@springwebstore.com");
 		mailSender.setPassword("QQQwwwEEE1234$");
 
         Properties javaMailProperties = new Properties();
-    //    javaMailProperties.put("mail.smtp.starttls.enable", "true");
+        javaMailProperties.put("mail.smtp.starttls.enable", "true");
         javaMailProperties.put("mail.smtp.auth", "true");
-		javaMailProperties.put("mail.smtp.ssl.Enable", "true");
+		//javaMailProperties.put("mail.smtp.ssl.Enable", "true");
         javaMailProperties.put("mail.transport.protocol", "smtp");
         javaMailProperties.put("mail.debug", "true");
  
