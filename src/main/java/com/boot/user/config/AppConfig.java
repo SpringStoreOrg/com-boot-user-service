@@ -56,9 +56,9 @@ public class AppConfig {
 		mailSender.setPassword("QQQwwwEEE1234$");
 
         Properties javaMailProperties = new Properties();
-        javaMailProperties.put("mail.smtp.starttls.enable", "true");
+    //    javaMailProperties.put("mail.smtp.starttls.enable", "true");
         javaMailProperties.put("mail.smtp.auth", "true");
-		javaMailProperties.put("mail.smtp.ssl.trust", "smtp.hostinger.com");
+	//	javaMailProperties.put("mail.smtp.ssl.trust", "smtp.hostinger.com");
         javaMailProperties.put("mail.transport.protocol", "smtp");
         javaMailProperties.put("mail.debug", "true");
  
