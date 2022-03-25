@@ -35,7 +35,7 @@ public class EmailService {
 
 		Email email = new Email();
 
-		email.setEmailFrom("springStore@noreply.com");
+		email.setEmailFrom("noreply@springwebstore.com");
 		email.setEmailTo(user.getEmail());
 		email.setEmailSubject("SpringStore confirmation Email");
 
@@ -78,7 +78,7 @@ public class EmailService {
 
 		Email email = new Email();
 
-		email.setEmailFrom("springStore@noreply.com");
+		email.setEmailFrom("noreply@springwebstore.com");
 		email.setEmailTo(user.getEmail());
 		email.setEmailSubject("Password Reset Request");
 
