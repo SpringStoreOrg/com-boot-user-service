@@ -20,10 +20,7 @@ import com.boot.user.client.ProductServiceClient;
 @Configuration
 public class AppConfig {
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+
 
 	@Bean
 	public RestTemplate template() {
