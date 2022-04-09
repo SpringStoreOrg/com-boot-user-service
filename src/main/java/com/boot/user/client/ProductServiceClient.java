@@ -11,11 +11,10 @@ public class ProductServiceClient {
 
 
 	@Autowired
-	private RestTemplate restTemplate;
-
+	private RestTemplate productServiceRestTemplate;
 
 	public ResponseEntity<ProductDTO> callGetProductByProductName(String productName) {
 
-		return restTemplate.getForEntity(Constants.GET_PRODUCT_BY_PRODUCT_NAME + productName, ProductDTO.class);
+		return productServiceRestTemplate.getForEntity(Constants.GET_PRODUCT_BY_PRODUCT_NAME + productName, ProductDTO.class);
 	}
 }

@@ -5,6 +5,8 @@ import java.util.Properties;
 
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.VelocityException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,6 +21,22 @@ import com.boot.user.client.ProductServiceClient;
 
 @Configuration
 public class AppConfig {
+
+	@Value("${cart.service.url}")
+	private String cartServiceUrl;
+
+	@Value("${product.service.url}")
+	private String productServiceUrl;
+
+	@Bean(name="cartServiceRestTemplate")
+	public RestTemplate cartServiceRestTemplateUrl() {
+		return new RestTemplateBuilder().rootUri(cartServiceUrl).build();
+	}
+
+	@Bean(name="productServiceRestTemplate")
+	public RestTemplate productServiceRestTemplateUrl() {
+		return new RestTemplateBuilder().rootUri(productServiceUrl).build();
+	}
 
 	@Bean
 	PasswordEncoder passwordEncoder() {
@@ -39,7 +57,7 @@ public class AppConfig {
 	public CartServiceClient cartServiceClient() {
 		return new CartServiceClient();
 	}
-	
+
 	@Bean
 	public JavaMailSender getJavaMailSender() {
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();

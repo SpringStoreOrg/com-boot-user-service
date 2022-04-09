@@ -12,11 +12,11 @@ public class CartServiceClient {
 
 
 	@Autowired
-	private RestTemplate restTemplate;
+	private RestTemplate cartServiceRestTemplate;
 
 	public void callDeleteCartByEmail(String email) {
 
-		restTemplate.exchange(Constants.DELETE_CART_BY_EMAIL + email, HttpMethod.DELETE,
+		cartServiceRestTemplate.exchange(Constants.DELETE_CART_BY_EMAIL + email, HttpMethod.DELETE,
 				new HttpEntity<>(UserDTO.class), String.class);
 	}
 }
