@@ -107,6 +107,7 @@ public class UserService {
 		return userDTOMapped.getFavoriteProductList();
 	}
 
+	//TODO add @Transactional on this method as you do multiple save operations. You don't want a persisted new user without confirmation token.
 	public UserDTO addUser(UserDTO userDTO) throws InvalidInputDataException {
 		log.info("addUser - process started");
 		if (!userValidator.isEmailValid(userDTO.getEmail())) {
@@ -164,6 +165,7 @@ public class UserService {
 				throw new UnableToModifyDataException("User was already confirmed!");
 			}
 			user.setActivated(true);
+			//if you call this you do all the validation on userDTO, and this does not make sense as you load the data from DB
 			updateUserByEmail(user.getEmail(), user);
 
 		} else {
@@ -232,6 +234,7 @@ public class UserService {
 	}
 
 	public List<UserDTO> getAllUsers() throws EntityNotFoundException {
+		//try to call findAll only once
 		if (userRepository.findAll() == null || userRepository.findAll().isEmpty()) {
 			throw new EntityNotFoundException("No user found in the Database!");
 		}
@@ -312,6 +315,7 @@ public class UserService {
 				throw new EntityNotFoundException("Please select another password, this one was already used last time!");
 			}
 
+			//don't you need to encode the password here?
 			userDto.setPassword(newPassword);
 			updateUserByEmail(userDto.getEmail(), userDto);
 
