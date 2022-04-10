@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 public class TokenValidator {
 
 	public boolean checkTokenAvailability(Date date) throws ParseException {
+		//You could implement this logic using:
+		//LocalDateTime.now().isBefore(Instant.ofEpochMilli(date.getTime())
+                //.atZone(ZoneId.systemDefault())
+                //.toLocalDateTime().plusHours(1))
 		Date now = Calendar.getInstance().getTime(); // Get time now
 		long differenceInMillis = now.getTime() - date.getTime();
 		long differenceInHours = (differenceInMillis) / 1000L / 60L / 60L; // Divide by millis/sec, secs/min, mins/hr
