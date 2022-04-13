@@ -28,14 +28,20 @@ public class AppConfig {
 	@Value("${product.service.url}")
 	private String productServiceUrl;
 
+	@Value("${user.service.url}")
+	public String userServiceUrl;
+
 	@Bean(name="cartServiceRestTemplate")
 	public RestTemplate cartServiceRestTemplateUrl() {
 		return new RestTemplateBuilder().rootUri(cartServiceUrl).build();
 	}
-
 	@Bean(name="productServiceRestTemplate")
 	public RestTemplate productServiceRestTemplateUrl() {
 		return new RestTemplateBuilder().rootUri(productServiceUrl).build();
+	}
+	@Bean(name="userServiceRestTemplate")
+	public RestTemplate userServiceRestTemplateUrl() {
+		return new RestTemplateBuilder().rootUri(userServiceUrl).build();
 	}
 
 	@Bean

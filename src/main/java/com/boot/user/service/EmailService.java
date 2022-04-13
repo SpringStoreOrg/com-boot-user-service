@@ -6,6 +6,8 @@ import java.util.Map;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import com.boot.user.config.AppConfig;
+import com.boot.user.util.Constants;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -26,6 +28,9 @@ public class EmailService {
 	private static final String RESET_PASSWORD_EMAIL_TEMPLATE = "/templates/reset-password-email-template.vm";
 
 	@Autowired
+	AppConfig appConfig;
+
+	@Autowired
 	JavaMailSender emailSender;
 
 	@Autowired
@@ -42,8 +47,8 @@ public class EmailService {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("firstName", user.getFirstName());
 		model.put("lastName", user.getLastName());
+		model.put("path", appConfig.userServiceUrl + Constants.CONFIRM_USER_ACCOUNT);
 		model.put("confirmationToken", confirmationToken.getConfirmationToken());
-		model.put("location", "Cluj");
 		model.put("signature", "www.springStore.com");
 		email.setModel(model);
 
