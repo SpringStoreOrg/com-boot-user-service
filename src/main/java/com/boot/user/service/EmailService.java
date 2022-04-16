@@ -83,6 +83,7 @@ public class EmailService {
 
 		Email email = new Email();
 
+		//you could move these configuration to application.properties
 		email.setEmailFrom("noreply@springwebstore.com");
 		email.setEmailTo(user.getEmail());
 		email.setEmailSubject("Password Reset Request");
@@ -108,6 +109,7 @@ public class EmailService {
 
 			emailSender.send(mimeMessageHelper.getMimeMessage());
 		} catch (MessagingException e) {
+			//you could use logging here
 			e.printStackTrace();
 		}
 	}
