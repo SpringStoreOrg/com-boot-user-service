@@ -49,6 +49,7 @@ public class AppConfig {
 		return new BCryptPasswordEncoder();
 	}
 
+	//I don't know if you use this anywhere
 	@Bean
 	public RestTemplate template() {
 		return new RestTemplate();
@@ -68,6 +69,7 @@ public class AppConfig {
 	public JavaMailSender getJavaMailSender() {
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
+		//TODO move this configurations to the application.properties
 		mailSender.setHost("smtp.hostinger.com");
 		mailSender.setPort(587);
 
