@@ -35,6 +35,7 @@ public class AppConfig {
 	public RestTemplate cartServiceRestTemplateUrl() {
 		return new RestTemplateBuilder().rootUri(cartServiceUrl).build();
 	}
+
 	@Bean(name="productServiceRestTemplate")
 	public RestTemplate productServiceRestTemplateUrl() {
 		return new RestTemplateBuilder().rootUri(productServiceUrl).build();
@@ -47,12 +48,6 @@ public class AppConfig {
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
-	}
-
-	//I don't know if you use this anywhere
-	@Bean
-	public RestTemplate template() {
-		return new RestTemplate();
 	}
 
 	@Bean
