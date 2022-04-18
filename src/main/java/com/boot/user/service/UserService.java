@@ -179,11 +179,12 @@ public class UserService {
     }
 
     public List<UserDTO> getAllUsers() throws EntityNotFoundException {
-        //try to call findAll only once
-        if (userRepository.findAll() == null || userRepository.findAll().isEmpty()) {
+
+        List<User> userList = userRepository.findAll();
+
+        if (userList == null || userList.isEmpty()) {
             throw new EntityNotFoundException("No user found in the Database!");
         }
-        List<User> userList = userRepository.findAll();
         List<UserDTO> userDTOList = new ArrayList<>();
 
         userList.stream().forEach(u -> userDTOList.add(UserMapper.UserEntityToDto(u)));
