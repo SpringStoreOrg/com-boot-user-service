@@ -243,7 +243,7 @@ public class UserService {
         PasswordResetToken token = passwordReserTokenRepository.findByResetToken(confirmationToken);
 
         if (token != null) {
-            if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
+            if (!tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
                 throw new EntityNotFoundException("Token Expired!");
             }
 
@@ -261,8 +261,7 @@ public class UserService {
                 throw new EntityNotFoundException("Please select another password, this one was already used last time!");
             }
 
-            //don't you need to encode the password here?
-            userDto.setPassword(newPassword);
+            userDto.setPassword(passwordEncoder.encode(newPassword));
             updateUserByEmail(userDto.getEmail(), userDto);
 
         } else {
