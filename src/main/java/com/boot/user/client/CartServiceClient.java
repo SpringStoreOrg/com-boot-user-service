@@ -16,7 +16,7 @@ public class CartServiceClient {
 
 	public void callDeleteCartByEmail(String email) {
 
-		cartServiceRestTemplate.exchange(Constants.DELETE_CART_BY_EMAIL + email, HttpMethod.DELETE,
-				new HttpEntity<>(UserDTO.class), String.class);
+		cartServiceRestTemplate.exchange(Constants.DELETE_CART_BY_EMAIL, HttpMethod.DELETE,
+				new HttpEntity<>(UserDTO.class), String.class, email);
 	}
 }

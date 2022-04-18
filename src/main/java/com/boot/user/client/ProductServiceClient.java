@@ -15,6 +15,6 @@ public class ProductServiceClient {
 
 	public ResponseEntity<ProductDTO> callGetProductByProductName(String productName) {
 
-		return productServiceRestTemplate.getForEntity(Constants.GET_PRODUCT_BY_PRODUCT_NAME + productName, ProductDTO.class);
+		return productServiceRestTemplate.getForEntity(Constants.GET_PRODUCT_BY_PRODUCT_NAME, ProductDTO.class, productName);
 	}
 }
