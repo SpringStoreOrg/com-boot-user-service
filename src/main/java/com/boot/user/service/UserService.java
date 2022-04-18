@@ -151,7 +151,7 @@ public class UserService {
     }
 
     public void confirmUserAccount(String confirmationToken)
-            throws InvalidInputDataException, EntityNotFoundException, UnableToModifyDataException, ParseException {
+            throws InvalidInputDataException, EntityNotFoundException, UnableToModifyDataException {
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
 
         if (token != null) {

@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Set;
 
+import com.boot.user.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,9 @@ import com.boot.user.exception.InvalidInputDataException;
 import com.boot.user.exception.UnableToModifyDataException;
 import com.boot.user.service.UserService;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
+
 @Controller
 @RequestMapping("/")
 public class UserController {
@@ -41,32 +45,32 @@ public class UserController {
     }
 
     @PutMapping("/addProductToUserFavorites/{email}/{productName}")
-    public ResponseEntity<UserDTO> addProductToUserFavorites(@PathVariable("email") String email,
-                                                             @PathVariable("productName") String productName)
-            throws EntityNotFoundException, InvalidInputDataException, DuplicateEntryException {
+    public ResponseEntity<UserDTO> addProductToUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email,
+                                                             @Size(min = 2, max = 30, message = "Product Name size has to be between 2 and 30 characters!") @PathVariable("productName") String productName)
+            throws DuplicateEntryException {
         UserDTO user = userService.addProductToUserFavorites(email, productName);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PutMapping("/removeProductFromUserFavorites/{email}/{productName}")
-    public ResponseEntity<UserDTO> removeProductFromUserFavorites(@PathVariable("email") String email,
-                                                                  @PathVariable("productName") String productName)
-            throws EntityNotFoundException, InvalidInputDataException, DuplicateEntryException {
+    public ResponseEntity<UserDTO> removeProductFromUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email,
+                                                                  @Size(min = 2, max = 30, message = "Product Name size has to be between 2 and 30 characters!") @PathVariable("productName") String productName)
+            throws EntityNotFoundException {
         UserDTO user = userService.removeProductFromUserFavorites(email, productName);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping("/getAllProductsFromUserFavorites/{email}")
     @ResponseBody
-    public ResponseEntity<Set<ProductDTO>> getAllProductsFromUserFavorites(@PathVariable("email") String email)
+    public ResponseEntity<Set<ProductDTO>> getAllProductsFromUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
             throws EntityNotFoundException {
         Set<ProductDTO> productList = userService.getAllProductsFromUserFavorites(email);
         return new ResponseEntity<>(productList, HttpStatus.OK);
     }
 
     @PutMapping("/updateUserByEmail/{email}")
-    public ResponseEntity<UserDTO> updateUserByEmail(@RequestBody UserDTO userDTO, @PathVariable("email") String email)
-            throws EntityNotFoundException, InvalidInputDataException {
+    public ResponseEntity<UserDTO> updateUserByEmail(@RequestBody UserDTO userDTO, @Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
+            throws InvalidInputDataException {
         UserDTO user = userService.updateUserByEmail(email, userDTO);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -94,7 +98,7 @@ public class UserController {
 
     @GetMapping("/getUserByEmail")
     @ResponseBody
-    public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) throws EntityNotFoundException {
+    public ResponseEntity<UserDTO> getUserByEmail(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @RequestParam String email) throws EntityNotFoundException {
         UserDTO user = userService.getUserByEmail(email);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -106,14 +110,14 @@ public class UserController {
     }
 
     @DeleteMapping("/deleteUserByEmail/{email}")
-    public ResponseEntity<UserDTO> deleteUserByByEmail(@PathVariable("email") String email)
+    public ResponseEntity<UserDTO> deleteUserByByEmail(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
             throws EntityNotFoundException {
         userService.deleteUserByEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/requestResetPassword/{email}", method = {RequestMethod.GET, RequestMethod.PUT})
-    public ResponseEntity<String> requestResetPassword(@PathVariable("email") String email)
+    public ResponseEntity<String> requestResetPassword(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
             throws EntityNotFoundException {
         userService.requestResetPassword(email);
         return new ResponseEntity<>("Request to reset Password succesfully send!", HttpStatus.OK);
