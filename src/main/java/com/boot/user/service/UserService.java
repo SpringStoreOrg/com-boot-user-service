@@ -29,6 +29,7 @@ import com.boot.user.validator.TokenValidator;
 import com.boot.user.validator.UserValidator;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -107,7 +108,7 @@ public class UserService {
         return userDTOMapped.getFavoriteProductList();
     }
 
-    //TODO add @Transactional on this method as you do multiple save operations. You don't want a persisted new user without confirmation token.
+    @Transactional
     public UserDTO addUser(UserDTO userDTO) {
         log.info("addUser - process started");
 
@@ -131,7 +132,7 @@ public class UserService {
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
 
         if (token != null) {
-            if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
+            if (!tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
                 throw new EntityNotFoundException("Token Expired!");
             }
 
@@ -141,9 +142,8 @@ public class UserService {
                 throw new UnableToModifyDataException("User was already confirmed!");
             }
             user.setActivated(true);
-            //if you call this you do all the validation on userDTO, and this does not make sense as you load the data from DB
-            updateUserByEmail(user.getEmail(), user);
 
+            userRepository.save(UserMapper.DtoToUserEntity(user));
         } else {
             throw new EntityNotFoundException("Token not found!");
         }
