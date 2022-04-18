@@ -91,7 +91,8 @@ public class EmailService {
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("firstName", user.getFirstName());
         model.put("lastName", user.getLastName());
-        model.put("confirmationToken", passwordResetToken.getResetToken());
+        model.put("path", appConfig.userServiceUrl + Constants.PASSWORD_RESET_EMAIL);
+        model.put("passwordResetToken", passwordResetToken.getResetToken());
         model.put("location", "Cluj");
         model.put("signature", "www.springStore.com");
         email.setModel(model);
