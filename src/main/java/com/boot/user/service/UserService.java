@@ -108,32 +108,8 @@ public class UserService {
     }
 
     //TODO add @Transactional on this method as you do multiple save operations. You don't want a persisted new user without confirmation token.
-    public UserDTO addUser(UserDTO userDTO) throws InvalidInputDataException {
+    public UserDTO addUser(UserDTO userDTO) {
         log.info("addUser - process started");
-        if (!userValidator.isEmailValid(userDTO.getEmail())) {
-            throw new InvalidInputDataException("invalid email format!");
-        }
-
-        if (!userValidator.isUserDataSizeCorrect(userDTO.getEmail(), 3, 30)) {
-            throw new InvalidInputDataException("Provided Email has to be between 3 and 30 characters long!");
-        }
-
-        if (!userValidator.isUserDataSizeCorrect(userDTO.getFirstName(), 3, 30)) {
-            throw new InvalidInputDataException("Name has to be between 3 and 30 characters long!");
-        }
-        if (!userValidator.isUserDataSizeCorrect(userDTO.getLastName(), 3, 30)) {
-            throw new InvalidInputDataException("Surname has to be between 3 and 30 characters long!");
-        }
-
-        if (!userValidator.isUserDataSizeCorrect(userDTO.getDeliveryAddress(), 3, 300)) {
-            throw new InvalidInputDataException("Address has to be between 3 and 300 characters long!");
-        }
-        if (!userValidator.isPhoneNumberValid(userDTO.getPhoneNumber())) {
-            throw new InvalidInputDataException("invalid phone number format!");
-        }
-        if (!userValidator.isUserDataSizeCorrect(userDTO.getPhoneNumber(), 10, 15)) {
-            throw new InvalidInputDataException("Phone number has to be between 10 and 15 characters long!");
-        }
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
@@ -151,7 +127,7 @@ public class UserService {
     }
 
     public void confirmUserAccount(String confirmationToken)
-            throws InvalidInputDataException, EntityNotFoundException, UnableToModifyDataException {
+            throws EntityNotFoundException, UnableToModifyDataException {
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
 
         if (token != null) {
@@ -173,53 +149,22 @@ public class UserService {
         }
     }
 
-    public UserDTO updateUserByEmail(String email, UserDTO userDTO) throws InvalidInputDataException {
+    public UserDTO updateUserByEmail(String email, UserDTO userDTO) {
 
         User user = userRepository.getUserByEmail(email);
 
         UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
 
-        if (!userValidator.isEmailValid(userDTO.getEmail())) {
-            throw new InvalidInputDataException("invalid email format!");
-        }
-
-        if (!userValidator.isUserDataSizeCorrect(userDTO.getEmail(), 3, 30)) {
-            throw new InvalidInputDataException("Provided Email has to be between 3 and 30 characters long!");
-        }
         userDTOMapped.setEmail(userDTO.getEmail());
-
-        if (!userValidator.isUserDataSizeCorrect(userDTO.getFirstName(), 3, 30)) {
-            throw new InvalidInputDataException("Name has to be between 3 and 30 characters long!");
-        }
         userDTOMapped.setFirstName(userDTO.getFirstName());
-
-        if (!userValidator.isUserDataSizeCorrect(userDTO.getLastName(), 3, 30)) {
-            throw new InvalidInputDataException("Surname has to be between 3 and 30 characters long!");
-        }
-
         userDTOMapped.setLastName(userDTO.getLastName());
-
-        if (!userValidator.isUserDataSizeCorrect(userDTO.getDeliveryAddress(), 3, 300)) {
-            throw new InvalidInputDataException("Adress has to be between 3 and 300 characters long!");
-        }
-
         userDTOMapped.setDeliveryAddress(userDTO.getDeliveryAddress());
-
-        if (!userValidator.isPhoneNumberValid(userDTO.getPhoneNumber())) {
-            throw new InvalidInputDataException("invalid phone number format!");
-        }
-        if (!userValidator.isUserDataSizeCorrect(userDTO.getPhoneNumber(), 10, 15)) {
-            throw new InvalidInputDataException("Phone number has to be between 10 and 15 characters long!");
-        }
         userDTOMapped.setPhoneNumber(userDTO.getPhoneNumber());
-
         userDTOMapped.setPassword(userDTO.getPassword());
-
         userDTOMapped.setFavoriteProductList(userDTO.getFavoriteProductList());
-
         userDTOMapped.setActivated(userDTO.isActivated());
 
-        user = userRepository
+         userRepository
                 .save(UserMapper.updateDtoToUserEntity(user, userDTOMapped).setLastUpdatedOn(LocalDate.now()));
 
         return userDTOMapped;
@@ -292,7 +237,7 @@ public class UserService {
     }
 
     public void changeUserPassword(String confirmationToken, String newPassword, String confirmedNewPassword)
-            throws InvalidInputDataException, EntityNotFoundException, UnableToModifyDataException, ParseException {
+            throws  EntityNotFoundException, UnableToModifyDataException, ParseException {
 
         PasswordResetToken token = passwordReserTokenRepository.findByResetToken(confirmationToken);
 

@@ -28,6 +28,7 @@ import com.boot.user.exception.InvalidInputDataException;
 import com.boot.user.exception.UnableToModifyDataException;
 import com.boot.user.service.UserService;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 
@@ -38,7 +39,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/addUser")
-    public ResponseEntity<UserDTO> addUser(@RequestBody UserDTO user) throws InvalidInputDataException {
+    public ResponseEntity<UserDTO> addUser(@Valid @RequestBody UserDTO user) {
         UserDTO newUser = userService.addUser(user);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
@@ -68,8 +69,7 @@ public class UserController {
     }
 
     @PutMapping("/updateUserByEmail/{email}")
-    public ResponseEntity<UserDTO> updateUserByEmail(@RequestBody UserDTO userDTO, @Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
-            throws InvalidInputDataException {
+    public ResponseEntity<UserDTO> updateUserByEmail(@Valid @RequestBody UserDTO userDTO, @Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email) {
         UserDTO user = userService.updateUserByEmail(email, userDTO);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -127,7 +127,7 @@ public class UserController {
     public ResponseEntity<String> changeUserPassword(@PathVariable("token") String token,
                                                      @PathVariable("newPassword") String newPassword,
                                                      @PathVariable("confirmedNewPassword") String confirmedNewPassword)
-            throws EntityNotFoundException, InvalidInputDataException, UnableToModifyDataException, ParseException {
+            throws EntityNotFoundException, UnableToModifyDataException, ParseException {
         userService.changeUserPassword(token, newPassword, confirmedNewPassword);
         return new ResponseEntity<>("Password succesfully changed!", HttpStatus.OK);
     }
