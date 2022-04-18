@@ -11,12 +11,12 @@ import com.boot.user.util.Constants;
 public class CartServiceClient {
 
 
-	@Autowired
-	private RestTemplate cartServiceRestTemplate;
+    @Autowired
+    private RestTemplate cartServiceRestTemplate;
 
-	public void callDeleteCartByEmail(String email) {
+    public void callDeleteCartByEmail(String email) {
 
-		cartServiceRestTemplate.exchange(Constants.DELETE_CART_BY_EMAIL, HttpMethod.DELETE,
-				new HttpEntity<>(UserDTO.class), String.class, email);
-	}
+        cartServiceRestTemplate.exchange(Constants.DELETE_CART_BY_EMAIL, HttpMethod.DELETE,
+                new HttpEntity<>(UserDTO.class), String.class, email);
+    }
 }

@@ -34,294 +34,294 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class UserService {
 
-	@Autowired
-	private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-	@Autowired
-	private UserValidator userValidator;
+    @Autowired
+    private UserValidator userValidator;
 
-	@Autowired
-	private TokenValidator tokenValidator;
+    @Autowired
+    private TokenValidator tokenValidator;
 
-	@Autowired
-	private ConfirmationTokenRepository confirmationTokenRepository;
+    @Autowired
+    private ConfirmationTokenRepository confirmationTokenRepository;
 
-	@Autowired
-	private EmailService emailSenderService;
+    @Autowired
+    private EmailService emailSenderService;
 
-	@Autowired
-	private ProductServiceClient productServiceClient;
-	
-	@Autowired
-	private CartServiceClient cartServiceClient;
+    @Autowired
+    private ProductServiceClient productServiceClient;
 
-	@Autowired
-	private PasswordResetTokenRepository passwordReserTokenRepository;
+    @Autowired
+    private CartServiceClient cartServiceClient;
 
-	public UserDTO addProductToUserFavorites(String email, String productName) throws DuplicateEntryException {
+    @Autowired
+    private PasswordResetTokenRepository passwordReserTokenRepository;
 
-		ProductDTO productDTO = productServiceClient.callGetProductByProductName(productName).getBody();
+    public UserDTO addProductToUserFavorites(String email, String productName) throws DuplicateEntryException {
 
-		User user = userRepository.getUserByEmail(email);
+        ProductDTO productDTO = productServiceClient.callGetProductByProductName(productName).getBody();
 
-		UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
+        User user = userRepository.getUserByEmail(email);
 
-		if (userDTOMapped.getFavoriteProductList().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
-			throw new DuplicateEntryException("Product: " + productName + " was already added to favorites!");
-		} else {
-			userDTOMapped.getFavoriteProductList().add(productDTO);
-			userRepository.save(UserMapper.updateDtoToUserEntity(user, userDTOMapped));
+        UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
 
-			return UserMapper.UserEntityToDto(user);
-		}
-	}
+        if (userDTOMapped.getFavoriteProductList().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
+            throw new DuplicateEntryException("Product: " + productName + " was already added to favorites!");
+        } else {
+            userDTOMapped.getFavoriteProductList().add(productDTO);
+            userRepository.save(UserMapper.updateDtoToUserEntity(user, userDTOMapped));
 
-	public UserDTO removeProductFromUserFavorites(String email, String productName) throws EntityNotFoundException {
+            return UserMapper.UserEntityToDto(user);
+        }
+    }
 
-		ProductDTO productDTO = productServiceClient.callGetProductByProductName(productName).getBody();
+    public UserDTO removeProductFromUserFavorites(String email, String productName) throws EntityNotFoundException {
 
-		User user = userRepository.getUserByEmail(email);
+        ProductDTO productDTO = productServiceClient.callGetProductByProductName(productName).getBody();
 
-		UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
+        User user = userRepository.getUserByEmail(email);
 
-		if (userDTOMapped.getFavoriteProductList().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
+        UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
 
-			userDTOMapped.getFavoriteProductList().remove(productDTO);
-			user = userRepository.save(UserMapper.updateDtoToUserEntity(user, userDTOMapped));
+        if (userDTOMapped.getFavoriteProductList().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
 
-			return UserMapper.UserEntityToDto(user);
-		} else {
-			throw new EntityNotFoundException("Product: " + productName + " was not found in the favorites list!");
-		}
-	}
-	
-	public Set<ProductDTO> getAllProductsFromUserFavorites(String email) throws EntityNotFoundException {
+            userDTOMapped.getFavoriteProductList().remove(productDTO);
+            user = userRepository.save(UserMapper.updateDtoToUserEntity(user, userDTOMapped));
 
-		User user = userRepository.getUserByEmail(email);
+            return UserMapper.UserEntityToDto(user);
+        } else {
+            throw new EntityNotFoundException("Product: " + productName + " was not found in the favorites list!");
+        }
+    }
 
-		UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
+    public Set<ProductDTO> getAllProductsFromUserFavorites(String email) throws EntityNotFoundException {
 
-		return userDTOMapped.getFavoriteProductList();
-	}
+        User user = userRepository.getUserByEmail(email);
 
-	//TODO add @Transactional on this method as you do multiple save operations. You don't want a persisted new user without confirmation token.
-	public UserDTO addUser(UserDTO userDTO) throws InvalidInputDataException {
-		log.info("addUser - process started");
-		if (!userValidator.isEmailValid(userDTO.getEmail())) {
-			throw new InvalidInputDataException("invalid email format!");
-		}
+        UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
 
-		if (!userValidator.isUserDataSizeCorrect(userDTO.getEmail(), 3, 30)) {
-			throw new InvalidInputDataException("Provided Email has to be between 3 and 30 characters long!");
-		}
+        return userDTOMapped.getFavoriteProductList();
+    }
 
-		if (!userValidator.isUserDataSizeCorrect(userDTO.getFirstName(), 3, 30)) {
-			throw new InvalidInputDataException("Name has to be between 3 and 30 characters long!");
-		}
-		if (!userValidator.isUserDataSizeCorrect(userDTO.getLastName(), 3, 30)) {
-			throw new InvalidInputDataException("Surname has to be between 3 and 30 characters long!");
-		}
+    //TODO add @Transactional on this method as you do multiple save operations. You don't want a persisted new user without confirmation token.
+    public UserDTO addUser(UserDTO userDTO) throws InvalidInputDataException {
+        log.info("addUser - process started");
+        if (!userValidator.isEmailValid(userDTO.getEmail())) {
+            throw new InvalidInputDataException("invalid email format!");
+        }
 
-		if (!userValidator.isUserDataSizeCorrect(userDTO.getDeliveryAddress(), 3, 300)) {
-			throw new InvalidInputDataException("Address has to be between 3 and 300 characters long!");
-		}
-		if (!userValidator.isPhoneNumberValid(userDTO.getPhoneNumber())) {
-			throw new InvalidInputDataException("invalid phone number format!");
-		}
-		if (!userValidator.isUserDataSizeCorrect(userDTO.getPhoneNumber(), 10, 15)) {
-			throw new InvalidInputDataException("Phone number has to be between 10 and 15 characters long!");
-		}
+        if (!userValidator.isUserDataSizeCorrect(userDTO.getEmail(), 3, 30)) {
+            throw new InvalidInputDataException("Provided Email has to be between 3 and 30 characters long!");
+        }
 
-		userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-		
-		userDTO.setRole("USER");
-		
-		User user = userRepository.save(UserMapper.DtoToUserEntity(userDTO).setCreatedOn(LocalDate.now()));
+        if (!userValidator.isUserDataSizeCorrect(userDTO.getFirstName(), 3, 30)) {
+            throw new InvalidInputDataException("Name has to be between 3 and 30 characters long!");
+        }
+        if (!userValidator.isUserDataSizeCorrect(userDTO.getLastName(), 3, 30)) {
+            throw new InvalidInputDataException("Surname has to be between 3 and 30 characters long!");
+        }
 
-		ConfirmationToken confirmationToken = new ConfirmationToken(user);
+        if (!userValidator.isUserDataSizeCorrect(userDTO.getDeliveryAddress(), 3, 300)) {
+            throw new InvalidInputDataException("Address has to be between 3 and 300 characters long!");
+        }
+        if (!userValidator.isPhoneNumberValid(userDTO.getPhoneNumber())) {
+            throw new InvalidInputDataException("invalid phone number format!");
+        }
+        if (!userValidator.isUserDataSizeCorrect(userDTO.getPhoneNumber(), 10, 15)) {
+            throw new InvalidInputDataException("Phone number has to be between 10 and 15 characters long!");
+        }
 
-		confirmationTokenRepository.save(confirmationToken);
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
-		emailSenderService.sendConfirmationEmail(user, confirmationToken);
+        userDTO.setRole("USER");
 
-		return UserMapper.UserEntityToDto(user);
-	}
+        User user = userRepository.save(UserMapper.DtoToUserEntity(userDTO).setCreatedOn(LocalDate.now()));
 
-	public void confirmUserAccount(String confirmationToken)
-			throws InvalidInputDataException, EntityNotFoundException, UnableToModifyDataException, ParseException {
-		ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
+        ConfirmationToken confirmationToken = new ConfirmationToken(user);
 
-		if (token != null) {
-			if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
-				throw new EntityNotFoundException("Token Expired!");
-			}
+        confirmationTokenRepository.save(confirmationToken);
 
-			UserDTO user = getUserByEmail(token.getUser().getEmail());
+        emailSenderService.sendConfirmationEmail(user, confirmationToken);
 
-			if (user.isActivated() == true) {
-				throw new UnableToModifyDataException("User was already confirmed!");
-			}
-			user.setActivated(true);
-			//if you call this you do all the validation on userDTO, and this does not make sense as you load the data from DB
-			updateUserByEmail(user.getEmail(), user);
-
-		} else {
-			throw new EntityNotFoundException("Token not found!");
-		}
-	}
+        return UserMapper.UserEntityToDto(user);
+    }
 
-	public UserDTO updateUserByEmail(String email, UserDTO userDTO) throws InvalidInputDataException {
+    public void confirmUserAccount(String confirmationToken)
+            throws InvalidInputDataException, EntityNotFoundException, UnableToModifyDataException, ParseException {
+        ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
 
-		User user = userRepository.getUserByEmail(email);
+        if (token != null) {
+            if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
+                throw new EntityNotFoundException("Token Expired!");
+            }
 
-		UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
+            UserDTO user = getUserByEmail(token.getUser().getEmail());
 
-		if (!userValidator.isEmailValid(userDTO.getEmail())) {
-			throw new InvalidInputDataException("invalid email format!");
-		}
+            if (user.isActivated() == true) {
+                throw new UnableToModifyDataException("User was already confirmed!");
+            }
+            user.setActivated(true);
+            //if you call this you do all the validation on userDTO, and this does not make sense as you load the data from DB
+            updateUserByEmail(user.getEmail(), user);
 
-		if (!userValidator.isUserDataSizeCorrect(userDTO.getEmail(), 3, 30)) {
-			throw new InvalidInputDataException("Provided Email has to be between 3 and 30 characters long!");
-		}
-		userDTOMapped.setEmail(userDTO.getEmail());
+        } else {
+            throw new EntityNotFoundException("Token not found!");
+        }
+    }
 
-		if (!userValidator.isUserDataSizeCorrect(userDTO.getFirstName(), 3, 30)) {
-			throw new InvalidInputDataException("Name has to be between 3 and 30 characters long!");
-		}
-		userDTOMapped.setFirstName(userDTO.getFirstName());
+    public UserDTO updateUserByEmail(String email, UserDTO userDTO) throws InvalidInputDataException {
 
-		if (!userValidator.isUserDataSizeCorrect(userDTO.getLastName(), 3, 30)) {
-			throw new InvalidInputDataException("Surname has to be between 3 and 30 characters long!");
-		}
+        User user = userRepository.getUserByEmail(email);
 
-		userDTOMapped.setLastName(userDTO.getLastName());
+        UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
 
-		if (!userValidator.isUserDataSizeCorrect(userDTO.getDeliveryAddress(), 3, 300)) {
-			throw new InvalidInputDataException("Adress has to be between 3 and 300 characters long!");
-		}
+        if (!userValidator.isEmailValid(userDTO.getEmail())) {
+            throw new InvalidInputDataException("invalid email format!");
+        }
 
-		userDTOMapped.setDeliveryAddress(userDTO.getDeliveryAddress());
+        if (!userValidator.isUserDataSizeCorrect(userDTO.getEmail(), 3, 30)) {
+            throw new InvalidInputDataException("Provided Email has to be between 3 and 30 characters long!");
+        }
+        userDTOMapped.setEmail(userDTO.getEmail());
 
-		if (!userValidator.isPhoneNumberValid(userDTO.getPhoneNumber())) {
-			throw new InvalidInputDataException("invalid phone number format!");
-		}
-		if (!userValidator.isUserDataSizeCorrect(userDTO.getPhoneNumber(), 10, 15)) {
-			throw new InvalidInputDataException("Phone number has to be between 10 and 15 characters long!");
-		}
-		userDTOMapped.setPhoneNumber(userDTO.getPhoneNumber());
-
-		userDTOMapped.setPassword(userDTO.getPassword());
-
-		userDTOMapped.setFavoriteProductList(userDTO.getFavoriteProductList());
-
-		userDTOMapped.setActivated(userDTO.isActivated());
-
-		user = userRepository
-				.save(UserMapper.updateDtoToUserEntity(user, userDTOMapped).setLastUpdatedOn(LocalDate.now()));
-
-		return userDTOMapped;
-	}
-
-	public UserDTO getUserById(long id) throws EntityNotFoundException {
-		if (!userValidator.isIdPresent(id)) {
-			throw new EntityNotFoundException("Id: " + id + " not found in the Database!");
-		}
-		User user = userRepository.getUserById(id);
-		return UserMapper.UserEntityToDto(user);
-	}
-
-	public List<UserDTO> getAllUsers() throws EntityNotFoundException {
-		//try to call findAll only once
-		if (userRepository.findAll() == null || userRepository.findAll().isEmpty()) {
-			throw new EntityNotFoundException("No user found in the Database!");
-		}
-		List<User> userList = userRepository.findAll();
-		List<UserDTO> userDTOList = new ArrayList<>();
-
-		userList.stream().forEach(u -> userDTOList.add(UserMapper.UserEntityToDto(u)));
-		return userDTOList;
-	}
-
-	public UserDTO getUserByEmail(String email) throws EntityNotFoundException {
-		log.info("getUserByEmail - process started");
-		if (userValidator.isEmailPresent(email)) {
-			throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
-		}
-
-		User user = userRepository.getUserByEmail(email);
-		return UserMapper.UserEntityToDto(user);
-	}
-
-	public void deleteUserById(long id) throws EntityNotFoundException {
-		if (!userValidator.isIdPresent(id)) {
-			throw new EntityNotFoundException("Id: " + id + " not found in the Database!");
-		}
-		userRepository.deleteById(id);
-	}
-
-	public void deleteUserByEmail(String email) throws EntityNotFoundException {
-		log.info("deleteUserByEmail - process started");
-		if (userValidator.isEmailPresent(email)) {
-			throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
-		}
-		
-		UserDTO userDto = getUserByEmail(email);
-
-		userDto.getFavoriteProductList().clear();
-
-		cartServiceClient.callDeleteCartByEmail(email);
-
-		userRepository.deleteByEmail(email);
-	}
-
-	public void requestResetPassword(String userEmail) throws EntityNotFoundException {
-
-		User user = userRepository.getUserByEmail(userEmail);
-		
-		if (user == null) {
-			throw new EntityNotFoundException("Invalid Email adress!");
-		}
-		PasswordResetToken confirmationToken = new PasswordResetToken(user);
-
-		passwordReserTokenRepository.save(confirmationToken);
-
-		emailSenderService.sendPasswordResetEmail(user, confirmationToken);
-	}
-
-	public void changeUserPassword(String confirmationToken, String newPassword, String confirmedNewPassword)
-			throws InvalidInputDataException, EntityNotFoundException, UnableToModifyDataException, ParseException {
-		
-		PasswordResetToken token = passwordReserTokenRepository.findByResetToken(confirmationToken);
-
-		if (token != null) {			
-			if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
-				throw new EntityNotFoundException("Token Expired!");
-			}
-
-			UserDTO userDto = getUserByEmail(token.getUser().getEmail());
-
-			if (userDto.isActivated() != true) {
-				throw new UnableToModifyDataException("User was not activated!");
-			}
-			
-			if (!newPassword.contentEquals(confirmedNewPassword)) {
-				throw new EntityNotFoundException("Passwords do not mactch!");
-			}
-						
-			if (passwordEncoder.matches(newPassword, userDto.getPassword())) {
-				throw new EntityNotFoundException("Please select another password, this one was already used last time!");
-			}
-
-			//don't you need to encode the password here?
-			userDto.setPassword(newPassword);
-			updateUserByEmail(userDto.getEmail(), userDto);
-
-		} else {
-			throw new EntityNotFoundException("Token not found!");
-		}
-	}
+        if (!userValidator.isUserDataSizeCorrect(userDTO.getFirstName(), 3, 30)) {
+            throw new InvalidInputDataException("Name has to be between 3 and 30 characters long!");
+        }
+        userDTOMapped.setFirstName(userDTO.getFirstName());
+
+        if (!userValidator.isUserDataSizeCorrect(userDTO.getLastName(), 3, 30)) {
+            throw new InvalidInputDataException("Surname has to be between 3 and 30 characters long!");
+        }
+
+        userDTOMapped.setLastName(userDTO.getLastName());
+
+        if (!userValidator.isUserDataSizeCorrect(userDTO.getDeliveryAddress(), 3, 300)) {
+            throw new InvalidInputDataException("Adress has to be between 3 and 300 characters long!");
+        }
+
+        userDTOMapped.setDeliveryAddress(userDTO.getDeliveryAddress());
+
+        if (!userValidator.isPhoneNumberValid(userDTO.getPhoneNumber())) {
+            throw new InvalidInputDataException("invalid phone number format!");
+        }
+        if (!userValidator.isUserDataSizeCorrect(userDTO.getPhoneNumber(), 10, 15)) {
+            throw new InvalidInputDataException("Phone number has to be between 10 and 15 characters long!");
+        }
+        userDTOMapped.setPhoneNumber(userDTO.getPhoneNumber());
+
+        userDTOMapped.setPassword(userDTO.getPassword());
+
+        userDTOMapped.setFavoriteProductList(userDTO.getFavoriteProductList());
+
+        userDTOMapped.setActivated(userDTO.isActivated());
+
+        user = userRepository
+                .save(UserMapper.updateDtoToUserEntity(user, userDTOMapped).setLastUpdatedOn(LocalDate.now()));
+
+        return userDTOMapped;
+    }
+
+    public UserDTO getUserById(long id) throws EntityNotFoundException {
+        if (!userValidator.isIdPresent(id)) {
+            throw new EntityNotFoundException("Id: " + id + " not found in the Database!");
+        }
+        User user = userRepository.getUserById(id);
+        return UserMapper.UserEntityToDto(user);
+    }
+
+    public List<UserDTO> getAllUsers() throws EntityNotFoundException {
+        //try to call findAll only once
+        if (userRepository.findAll() == null || userRepository.findAll().isEmpty()) {
+            throw new EntityNotFoundException("No user found in the Database!");
+        }
+        List<User> userList = userRepository.findAll();
+        List<UserDTO> userDTOList = new ArrayList<>();
+
+        userList.stream().forEach(u -> userDTOList.add(UserMapper.UserEntityToDto(u)));
+        return userDTOList;
+    }
+
+    public UserDTO getUserByEmail(String email) throws EntityNotFoundException {
+        log.info("getUserByEmail - process started");
+        if (userValidator.isEmailPresent(email)) {
+            throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
+        }
+
+        User user = userRepository.getUserByEmail(email);
+        return UserMapper.UserEntityToDto(user);
+    }
+
+    public void deleteUserById(long id) throws EntityNotFoundException {
+        if (!userValidator.isIdPresent(id)) {
+            throw new EntityNotFoundException("Id: " + id + " not found in the Database!");
+        }
+        userRepository.deleteById(id);
+    }
+
+    public void deleteUserByEmail(String email) throws EntityNotFoundException {
+        log.info("deleteUserByEmail - process started");
+        if (userValidator.isEmailPresent(email)) {
+            throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
+        }
+
+        UserDTO userDto = getUserByEmail(email);
+
+        userDto.getFavoriteProductList().clear();
+
+        cartServiceClient.callDeleteCartByEmail(email);
+
+        userRepository.deleteByEmail(email);
+    }
+
+    public void requestResetPassword(String userEmail) throws EntityNotFoundException {
+
+        User user = userRepository.getUserByEmail(userEmail);
+
+        if (user == null) {
+            throw new EntityNotFoundException("Invalid Email adress!");
+        }
+        PasswordResetToken confirmationToken = new PasswordResetToken(user);
+
+        passwordReserTokenRepository.save(confirmationToken);
+
+        emailSenderService.sendPasswordResetEmail(user, confirmationToken);
+    }
+
+    public void changeUserPassword(String confirmationToken, String newPassword, String confirmedNewPassword)
+            throws InvalidInputDataException, EntityNotFoundException, UnableToModifyDataException, ParseException {
+
+        PasswordResetToken token = passwordReserTokenRepository.findByResetToken(confirmationToken);
+
+        if (token != null) {
+            if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
+                throw new EntityNotFoundException("Token Expired!");
+            }
+
+            UserDTO userDto = getUserByEmail(token.getUser().getEmail());
+
+            if (userDto.isActivated() != true) {
+                throw new UnableToModifyDataException("User was not activated!");
+            }
+
+            if (!newPassword.contentEquals(confirmedNewPassword)) {
+                throw new EntityNotFoundException("Passwords do not mactch!");
+            }
+
+            if (passwordEncoder.matches(newPassword, userDto.getPassword())) {
+                throw new EntityNotFoundException("Please select another password, this one was already used last time!");
+            }
+
+            //don't you need to encode the password here?
+            userDto.setPassword(newPassword);
+            updateUserByEmail(userDto.getEmail(), userDto);
+
+        } else {
+            throw new EntityNotFoundException("Token not found!");
+        }
+    }
 
 }

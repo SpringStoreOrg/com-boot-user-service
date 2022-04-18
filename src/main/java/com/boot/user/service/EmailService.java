@@ -23,95 +23,95 @@ import com.boot.user.model.PasswordResetToken;
 @Service
 public class EmailService {
 
-	private static final String CONFIMATION_EMAIL_TEMPLATE = "/templates/email-template.vm";
-	
-	private static final String RESET_PASSWORD_EMAIL_TEMPLATE = "/templates/reset-password-email-template.vm";
+    private static final String CONFIMATION_EMAIL_TEMPLATE = "/templates/email-template.vm";
 
-	@Autowired
-	AppConfig appConfig;
+    private static final String RESET_PASSWORD_EMAIL_TEMPLATE = "/templates/reset-password-email-template.vm";
 
-	@Autowired
-	JavaMailSender emailSender;
+    @Autowired
+    AppConfig appConfig;
 
-	@Autowired
-	VelocityEngine velocityEngine;
+    @Autowired
+    JavaMailSender emailSender;
 
-	public void sendConfirmationEmail(User user, ConfirmationToken confirmationToken) {
+    @Autowired
+    VelocityEngine velocityEngine;
 
-		Email email = new Email();
+    public void sendConfirmationEmail(User user, ConfirmationToken confirmationToken) {
 
-		email.setEmailFrom("noreply@springwebstore.com");
-		email.setEmailTo(user.getEmail());
-		email.setEmailSubject("SpringStore confirmation Email");
+        Email email = new Email();
 
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("firstName", user.getFirstName());
-		model.put("lastName", user.getLastName());
-		model.put("path", appConfig.userServiceUrl + Constants.CONFIRM_USER_ACCOUNT);
-		model.put("confirmationToken", confirmationToken.getConfirmationToken());
-		model.put("signature", "www.springStore.com");
-		email.setModel(model);
+        email.setEmailFrom("noreply@springwebstore.com");
+        email.setEmailTo(user.getEmail());
+        email.setEmailSubject("SpringStore confirmation Email");
 
-		MimeMessage mimeMessage = emailSender.createMimeMessage();
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("firstName", user.getFirstName());
+        model.put("lastName", user.getLastName());
+        model.put("path", appConfig.userServiceUrl + Constants.CONFIRM_USER_ACCOUNT);
+        model.put("confirmationToken", confirmationToken.getConfirmationToken());
+        model.put("signature", "www.springStore.com");
+        email.setModel(model);
 
-		try {
-			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+        MimeMessage mimeMessage = emailSender.createMimeMessage();
 
-			mimeMessageHelper.setSubject(email.getEmailSubject());
-			mimeMessageHelper.setFrom(email.getEmailFrom());
-			mimeMessageHelper.setTo(email.getEmailTo());
-			email.setEmailContent(geContentFromTemplate(email.getModel(), CONFIMATION_EMAIL_TEMPLATE));
-			mimeMessageHelper.setText(email.getEmailContent(), true);
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
-			emailSender.send(mimeMessageHelper.getMimeMessage());
-		} catch (MessagingException e) {
-			e.printStackTrace();
-		}
-	}
+            mimeMessageHelper.setSubject(email.getEmailSubject());
+            mimeMessageHelper.setFrom(email.getEmailFrom());
+            mimeMessageHelper.setTo(email.getEmailTo());
+            email.setEmailContent(geContentFromTemplate(email.getModel(), CONFIMATION_EMAIL_TEMPLATE));
+            mimeMessageHelper.setText(email.getEmailContent(), true);
 
-	public String geContentFromTemplate(Map<String, Object> model, String templatePath) {
-		StringBuffer content = new StringBuffer();
-		try {
-			content.append(VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, templatePath, model));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return content.toString();
-	}
+            emailSender.send(mimeMessageHelper.getMimeMessage());
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
 
-	public void sendPasswordResetEmail(User user, PasswordResetToken passwordResetToken) {
+    public String geContentFromTemplate(Map<String, Object> model, String templatePath) {
+        StringBuffer content = new StringBuffer();
+        try {
+            content.append(VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, templatePath, model));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return content.toString();
+    }
 
-		Email email = new Email();
+    public void sendPasswordResetEmail(User user, PasswordResetToken passwordResetToken) {
 
-		//you could move these configuration to application.properties
-		email.setEmailFrom("noreply@springwebstore.com");
-		email.setEmailTo(user.getEmail());
-		email.setEmailSubject("Password Reset Request");
+        Email email = new Email();
 
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("firstName", user.getFirstName());
-		model.put("lastName", user.getLastName());
-		model.put("confirmationToken", passwordResetToken.getResetToken());
-		model.put("location", "Cluj");
-		model.put("signature", "www.springStore.com");
-		email.setModel(model);
+        //you could move these configuration to application.properties
+        email.setEmailFrom("noreply@springwebstore.com");
+        email.setEmailTo(user.getEmail());
+        email.setEmailSubject("Password Reset Request");
 
-		MimeMessage mimeMessage = emailSender.createMimeMessage();
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("firstName", user.getFirstName());
+        model.put("lastName", user.getLastName());
+        model.put("confirmationToken", passwordResetToken.getResetToken());
+        model.put("location", "Cluj");
+        model.put("signature", "www.springStore.com");
+        email.setModel(model);
 
-		try {
-			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+        MimeMessage mimeMessage = emailSender.createMimeMessage();
 
-			mimeMessageHelper.setSubject(email.getEmailSubject());
-			mimeMessageHelper.setFrom(email.getEmailFrom());
-			mimeMessageHelper.setTo(email.getEmailTo());
-			email.setEmailContent(geContentFromTemplate(email.getModel(), RESET_PASSWORD_EMAIL_TEMPLATE));
-			mimeMessageHelper.setText(email.getEmailContent(), true);
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
-			emailSender.send(mimeMessageHelper.getMimeMessage());
-		} catch (MessagingException e) {
-			//you could use logging here
-			e.printStackTrace();
-		}
-	}
+            mimeMessageHelper.setSubject(email.getEmailSubject());
+            mimeMessageHelper.setFrom(email.getEmailFrom());
+            mimeMessageHelper.setTo(email.getEmailTo());
+            email.setEmailContent(geContentFromTemplate(email.getModel(), RESET_PASSWORD_EMAIL_TEMPLATE));
+            mimeMessageHelper.setText(email.getEmailContent(), true);
+
+            emailSender.send(mimeMessageHelper.getMimeMessage());
+        } catch (MessagingException e) {
+            //you could use logging here
+            e.printStackTrace();
+        }
+    }
 
 }

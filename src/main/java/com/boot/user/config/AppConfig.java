@@ -22,65 +22,66 @@ import com.boot.user.client.ProductServiceClient;
 @Configuration
 public class AppConfig {
 
-	@Value("${cart.service.url}")
-	private String cartServiceUrl;
+    @Value("${cart.service.url}")
+    private String cartServiceUrl;
 
-	@Value("${product.service.url}")
-	private String productServiceUrl;
+    @Value("${product.service.url}")
+    private String productServiceUrl;
 
-	@Value("${user.service.url}")
-	public String userServiceUrl;
+    @Value("${user.service.url}")
+    public String userServiceUrl;
 
-	@Bean(name="cartServiceRestTemplate")
-	public RestTemplate cartServiceRestTemplateUrl() {
-		return new RestTemplateBuilder().rootUri(cartServiceUrl).build();
-	}
+    @Bean(name = "cartServiceRestTemplate")
+    public RestTemplate cartServiceRestTemplateUrl() {
+        return new RestTemplateBuilder().rootUri(cartServiceUrl).build();
+    }
 
-	@Bean(name="productServiceRestTemplate")
-	public RestTemplate productServiceRestTemplateUrl() {
-		return new RestTemplateBuilder().rootUri(productServiceUrl).build();
-	}
-	@Bean(name="userServiceRestTemplate")
-	public RestTemplate userServiceRestTemplateUrl() {
-		return new RestTemplateBuilder().rootUri(userServiceUrl).build();
-	}
+    @Bean(name = "productServiceRestTemplate")
+    public RestTemplate productServiceRestTemplateUrl() {
+        return new RestTemplateBuilder().rootUri(productServiceUrl).build();
+    }
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean(name = "userServiceRestTemplate")
+    public RestTemplate userServiceRestTemplateUrl() {
+        return new RestTemplateBuilder().rootUri(userServiceUrl).build();
+    }
 
-	@Bean
-	public ProductServiceClient productServiceClient() {
-		return new ProductServiceClient();
-	}
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Bean
-	public CartServiceClient cartServiceClient() {
-		return new CartServiceClient();
-	}
+    @Bean
+    public ProductServiceClient productServiceClient() {
+        return new ProductServiceClient();
+    }
 
-	@Bean
-	public JavaMailSender getJavaMailSender() {
-		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+    @Bean
+    public CartServiceClient cartServiceClient() {
+        return new CartServiceClient();
+    }
 
-		//TODO move this configurations to the application.properties
-		mailSender.setHost("smtp.hostinger.com");
-		mailSender.setPort(587);
+    @Bean
+    public JavaMailSender getJavaMailSender() {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
-		mailSender.setUsername("noreply@springwebstore.com");
-		mailSender.setPassword("QQQwwwEEE1234$");
+        //TODO move this configurations to the application.properties
+        mailSender.setHost("smtp.hostinger.com");
+        mailSender.setPort(587);
+
+        mailSender.setUsername("noreply@springwebstore.com");
+        mailSender.setPassword("QQQwwwEEE1234$");
 
         Properties javaMailProperties = new Properties();
         javaMailProperties.put("mail.smtp.starttls.enable", "true");
         javaMailProperties.put("mail.smtp.auth", "true");
         javaMailProperties.put("mail.transport.protocol", "smtp");
         javaMailProperties.put("mail.debug", "true");
- 
+
         mailSender.setJavaMailProperties(javaMailProperties);
 
-		return mailSender;
-	}
+        return mailSender;
+    }
 
     @Bean
     public VelocityEngine getVelocityEngine() throws VelocityException, IOException {
@@ -88,7 +89,7 @@ public class AppConfig {
         Properties props = new Properties();
         props.put("resource.loader", "class");
         props.put("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
- 
+
         velocityEngineFactory.setVelocityProperties(props);
         return velocityEngineFactory.createVelocityEngine();
     }

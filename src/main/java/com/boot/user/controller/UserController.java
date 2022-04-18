@@ -31,102 +31,102 @@ import com.boot.user.service.UserService;
 @RequestMapping("/")
 public class UserController {
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
-	@PostMapping("/addUser")
-	public ResponseEntity<UserDTO> addUser(@RequestBody UserDTO user) throws InvalidInputDataException {
-		UserDTO newUser = userService.addUser(user);
-		return new ResponseEntity<>(newUser, HttpStatus.CREATED);
-	}
+    @PostMapping("/addUser")
+    public ResponseEntity<UserDTO> addUser(@RequestBody UserDTO user) throws InvalidInputDataException {
+        UserDTO newUser = userService.addUser(user);
+        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+    }
 
-	@PutMapping("/addProductToUserFavorites/{email}/{productName}")
-	public ResponseEntity<UserDTO> addProductToUserFavorites(@PathVariable("email") String email,
-			@PathVariable("productName") String productName)
-			throws EntityNotFoundException, InvalidInputDataException, DuplicateEntryException {
-		UserDTO user = userService.addProductToUserFavorites(email, productName);
-		return new ResponseEntity<>(user, HttpStatus.OK);
-	}
+    @PutMapping("/addProductToUserFavorites/{email}/{productName}")
+    public ResponseEntity<UserDTO> addProductToUserFavorites(@PathVariable("email") String email,
+                                                             @PathVariable("productName") String productName)
+            throws EntityNotFoundException, InvalidInputDataException, DuplicateEntryException {
+        UserDTO user = userService.addProductToUserFavorites(email, productName);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 
-	@PutMapping("/removeProductFromUserFavorites/{email}/{productName}")
-	public ResponseEntity<UserDTO> removeProductFromUserFavorites(@PathVariable("email") String email,
-			@PathVariable("productName") String productName)
-			throws EntityNotFoundException, InvalidInputDataException, DuplicateEntryException {
-		UserDTO user = userService.removeProductFromUserFavorites(email, productName);
-		return new ResponseEntity<>(user, HttpStatus.OK);
-	}
+    @PutMapping("/removeProductFromUserFavorites/{email}/{productName}")
+    public ResponseEntity<UserDTO> removeProductFromUserFavorites(@PathVariable("email") String email,
+                                                                  @PathVariable("productName") String productName)
+            throws EntityNotFoundException, InvalidInputDataException, DuplicateEntryException {
+        UserDTO user = userService.removeProductFromUserFavorites(email, productName);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 
-	@GetMapping("/getAllProductsFromUserFavorites/{email}")
-	@ResponseBody
-	public ResponseEntity<Set<ProductDTO>> getAllProductsFromUserFavorites(@PathVariable("email") String email)
-			throws EntityNotFoundException {
-		Set<ProductDTO> productList = userService.getAllProductsFromUserFavorites(email);
-		return new ResponseEntity<>(productList, HttpStatus.OK);
-	}
+    @GetMapping("/getAllProductsFromUserFavorites/{email}")
+    @ResponseBody
+    public ResponseEntity<Set<ProductDTO>> getAllProductsFromUserFavorites(@PathVariable("email") String email)
+            throws EntityNotFoundException {
+        Set<ProductDTO> productList = userService.getAllProductsFromUserFavorites(email);
+        return new ResponseEntity<>(productList, HttpStatus.OK);
+    }
 
-	@PutMapping("/updateUserByEmail/{email}")
-	public ResponseEntity<UserDTO> updateUserByEmail(@RequestBody UserDTO userDTO, @PathVariable("email") String email)
-			throws EntityNotFoundException, InvalidInputDataException {
-		UserDTO user = userService.updateUserByEmail(email, userDTO);
-		return new ResponseEntity<>(user, HttpStatus.OK);
-	}
+    @PutMapping("/updateUserByEmail/{email}")
+    public ResponseEntity<UserDTO> updateUserByEmail(@RequestBody UserDTO userDTO, @PathVariable("email") String email)
+            throws EntityNotFoundException, InvalidInputDataException {
+        UserDTO user = userService.updateUserByEmail(email, userDTO);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 
-	@RequestMapping(value = "/confirmUserAccount/{token}", method = { RequestMethod.GET, RequestMethod.PUT })
-	public ResponseEntity<String> confirmUserAccount(@PathVariable("token") String token)
-			throws EntityNotFoundException, InvalidInputDataException, UnableToModifyDataException, ParseException {
-		userService.confirmUserAccount(token);
-		return new ResponseEntity<>("User activated Succesfully!", HttpStatus.OK);
-	}
+    @RequestMapping(value = "/confirmUserAccount/{token}", method = {RequestMethod.GET, RequestMethod.PUT})
+    public ResponseEntity<String> confirmUserAccount(@PathVariable("token") String token)
+            throws EntityNotFoundException, InvalidInputDataException, UnableToModifyDataException, ParseException {
+        userService.confirmUserAccount(token);
+        return new ResponseEntity<>("User activated Succesfully!", HttpStatus.OK);
+    }
 
-	@GetMapping("/getUserById")
-	@ResponseBody
-	public ResponseEntity<UserDTO> findByUserId(@RequestParam long id) throws EntityNotFoundException {
-		UserDTO user = userService.getUserById(id);
-		return new ResponseEntity<>(user, HttpStatus.OK);
-	}
+    @GetMapping("/getUserById")
+    @ResponseBody
+    public ResponseEntity<UserDTO> findByUserId(@RequestParam long id) throws EntityNotFoundException {
+        UserDTO user = userService.getUserById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 
-	@GetMapping("/getAllUsers")
-	@ResponseBody
-	public ResponseEntity<List<UserDTO>> getAllUsers() throws EntityNotFoundException {
-		List<UserDTO> userList = userService.getAllUsers();
-		return new ResponseEntity<>(userList, HttpStatus.OK);
-	}
+    @GetMapping("/getAllUsers")
+    @ResponseBody
+    public ResponseEntity<List<UserDTO>> getAllUsers() throws EntityNotFoundException {
+        List<UserDTO> userList = userService.getAllUsers();
+        return new ResponseEntity<>(userList, HttpStatus.OK);
+    }
 
-	@GetMapping("/getUserByEmail")
-	@ResponseBody
-	public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) throws EntityNotFoundException {
-		UserDTO user = userService.getUserByEmail(email);
-		return new ResponseEntity<>(user, HttpStatus.OK);
-	}
+    @GetMapping("/getUserByEmail")
+    @ResponseBody
+    public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) throws EntityNotFoundException {
+        UserDTO user = userService.getUserByEmail(email);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 
-	@DeleteMapping("/deleteUserById/{id}")
-	public ResponseEntity<UserDTO> deleteUserById(@PathVariable("id") long id) throws EntityNotFoundException {
-		userService.deleteUserById(id);
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
+    @DeleteMapping("/deleteUserById/{id}")
+    public ResponseEntity<UserDTO> deleteUserById(@PathVariable("id") long id) throws EntityNotFoundException {
+        userService.deleteUserById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
-	@DeleteMapping("/deleteUserByEmail/{email}")
-	public ResponseEntity<UserDTO> deleteUserByByEmail(@PathVariable("email") String email)
-			throws EntityNotFoundException {
-		userService.deleteUserByEmail(email);
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
+    @DeleteMapping("/deleteUserByEmail/{email}")
+    public ResponseEntity<UserDTO> deleteUserByByEmail(@PathVariable("email") String email)
+            throws EntityNotFoundException {
+        userService.deleteUserByEmail(email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
-	@RequestMapping(value = "/requestResetPassword/{email}", method = { RequestMethod.GET, RequestMethod.PUT })
-	public ResponseEntity<String> requestResetPassword(@PathVariable("email") String email)
-			throws EntityNotFoundException {
-		userService.requestResetPassword(email);
-		return new ResponseEntity<>("Request to reset Password succesfully send!", HttpStatus.OK);
-	}
+    @RequestMapping(value = "/requestResetPassword/{email}", method = {RequestMethod.GET, RequestMethod.PUT})
+    public ResponseEntity<String> requestResetPassword(@PathVariable("email") String email)
+            throws EntityNotFoundException {
+        userService.requestResetPassword(email);
+        return new ResponseEntity<>("Request to reset Password succesfully send!", HttpStatus.OK);
+    }
 
-	@RequestMapping(value = "/changeUserPassword/{token}/{newPassword}/{confirmedNewPassword}", method = {
-			RequestMethod.GET, RequestMethod.PUT })
-	public ResponseEntity<String> changeUserPassword(@PathVariable("token") String token,
-			@PathVariable("newPassword") String newPassword,
-			@PathVariable("confirmedNewPassword") String confirmedNewPassword)
-			throws EntityNotFoundException, InvalidInputDataException, UnableToModifyDataException, ParseException {
-		userService.changeUserPassword(token, newPassword, confirmedNewPassword);
-		return new ResponseEntity<>("Password succesfully changed!", HttpStatus.OK);
-	}
+    @RequestMapping(value = "/changeUserPassword/{token}/{newPassword}/{confirmedNewPassword}", method = {
+            RequestMethod.GET, RequestMethod.PUT})
+    public ResponseEntity<String> changeUserPassword(@PathVariable("token") String token,
+                                                     @PathVariable("newPassword") String newPassword,
+                                                     @PathVariable("confirmedNewPassword") String confirmedNewPassword)
+            throws EntityNotFoundException, InvalidInputDataException, UnableToModifyDataException, ParseException {
+        userService.changeUserPassword(token, newPassword, confirmedNewPassword);
+        return new ResponseEntity<>("Password succesfully changed!", HttpStatus.OK);
+    }
 
 }

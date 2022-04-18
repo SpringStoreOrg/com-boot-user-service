@@ -10,11 +10,11 @@ import com.boot.user.util.Constants;
 public class ProductServiceClient {
 
 
-	@Autowired
-	private RestTemplate productServiceRestTemplate;
+    @Autowired
+    private RestTemplate productServiceRestTemplate;
 
-	public ResponseEntity<ProductDTO> callGetProductByProductName(String productName) {
+    public ResponseEntity<ProductDTO> callGetProductByProductName(String productName) {
 
-		return productServiceRestTemplate.getForEntity(Constants.GET_PRODUCT_BY_PRODUCT_NAME, ProductDTO.class, productName);
-	}
+        return productServiceRestTemplate.getForEntity(Constants.GET_PRODUCT_BY_PRODUCT_NAME, ProductDTO.class, productName);
+    }
 }
