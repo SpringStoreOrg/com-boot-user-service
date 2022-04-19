@@ -62,28 +62,6 @@ public class AppConfig {
     }
 
     @Bean
-    public JavaMailSender getJavaMailSender() {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-
-        //TODO move this configurations to the application.properties
-        mailSender.setHost("smtp.hostinger.com");
-        mailSender.setPort(587);
-
-        mailSender.setUsername("noreply@springwebstore.com");
-        mailSender.setPassword("QQQwwwEEE1234$");
-
-        Properties javaMailProperties = new Properties();
-        javaMailProperties.put("mail.smtp.starttls.enable", "true");
-        javaMailProperties.put("mail.smtp.auth", "true");
-        javaMailProperties.put("mail.transport.protocol", "smtp");
-        javaMailProperties.put("mail.debug", "true");
-
-        mailSender.setJavaMailProperties(javaMailProperties);
-
-        return mailSender;
-    }
-
-    @Bean
     public VelocityEngine getVelocityEngine() throws VelocityException, IOException {
         VelocityEngineFactory velocityEngineFactory = new VelocityEngineFactory();
         Properties props = new Properties();
