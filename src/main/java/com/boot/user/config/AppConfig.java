@@ -52,16 +52,6 @@ public class AppConfig {
     }
 
     @Bean
-    public ProductServiceClient productServiceClient() {
-        return new ProductServiceClient();
-    }
-
-    @Bean
-    public CartServiceClient cartServiceClient() {
-        return new CartServiceClient();
-    }
-
-    @Bean
     public VelocityEngine getVelocityEngine() throws VelocityException, IOException {
         VelocityEngineFactory velocityEngineFactory = new VelocityEngineFactory();
         Properties props = new Properties();
