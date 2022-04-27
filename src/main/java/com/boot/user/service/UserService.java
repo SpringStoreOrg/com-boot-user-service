@@ -238,7 +238,7 @@ public class UserService {
     }
 
     public void changeUserPassword(String confirmationToken, String newPassword, String confirmedNewPassword)
-            throws  EntityNotFoundException, UnableToModifyDataException, ParseException {
+            throws  EntityNotFoundException, UnableToModifyDataException {
 
         PasswordResetToken token = passwordReserTokenRepository.findByResetToken(confirmationToken);
 

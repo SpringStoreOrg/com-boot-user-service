@@ -107,14 +107,14 @@
         <dependency>
             <groupId>com.github.GeorgeT88</groupId>
             <artifactId>commons-datamodel-entity</artifactId>
-            <version>release-1.1</version>
+            <version>release-1.4</version>
         </dependency>
 
         <!-- Datamodel DTO -->
         <dependency>
             <groupId>com.github.GeorgeT88</groupId>
             <artifactId>commons-datamodel-dto</artifactId>
-            <version>release-1.6</version>
+            <version>release-1.8</version>
         </dependency>
     </dependencies>
     <dependencyManagement>
