@@ -1,8 +1,9 @@
 package com.boot.user.controller;
 
-import java.util.List;
-import java.util.Set;
-
+import com.boot.services.dto.UserDTO;
+import com.boot.user.exception.EntityNotFoundException;
+import com.boot.user.exception.UnableToModifyDataException;
+import com.boot.user.service.UserService;
 import com.boot.user.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,16 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import com.boot.services.dto.ProductDTO;
-import com.boot.services.dto.UserDTO;
-import com.boot.user.exception.DuplicateEntryException;
-import com.boot.user.exception.EntityNotFoundException;
-import com.boot.user.exception.UnableToModifyDataException;
-import com.boot.user.service.UserService;
-
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Size;
+import java.util.List;
 
 @Controller
 public class UserController {
