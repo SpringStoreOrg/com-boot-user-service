@@ -6,9 +6,9 @@ public class Constants {
 
 	public static final String DELETE_CART_BY_EMAIL =  "/deleteCartByEmail/?email={email}";
 
-	public static final String CONFIRM_USER_ACCOUNT = "/confirmUserAccount/";
+	public static final String CONFIRM_USER_ACCOUNT = "/confirm/";
 
-	public static final String PASSWORD_RESET_EMAIL = "/changeUserPassword/";
+	public static final String PASSWORD_RESET_EMAIL = "/change/";
 
 	//Regular expression used for email validation
 	public static final String EMAIL_REGEXP = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-z" + "A-Z]{2,7}$";
