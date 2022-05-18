@@ -1,6 +1,5 @@
 package com.boot.user.controller;
 
-import java.text.ParseException;
 import java.util.List;
 import java.util.Set;
 
@@ -33,30 +32,6 @@ public class UserController {
     public ResponseEntity<UserDTO> addUser(@Valid @RequestBody UserDTO user) {
         UserDTO newUser = userService.addUser(user);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/userFavorites/add/{email}/{productName}")
-    public ResponseEntity<UserDTO> addProductToUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email,
-                                                             @Size(min = 2, max = 30, message = "Product Name size has to be between 2 and 30 characters!") @PathVariable("productName") String productName)
-            throws DuplicateEntryException {
-        UserDTO user = userService.addProductToUserFavorites(email, productName);
-        return new ResponseEntity<>(user, HttpStatus.OK);
-    }
-
-    @PutMapping("/userFavorites/remove/{email}/{productName}")
-    public ResponseEntity<UserDTO> removeProductFromUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email,
-                                                                  @Size(min = 2, max = 30, message = "Product Name size has to be between 2 and 30 characters!") @PathVariable("productName") String productName)
-            throws EntityNotFoundException {
-        UserDTO user = userService.removeProductFromUserFavorites(email, productName);
-        return new ResponseEntity<>(user, HttpStatus.OK);
-    }
-
-    @GetMapping("/userFavorites/{email}")
-    @ResponseBody
-    public ResponseEntity<Set<ProductDTO>> getAllProductsFromUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
-            throws EntityNotFoundException {
-        Set<ProductDTO> productList = userService.getAllProductsFromUserFavorites(email);
-        return new ResponseEntity<>(productList, HttpStatus.OK);
     }
 
     @PutMapping("/{email}")
@@ -105,22 +80,4 @@ public class UserController {
         userService.deleteUserByEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-    @RequestMapping(value = "/password/reset/{email}", method = {RequestMethod.GET, RequestMethod.PUT})
-    public ResponseEntity<String> requestResetPassword(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
-            throws EntityNotFoundException {
-        userService.requestResetPassword(email);
-        return new ResponseEntity<>("Request to reset Password succesfully send!", HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/password/change/{token}/{newPassword}/{confirmedNewPassword}", method = {
-            RequestMethod.GET, RequestMethod.PUT})
-    public ResponseEntity<String> changeUserPassword(@PathVariable("token") String token,
-                                                     @PathVariable("newPassword") String newPassword,
-                                                     @PathVariable("confirmedNewPassword") String confirmedNewPassword)
-            throws EntityNotFoundException, UnableToModifyDataException {
-        userService.changeUserPassword(token, newPassword, confirmedNewPassword);
-        return new ResponseEntity<>("Password succesfully changed!", HttpStatus.OK);
-    }
-
 }
