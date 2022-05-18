@@ -1,24 +1,19 @@
 package com.boot.user.service;
 
-import java.text.ParseException;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.boot.services.dto.ProductDTO;
 import com.boot.services.dto.UserDTO;
 import com.boot.services.mapper.UserMapper;
 import com.boot.services.model.User;
 import com.boot.user.client.CartServiceClient;
-import com.boot.user.client.ProductServiceClient;
-import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.exception.EntityNotFoundException;
-import com.boot.user.exception.InvalidInputDataException;
 import com.boot.user.exception.UnableToModifyDataException;
 import com.boot.user.model.ConfirmationToken;
 import com.boot.user.model.PasswordResetToken;
@@ -54,59 +49,10 @@ public class UserService {
     private EmailService emailSenderService;
 
     @Autowired
-    private ProductServiceClient productServiceClient;
-
-    @Autowired
     private CartServiceClient cartServiceClient;
 
     @Autowired
     private PasswordResetTokenRepository passwordReserTokenRepository;
-
-    public UserDTO addProductToUserFavorites(String email, String productName) throws DuplicateEntryException {
-
-        ProductDTO productDTO = productServiceClient.callGetProductByProductName(productName).getBody();
-
-        User user = userRepository.getUserByEmail(email);
-
-        UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
-
-        if (userDTOMapped.getFavoriteProductList().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
-            throw new DuplicateEntryException("Product: " + productName + " was already added to favorites!");
-        } else {
-            userDTOMapped.getFavoriteProductList().add(productDTO);
-            userRepository.save(UserMapper.updateDtoToUserEntity(user, userDTOMapped));
-
-            return UserMapper.UserEntityToDto(user);
-        }
-    }
-
-    public UserDTO removeProductFromUserFavorites(String email, String productName) throws EntityNotFoundException {
-
-        ProductDTO productDTO = productServiceClient.callGetProductByProductName(productName).getBody();
-
-        User user = userRepository.getUserByEmail(email);
-
-        UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
-
-        if (userDTOMapped.getFavoriteProductList().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
-
-            userDTOMapped.getFavoriteProductList().remove(productDTO);
-            user = userRepository.save(UserMapper.updateDtoToUserEntity(user, userDTOMapped));
-
-            return UserMapper.UserEntityToDto(user);
-        } else {
-            throw new EntityNotFoundException("Product: " + productName + " was not found in the favorites list!");
-        }
-    }
-
-    public Set<ProductDTO> getAllProductsFromUserFavorites(String email) throws EntityNotFoundException {
-
-        User user = userRepository.getUserByEmail(email);
-
-        UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
-
-        return userDTOMapped.getFavoriteProductList();
-    }
 
     @Transactional
     public UserDTO addUser(UserDTO userDTO) {
@@ -138,7 +84,7 @@ public class UserService {
 
             UserDTO user = getUserByEmail(token.getUser().getEmail());
 
-            if (user.isActivated() == true) {
+            if (user.isActivated()) {
                 throw new UnableToModifyDataException("User was already confirmed!");
             }
             user.setActivated(true);
@@ -182,12 +128,12 @@ public class UserService {
 
         List<User> userList = userRepository.findAll();
 
-        if (userList == null || userList.isEmpty()) {
+        if (userList.isEmpty()) {
             throw new EntityNotFoundException("No user found in the Database!");
         }
         List<UserDTO> userDTOList = new ArrayList<>();
 
-        userList.stream().forEach(u -> userDTOList.add(UserMapper.UserEntityToDto(u)));
+        userList.forEach(u -> userDTOList.add(UserMapper.UserEntityToDto(u)));
         return userDTOList;
     }
 
@@ -249,7 +195,7 @@ public class UserService {
 
             UserDTO userDto = getUserByEmail(token.getUser().getEmail());
 
-            if (userDto.isActivated() != true) {
+            if (!userDto.isActivated()) {
                 throw new UnableToModifyDataException("User was not activated!");
             }
 
