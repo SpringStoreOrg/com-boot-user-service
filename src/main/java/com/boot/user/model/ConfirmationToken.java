@@ -15,7 +15,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.boot.services.model.User;
+import com.boot.user.model.User;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

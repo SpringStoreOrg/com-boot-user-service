@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 
 import com.boot.services.model.Email;
-import com.boot.services.model.User;
+import com.boot.user.model.User;
 import com.boot.user.model.ConfirmationToken;
 import com.boot.user.model.PasswordResetToken;
 

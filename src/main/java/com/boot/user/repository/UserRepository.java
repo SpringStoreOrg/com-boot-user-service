@@ -4,17 +4,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.boot.services.model.User;
+import com.boot.user.model.User;
 
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-	public User getUserById(long id);
+	User getUserById(long id);
 	
-	public User getUserByEmail(String email);
+	User getUserByEmail(String email);
 
 	@Transactional
-	public void deleteByEmail(String email);
+	void deleteByEmail(String email);
 
 }

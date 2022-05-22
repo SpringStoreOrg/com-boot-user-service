@@ -1,30 +1,30 @@
 package com.boot.user.service;
 
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import com.boot.services.dto.UserDTO;
-import com.boot.services.mapper.UserMapper;
-import com.boot.services.model.User;
 import com.boot.user.client.CartServiceClient;
+import com.boot.user.dto.UserDTO;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.exception.UnableToModifyDataException;
 import com.boot.user.model.ConfirmationToken;
 import com.boot.user.model.PasswordResetToken;
+import com.boot.user.model.User;
 import com.boot.user.repository.ConfirmationTokenRepository;
 import com.boot.user.repository.PasswordResetTokenRepository;
 import com.boot.user.repository.UserRepository;
 import com.boot.user.validator.TokenValidator;
 import com.boot.user.validator.UserValidator;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.boot.user.model.User.*;
 
 @Slf4j
 @Service
@@ -62,7 +62,7 @@ public class UserService {
 
         userDTO.setRole("USER");
 
-        User user = userRepository.save(UserMapper.DtoToUserEntity(userDTO).setCreatedOn(LocalDate.now()));
+        User user = userRepository.save(dtoToUserEntity(userDTO).setCreatedOn(LocalDate.now()));
 
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
 
@@ -70,7 +70,7 @@ public class UserService {
 
         emailSenderService.sendConfirmationEmail(user, confirmationToken);
 
-        return UserMapper.UserEntityToDto(user);
+        return userEntityToDto(user);
     }
 
     public void confirmUserAccount(String confirmationToken)
@@ -81,7 +81,6 @@ public class UserService {
             if (!tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
                 throw new EntityNotFoundException("Token Expired!");
             }
-
             UserDTO user = getUserByEmail(token.getUser().getEmail());
 
             if (user.isActivated()) {
@@ -89,7 +88,7 @@ public class UserService {
             }
             user.setActivated(true);
 
-            userRepository.save(UserMapper.DtoToUserEntity(user));
+            userRepository.save(dtoToUserEntity(user));
         } else {
             throw new EntityNotFoundException("Token not found!");
         }
@@ -99,21 +98,29 @@ public class UserService {
 
         User user = userRepository.getUserByEmail(email);
 
-        UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
+        if(StringUtils.isNotBlank(userDTO.getEmail())) {
+            user.setEmail(userDTO.getEmail());
+        }
+        if(StringUtils.isNotBlank(userDTO.getFirstName())) {
+            user.setFirstName(userDTO.getFirstName());
+        }
 
-        userDTOMapped.setEmail(userDTO.getEmail());
-        userDTOMapped.setFirstName(userDTO.getFirstName());
-        userDTOMapped.setLastName(userDTO.getLastName());
-        userDTOMapped.setDeliveryAddress(userDTO.getDeliveryAddress());
-        userDTOMapped.setPhoneNumber(userDTO.getPhoneNumber());
-        userDTOMapped.setPassword(userDTO.getPassword());
-        userDTOMapped.setFavoriteProductList(userDTO.getFavoriteProductList());
-        userDTOMapped.setActivated(userDTO.isActivated());
+        if(StringUtils.isNotBlank(userDTO.getLastName())){
+            user.setLastName(userDTO.getLastName());
+        }
 
-         userRepository
-                .save(UserMapper.updateDtoToUserEntity(user, userDTOMapped).setLastUpdatedOn(LocalDate.now()));
+        if(StringUtils.isNotBlank(userDTO.getDeliveryAddress())) {
+            user.setDeliveryAddress(userDTO.getDeliveryAddress());
+        }
 
-        return userDTOMapped;
+        if(StringUtils.isNotBlank(userDTO.getPhoneNumber())) {
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+        }
+        user.setLastUpdatedOn(LocalDate.now());
+
+        userRepository.save(user);
+
+        return userEntityToDto(user);
     }
 
     public UserDTO getUserById(long id) throws EntityNotFoundException {
@@ -121,7 +128,7 @@ public class UserService {
             throw new EntityNotFoundException("Id: " + id + " not found in the Database!");
         }
         User user = userRepository.getUserById(id);
-        return UserMapper.UserEntityToDto(user);
+        return userEntityToDto(user);
     }
 
     public List<UserDTO> getAllUsers() throws EntityNotFoundException {
@@ -133,7 +140,7 @@ public class UserService {
         }
         List<UserDTO> userDTOList = new ArrayList<>();
 
-        userList.forEach(u -> userDTOList.add(UserMapper.UserEntityToDto(u)));
+        userList.forEach(u -> userDTOList.add(userEntityToDto(u)));
         return userDTOList;
     }
 
@@ -144,7 +151,7 @@ public class UserService {
         }
 
         User user = userRepository.getUserByEmail(email);
-        return UserMapper.UserEntityToDto(user);
+        return userEntityToDto(user);
     }
 
     public void deleteUserById(long id) throws EntityNotFoundException {
@@ -162,7 +169,7 @@ public class UserService {
 
         UserDTO userDto = getUserByEmail(email);
 
-        userDto.getFavoriteProductList().clear();
+        userDto.getUserFavorites().clear();
 
         cartServiceClient.callDeleteCartByEmail(email);
 

@@ -1,18 +1,20 @@
 package com.boot.user.service;
 
-import com.boot.services.dto.ProductDTO;
-import com.boot.services.dto.UserDTO;
-import com.boot.services.mapper.UserMapper;
-import com.boot.services.model.User;
-import com.boot.user.client.ProductServiceClient;
+import com.boot.user.dto.UserDTO;
 import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.exception.EntityNotFoundException;
+import com.boot.user.model.User;
+import com.boot.user.model.UserFavorite;
+import com.boot.user.repository.UserFavoriteRepository;
 import com.boot.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.boot.user.model.User.userEntityToDto;
 
 @Slf4j
 @Service
@@ -22,51 +24,50 @@ public class UserFavoritesService {
     private UserRepository userRepository;
 
     @Autowired
-    private ProductServiceClient productServiceClient;
+    private UserFavoriteRepository userFavoriteRepository;
+
 
     public UserDTO addProductToUserFavorites(String email, String productName) throws DuplicateEntryException {
 
-        ProductDTO productDTO = productServiceClient.callGetProductByProductName(productName).getBody();
-
         User user = userRepository.getUserByEmail(email);
 
-        UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
+        UserDTO userDTO = userEntityToDto(user);
 
-        if (userDTOMapped.getFavoriteProductList().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
+        if (userDTO.getUserFavorites().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
             throw new DuplicateEntryException("Product: " + productName + " was already added to favorites!");
         } else {
-            userDTOMapped.getFavoriteProductList().add(productDTO);
-            userRepository.save(UserMapper.updateDtoToUserEntity(user, userDTOMapped));
+            UserFavorite userFavorite = new UserFavorite();
 
-            return UserMapper.UserEntityToDto(user);
+            userFavorite.setUser(user);
+            userFavorite.setProductName(productName);
+
+            userDTO.getUserFavorites().add(userFavorite);
+            userFavoriteRepository.save(userFavorite);
+
+            return userEntityToDto(user);
         }
     }
 
     public UserDTO removeProductFromUserFavorites(String email, String productName) throws EntityNotFoundException {
 
-        ProductDTO productDTO = productServiceClient.callGetProductByProductName(productName).getBody();
+        User user = this.userRepository.getUserByEmail(email);
 
-        User user = userRepository.getUserByEmail(email);
+        userFavoriteRepository.deleteByUserAndProductName(user, productName);
 
-        UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
-
-        if (userDTOMapped.getFavoriteProductList().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
-
-            userDTOMapped.getFavoriteProductList().remove(productDTO);
-            user = userRepository.save(UserMapper.updateDtoToUserEntity(user, userDTOMapped));
-
-            return UserMapper.UserEntityToDto(user);
-        } else {
-            throw new EntityNotFoundException("Product: " + productName + " was not found in the favorites list!");
+        User userUpdated = this.userRepository.getUserByEmail(email);
+        if (userUpdated.getUserFavorites().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
+            throw new EntityNotFoundException("Product: " + productName + " was not succesfully deleted from the favorites list!");
         }
+        return User.userEntityToDto(userUpdated);
     }
 
-    public Set<ProductDTO> getAllProductsFromUserFavorites(String email){
+
+    public List<String> getAllProductsFromUserFavorites(String email){
 
         User user = userRepository.getUserByEmail(email);
 
-        UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
+        List<String> productFavorites = user.getUserFavorites().stream().map(UserFavorite :: getProductName).collect(Collectors.toList());
 
-        return userDTOMapped.getFavoriteProductList();
+        return productFavorites;
     }
 }

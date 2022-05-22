@@ -1,0 +1,15 @@
+package com.boot.user.repository;
+
+import com.boot.user.model.User;
+import com.boot.user.model.UserFavorite;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+
+@Repository
+public interface UserFavoriteRepository extends JpaRepository<UserFavorite, Long> {
+
+    @Transactional
+    void deleteByUserAndProductName(User user, String productName);
+}
