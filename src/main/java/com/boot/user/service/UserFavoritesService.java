@@ -7,8 +7,8 @@ import com.boot.user.model.User;
 import com.boot.user.model.UserFavorite;
 import com.boot.user.repository.UserFavoriteRepository;
 import com.boot.user.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,12 +18,11 @@ import static com.boot.user.model.User.userEntityToDto;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class UserFavoritesService {
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private UserFavoriteRepository userFavoriteRepository;
 
 
@@ -66,8 +65,6 @@ public class UserFavoritesService {
 
         User user = userRepository.getUserByEmail(email);
 
-        List<String> productFavorites = user.getUserFavorites().stream().map(UserFavorite :: getProductName).collect(Collectors.toList());
-
-        return productFavorites;
+        return user.getUserFavorites().stream().map(UserFavorite :: getProductName).collect(Collectors.toList());
     }
 }

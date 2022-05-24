@@ -13,9 +13,10 @@ import com.boot.user.repository.PasswordResetTokenRepository;
 import com.boot.user.repository.UserRepository;
 import com.boot.user.validator.TokenValidator;
 import com.boot.user.validator.UserValidator;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,38 +25,32 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.boot.user.model.User.*;
+import static com.boot.user.model.User.dtoToUserEntity;
+import static com.boot.user.model.User.userEntityToDto;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
     private UserValidator userValidator;
 
-    @Autowired
     private TokenValidator tokenValidator;
 
-    @Autowired
     private ConfirmationTokenRepository confirmationTokenRepository;
 
-    @Autowired
     private EmailService emailSenderService;
 
-    @Autowired
     private CartServiceClient cartServiceClient;
 
-    @Autowired
     private PasswordResetTokenRepository passwordReserTokenRepository;
 
     @Transactional
-    public UserDTO addUser(UserDTO userDTO) {
+    public UserDTO addUser(@NotNull UserDTO userDTO) {
         log.info("addUser - process started");
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
@@ -78,7 +73,7 @@ public class UserService {
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
 
         if (token != null) {
-            if (!tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
+            if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
                 throw new EntityNotFoundException("Token Expired!");
             }
             UserDTO user = getUserByEmail(token.getUser().getEmail());
@@ -94,7 +89,8 @@ public class UserService {
         }
     }
 
-    public UserDTO updateUserByEmail(String email, UserDTO userDTO) {
+    public UserDTO updateUserByEmail(String email, @NotNull UserDTO userDTO) {
+        log.info("updateUserByEmail - process started");
 
         User user = userRepository.getUserByEmail(email);
 
@@ -124,7 +120,7 @@ public class UserService {
     }
 
     public UserDTO getUserById(long id) throws EntityNotFoundException {
-        if (!userValidator.isIdPresent(id)) {
+        if (userValidator.isIdPresent(id)) {
             throw new EntityNotFoundException("Id: " + id + " not found in the Database!");
         }
         User user = userRepository.getUserById(id);
@@ -155,7 +151,7 @@ public class UserService {
     }
 
     public void deleteUserById(long id) throws EntityNotFoundException {
-        if (!userValidator.isIdPresent(id)) {
+        if (userValidator.isIdPresent(id)) {
             throw new EntityNotFoundException("Id: " + id + " not found in the Database!");
         }
         userRepository.deleteById(id);
@@ -196,7 +192,7 @@ public class UserService {
         PasswordResetToken token = passwordReserTokenRepository.findByResetToken(confirmationToken);
 
         if (token != null) {
-            if (!tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
+            if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
                 throw new EntityNotFoundException("Token Expired!");
             }
 

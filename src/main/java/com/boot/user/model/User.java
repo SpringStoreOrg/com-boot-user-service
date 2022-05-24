@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -65,7 +66,7 @@ public class User implements Serializable {
 	@Column
 	private boolean isActivated;
 
-	public static UserDTO userEntityToDto(User user) {
+	public static UserDTO userEntityToDto(@NotNull User user) {
 		return new UserDTO()
 				.setId(user.getId())
 				.setFirstName(user.getFirstName())
@@ -80,22 +81,8 @@ public class User implements Serializable {
 
 	}
 
-	public static User dtoToUserEntity(UserDTO userDto) {
+	public static User dtoToUserEntity(@NotNull UserDTO userDto) {
 		return new User()
-				.setId(userDto.getId())
-				.setFirstName(userDto.getFirstName())
-				.setLastName(userDto.getLastName())
-				.setPassword(userDto.getPassword())
-				.setPhoneNumber(userDto.getPhoneNumber())
-				.setDeliveryAddress(userDto.getDeliveryAddress())
-				.setEmail(userDto.getEmail())
-				.setRole(userDto.getRole())
-				.setUserFavorites(userDto.getUserFavorites())
-				.setActivated(userDto.isActivated());
-	}
-
-	public static User updateDtoToUserEntity(User user, UserDTO userDto) {
-		return user
 				.setId(userDto.getId())
 				.setFirstName(userDto.getFirstName())
 				.setLastName(userDto.getLastName())

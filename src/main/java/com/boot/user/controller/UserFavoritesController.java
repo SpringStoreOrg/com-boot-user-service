@@ -5,7 +5,7 @@ import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.service.UserFavoritesService;
 import com.boot.user.util.Constants;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,10 +16,10 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Controller
+@AllArgsConstructor
 @RequestMapping("/userFavorites")
 public class UserFavoritesController {
 
-    @Autowired
     private UserFavoritesService userFavoritesService;
 
     @PostMapping ("/{email}/{productName}")
