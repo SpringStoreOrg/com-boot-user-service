@@ -1,5 +1,7 @@
 package com.boot.user.service;
 
+import com.boot.services.dto.ProductDTO;
+import com.boot.user.client.ProductServiceClient;
 import com.boot.user.dto.UserDTO;
 import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.exception.EntityNotFoundException;
@@ -10,6 +12,7 @@ import com.boot.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,16 +26,16 @@ public class UserFavoritesService {
 
     private UserRepository userRepository;
 
+    private ProductServiceClient productServiceClient;
+
     private UserFavoriteRepository userFavoriteRepository;
 
-
+    @Transactional
     public UserDTO addProductToUserFavorites(String email, String productName) throws DuplicateEntryException {
 
         User user = userRepository.getUserByEmail(email);
 
-        UserDTO userDTO = userEntityToDto(user);
-
-        if (userDTO.getUserFavorites().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
+        if (user.getUserFavorites().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
             throw new DuplicateEntryException("Product: " + productName + " was already added to favorites!");
         } else {
             UserFavorite userFavorite = new UserFavorite();
@@ -40,13 +43,14 @@ public class UserFavoritesService {
             userFavorite.setUser(user);
             userFavorite.setProductName(productName);
 
-            userDTO.getUserFavorites().add(userFavorite);
+            user.getUserFavorites().add(userFavorite);
             userFavoriteRepository.save(userFavorite);
 
             return userEntityToDto(user);
         }
     }
 
+    @Transactional
     public UserDTO removeProductFromUserFavorites(String email, String productName) throws EntityNotFoundException {
 
         User user = this.userRepository.getUserByEmail(email);
@@ -57,14 +61,16 @@ public class UserFavoritesService {
         if (userUpdated.getUserFavorites().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
             throw new EntityNotFoundException("Product: " + productName + " was not succesfully deleted from the favorites list!");
         }
-        return User.userEntityToDto(userUpdated);
+        return userEntityToDto(userUpdated);
     }
 
 
-    public List<String> getAllProductsFromUserFavorites(String email){
+    public List<ProductDTO> getAllProductsFromUserFavorites(String email){
 
         User user = userRepository.getUserByEmail(email);
 
-        return user.getUserFavorites().stream().map(UserFavorite :: getProductName).collect(Collectors.toList());
+        List<String> userFavoriteProducts =  user.getUserFavorites().stream().map(UserFavorite :: getProductName).collect(Collectors.toList());
+
+        return  productServiceClient.callGetAllProductsFromUserFavorites(userFavoriteProducts);
     }
 }

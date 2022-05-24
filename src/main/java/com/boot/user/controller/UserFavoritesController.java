@@ -1,5 +1,6 @@
 package com.boot.user.controller;
 
+import com.boot.services.dto.ProductDTO;
 import com.boot.user.dto.UserDTO;
 import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.exception.EntityNotFoundException;
@@ -40,9 +41,9 @@ public class UserFavoritesController {
 
     @GetMapping("/{email}")
     @ResponseBody
-    public ResponseEntity<List<String>> getAllProductsFromUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
+    public ResponseEntity<List<ProductDTO>> getAllProductsFromUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
              {
-        List<String> productList = userFavoritesService.getAllProductsFromUserFavorites(email);
+        List<ProductDTO> productList = userFavoritesService.getAllProductsFromUserFavorites(email);
         return new ResponseEntity<>(productList, HttpStatus.OK);
     }
 }

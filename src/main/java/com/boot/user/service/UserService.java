@@ -1,7 +1,6 @@
 package com.boot.user.service;
 
 
-import com.boot.user.client.CartServiceClient;
 import com.boot.user.dto.UserDTO;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.exception.UnableToModifyDataException;
@@ -45,8 +44,6 @@ public class UserService {
 
     private EmailService emailSenderService;
 
-    private CartServiceClient cartServiceClient;
-
     private PasswordResetTokenRepository passwordReserTokenRepository;
 
     @Transactional
@@ -76,23 +73,27 @@ public class UserService {
             if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
                 throw new EntityNotFoundException("Token Expired!");
             }
-            UserDTO user = getUserByEmail(token.getUser().getEmail());
+            User user = userRepository.getUserByEmail(token.getUser().getEmail());
 
             if (user.isActivated()) {
                 throw new UnableToModifyDataException("User was already confirmed!");
             }
             user.setActivated(true);
 
-            userRepository.save(dtoToUserEntity(user));
+            userRepository.save(user);
         } else {
             throw new EntityNotFoundException("Token not found!");
         }
     }
 
-    public UserDTO updateUserByEmail(String email, @NotNull UserDTO userDTO) {
+    public UserDTO updateUserByEmail(String email, @NotNull UserDTO userDTO) throws EntityNotFoundException {
         log.info("updateUserByEmail - process started");
 
         User user = userRepository.getUserByEmail(email);
+
+        if (user == null) {
+            throw new EntityNotFoundException("Invalid Email address!");
+        }
 
         if(StringUtils.isNotBlank(userDTO.getEmail())) {
             user.setEmail(userDTO.getEmail());
@@ -119,14 +120,6 @@ public class UserService {
         return userEntityToDto(user);
     }
 
-    public UserDTO getUserById(long id) throws EntityNotFoundException {
-        if (userValidator.isIdPresent(id)) {
-            throw new EntityNotFoundException("Id: " + id + " not found in the Database!");
-        }
-        User user = userRepository.getUserById(id);
-        return userEntityToDto(user);
-    }
-
     public List<UserDTO> getAllUsers() throws EntityNotFoundException {
 
         List<User> userList = userRepository.findAll();
@@ -150,24 +143,12 @@ public class UserService {
         return userEntityToDto(user);
     }
 
-    public void deleteUserById(long id) throws EntityNotFoundException {
-        if (userValidator.isIdPresent(id)) {
-            throw new EntityNotFoundException("Id: " + id + " not found in the Database!");
-        }
-        userRepository.deleteById(id);
-    }
-
+    @Transactional
     public void deleteUserByEmail(String email) throws EntityNotFoundException {
         log.info("deleteUserByEmail - process started");
         if (userValidator.isEmailPresent(email)) {
             throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
         }
-
-        UserDTO userDto = getUserByEmail(email);
-
-        userDto.getUserFavorites().clear();
-
-        cartServiceClient.callDeleteCartByEmail(email);
 
         userRepository.deleteByEmail(email);
     }
@@ -177,7 +158,7 @@ public class UserService {
         User user = userRepository.getUserByEmail(userEmail);
 
         if (user == null) {
-            throw new EntityNotFoundException("Invalid Email adress!");
+            throw new EntityNotFoundException("Invalid Email address!");
         }
         PasswordResetToken confirmationToken = new PasswordResetToken(user);
 

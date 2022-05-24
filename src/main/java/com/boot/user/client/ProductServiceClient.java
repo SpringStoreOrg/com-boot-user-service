@@ -8,6 +8,10 @@ import org.springframework.web.client.RestTemplate;
 import com.boot.services.dto.ProductDTO;
 import com.boot.user.util.Constants;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 @Component
 public class ProductServiceClient {
 
@@ -18,5 +22,10 @@ public class ProductServiceClient {
     public ResponseEntity<ProductDTO> callGetProductByProductName(String productName) {
 
         return productServiceRestTemplate.getForEntity(Constants.GET_PRODUCT_BY_PRODUCT_NAME, ProductDTO.class, productName);
+    }
+
+    public List<ProductDTO> callGetAllProductsFromUserFavorites(List<String> productNames) {
+
+        return Arrays.asList(Objects.requireNonNull(productServiceRestTemplate.getForEntity(Constants.GET_ALL_PRODUCTS_FOR_USER, ProductDTO[].class, productNames).getBody()));
     }
 }

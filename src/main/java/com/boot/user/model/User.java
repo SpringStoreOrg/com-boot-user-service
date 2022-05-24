@@ -60,7 +60,7 @@ public class User implements Serializable {
 	private String role;
 
 	@JsonManagedReference
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY,  cascade = { CascadeType.REMOVE })
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY,  cascade = { CascadeType.ALL })
 	private List<UserFavorite> userFavorites;
 
 	@Column
