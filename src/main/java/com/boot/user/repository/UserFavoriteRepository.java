@@ -1,16 +1,13 @@
 package com.boot.user.repository;
 
 import com.boot.user.model.User;
+import com.boot.user.model.UserFavorite;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserFavoriteRepository extends JpaRepository<UserFavorite, Long> {
 
-	User getUserById(long id);
-	
-	User getUserByEmail(String email);
-
-	void deleteByEmail(String email);
+    void deleteByUserAndProductName(User user, String productName);
 }

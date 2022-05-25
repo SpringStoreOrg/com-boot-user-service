@@ -1,48 +1,45 @@
 package com.boot.user.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
+import com.boot.services.model.Email;
 import com.boot.user.config.AppConfig;
+import com.boot.user.model.ConfirmationToken;
+import com.boot.user.model.PasswordResetToken;
+import com.boot.user.model.User;
 import com.boot.user.util.Constants;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.app.VelocityEngine;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 
-import com.boot.services.model.Email;
-import com.boot.services.model.User;
-import com.boot.user.model.ConfirmationToken;
-import com.boot.user.model.PasswordResetToken;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class EmailService {
 
-    private static final String CONFIMATION_EMAIL_TEMPLATE = "/templates/email-template.vm";
+    private static final String CONFIRMATION_EMAIL_TEMPLATE = "/templates/email-template.vm";
 
     private static final String RESET_PASSWORD_EMAIL_TEMPLATE = "/templates/reset-password-email-template.vm";
 
-    @Autowired
     AppConfig appConfig;
 
-    @Autowired
     JavaMailSender emailSender;
 
-    @Autowired
     VelocityEngine velocityEngine;
 
-    public void sendConfirmationEmail(User user, ConfirmationToken confirmationToken) {
+    public void sendConfirmationEmail(@NotNull User user, @NotNull ConfirmationToken confirmationToken) {
 
         Email email = new Email();
 
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put("firstName", user.getFirstName());
         model.put("lastName", user.getLastName());
         model.put("path", appConfig.userServiceUrl + Constants.CONFIRM_USER_ACCOUNT);
@@ -58,20 +55,20 @@ public class EmailService {
             mimeMessageHelper.setSubject("SpringStore confirmation Email");
             mimeMessageHelper.setFrom("noreply@springwebstore.com");
             mimeMessageHelper.setTo(user.getEmail());
-            email.setEmailContent(geContentFromTemplate(email.getModel(), CONFIMATION_EMAIL_TEMPLATE));
+            email.setEmailContent(geContentFromTemplate(email.getModel(), CONFIRMATION_EMAIL_TEMPLATE));
             mimeMessageHelper.setText(email.getEmailContent(), true);
 
             emailSender.send(mimeMessageHelper.getMimeMessage());
         } catch (MessagingException e) {
-            log.info("Exception by sending confirmation email: {}", e.getStackTrace());
+            log.info("Exception by sending confirmation email: {}", (Object) e.getStackTrace());
         }
     }
 
-    public void sendPasswordResetEmail(User user, PasswordResetToken passwordResetToken) {
+    public void sendPasswordResetEmail(@NotNull User user, @NotNull PasswordResetToken passwordResetToken) {
 
         Email email = new Email();
 
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put("firstName", user.getFirstName());
         model.put("lastName", user.getLastName());
         model.put("path", appConfig.userServiceUrl + Constants.PASSWORD_RESET_EMAIL);
@@ -95,16 +92,16 @@ public class EmailService {
 
         } catch (MessagingException e) {
 
-            log.info("Exception by trying to send password reset email: {}", e.getStackTrace());
+            log.info("Exception by trying to send password reset email: {}", (Object) e.getStackTrace());
         }
     }
 
     public String geContentFromTemplate(Map<String, Object> model, String templatePath) {
-        StringBuffer content = new StringBuffer();
+        StringBuilder content = new StringBuilder();
         try {
             content.append(VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, templatePath, model));
         } catch (Exception e) {
-            log.info("Exception by getting content from the email template: {}", e.getStackTrace());
+            log.info("Exception by getting content from the email template: {}", (Object) e.getStackTrace());
         }
         return content.toString();
     }

@@ -1,68 +1,60 @@
 package com.boot.user.service;
 
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import com.boot.services.dto.UserDTO;
-import com.boot.services.mapper.UserMapper;
-import com.boot.services.model.User;
-import com.boot.user.client.CartServiceClient;
+import com.boot.user.dto.UserDTO;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.exception.UnableToModifyDataException;
 import com.boot.user.model.ConfirmationToken;
 import com.boot.user.model.PasswordResetToken;
+import com.boot.user.model.User;
 import com.boot.user.repository.ConfirmationTokenRepository;
 import com.boot.user.repository.PasswordResetTokenRepository;
 import com.boot.user.repository.UserRepository;
 import com.boot.user.validator.TokenValidator;
 import com.boot.user.validator.UserValidator;
-
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.boot.user.model.User.dtoToUserEntity;
+import static com.boot.user.model.User.userEntityToDto;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
     private UserValidator userValidator;
 
-    @Autowired
     private TokenValidator tokenValidator;
 
-    @Autowired
     private ConfirmationTokenRepository confirmationTokenRepository;
 
-    @Autowired
     private EmailService emailSenderService;
 
-    @Autowired
-    private CartServiceClient cartServiceClient;
-
-    @Autowired
     private PasswordResetTokenRepository passwordReserTokenRepository;
 
     @Transactional
-    public UserDTO addUser(UserDTO userDTO) {
+    public UserDTO addUser(@NotNull UserDTO userDTO) {
         log.info("addUser - process started");
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
         userDTO.setRole("USER");
 
-        User user = userRepository.save(UserMapper.DtoToUserEntity(userDTO).setCreatedOn(LocalDate.now()));
+        User user = userRepository.save(dtoToUserEntity(userDTO).setCreatedOn(LocalDate.now()));
 
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
 
@@ -70,7 +62,7 @@ public class UserService {
 
         emailSenderService.sendConfirmationEmail(user, confirmationToken);
 
-        return UserMapper.UserEntityToDto(user);
+        return userEntityToDto(user);
     }
 
     public void confirmUserAccount(String confirmationToken)
@@ -78,50 +70,54 @@ public class UserService {
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
 
         if (token != null) {
-            if (!tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
+            if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
                 throw new EntityNotFoundException("Token Expired!");
             }
-
-            UserDTO user = getUserByEmail(token.getUser().getEmail());
+            User user = userRepository.getUserByEmail(token.getUser().getEmail());
 
             if (user.isActivated()) {
                 throw new UnableToModifyDataException("User was already confirmed!");
             }
             user.setActivated(true);
 
-            userRepository.save(UserMapper.DtoToUserEntity(user));
+            userRepository.save(user);
         } else {
             throw new EntityNotFoundException("Token not found!");
         }
     }
 
-    public UserDTO updateUserByEmail(String email, UserDTO userDTO) {
+    public UserDTO updateUserByEmail(String email, @NotNull UserDTO userDTO) throws EntityNotFoundException {
+        log.info("updateUserByEmail - process started");
 
         User user = userRepository.getUserByEmail(email);
 
-        UserDTO userDTOMapped = UserMapper.UserEntityToDto(user);
-
-        userDTOMapped.setEmail(userDTO.getEmail());
-        userDTOMapped.setFirstName(userDTO.getFirstName());
-        userDTOMapped.setLastName(userDTO.getLastName());
-        userDTOMapped.setDeliveryAddress(userDTO.getDeliveryAddress());
-        userDTOMapped.setPhoneNumber(userDTO.getPhoneNumber());
-        userDTOMapped.setPassword(userDTO.getPassword());
-        userDTOMapped.setFavoriteProductList(userDTO.getFavoriteProductList());
-        userDTOMapped.setActivated(userDTO.isActivated());
-
-         userRepository
-                .save(UserMapper.updateDtoToUserEntity(user, userDTOMapped).setLastUpdatedOn(LocalDate.now()));
-
-        return userDTOMapped;
-    }
-
-    public UserDTO getUserById(long id) throws EntityNotFoundException {
-        if (!userValidator.isIdPresent(id)) {
-            throw new EntityNotFoundException("Id: " + id + " not found in the Database!");
+        if (user == null) {
+            throw new EntityNotFoundException("Invalid Email address!");
         }
-        User user = userRepository.getUserById(id);
-        return UserMapper.UserEntityToDto(user);
+
+        if(StringUtils.isNotBlank(userDTO.getEmail())) {
+            user.setEmail(userDTO.getEmail());
+        }
+        if(StringUtils.isNotBlank(userDTO.getFirstName())) {
+            user.setFirstName(userDTO.getFirstName());
+        }
+
+        if(StringUtils.isNotBlank(userDTO.getLastName())){
+            user.setLastName(userDTO.getLastName());
+        }
+
+        if(StringUtils.isNotBlank(userDTO.getDeliveryAddress())) {
+            user.setDeliveryAddress(userDTO.getDeliveryAddress());
+        }
+
+        if(StringUtils.isNotBlank(userDTO.getPhoneNumber())) {
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+        }
+        user.setLastUpdatedOn(LocalDate.now());
+
+        userRepository.save(user);
+
+        return userEntityToDto(user);
     }
 
     public List<UserDTO> getAllUsers() throws EntityNotFoundException {
@@ -133,7 +129,7 @@ public class UserService {
         }
         List<UserDTO> userDTOList = new ArrayList<>();
 
-        userList.forEach(u -> userDTOList.add(UserMapper.UserEntityToDto(u)));
+        userList.forEach(u -> userDTOList.add(userEntityToDto(u)));
         return userDTOList;
     }
 
@@ -144,27 +140,15 @@ public class UserService {
         }
 
         User user = userRepository.getUserByEmail(email);
-        return UserMapper.UserEntityToDto(user);
+        return userEntityToDto(user);
     }
 
-    public void deleteUserById(long id) throws EntityNotFoundException {
-        if (!userValidator.isIdPresent(id)) {
-            throw new EntityNotFoundException("Id: " + id + " not found in the Database!");
-        }
-        userRepository.deleteById(id);
-    }
-
+    @Transactional
     public void deleteUserByEmail(String email) throws EntityNotFoundException {
         log.info("deleteUserByEmail - process started");
         if (userValidator.isEmailPresent(email)) {
             throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
         }
-
-        UserDTO userDto = getUserByEmail(email);
-
-        userDto.getFavoriteProductList().clear();
-
-        cartServiceClient.callDeleteCartByEmail(email);
 
         userRepository.deleteByEmail(email);
     }
@@ -174,7 +158,7 @@ public class UserService {
         User user = userRepository.getUserByEmail(userEmail);
 
         if (user == null) {
-            throw new EntityNotFoundException("Invalid Email adress!");
+            throw new EntityNotFoundException("Invalid Email address!");
         }
         PasswordResetToken confirmationToken = new PasswordResetToken(user);
 
@@ -189,7 +173,7 @@ public class UserService {
         PasswordResetToken token = passwordReserTokenRepository.findByResetToken(confirmationToken);
 
         if (token != null) {
-            if (!tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
+            if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
                 throw new EntityNotFoundException("Token Expired!");
             }
 
