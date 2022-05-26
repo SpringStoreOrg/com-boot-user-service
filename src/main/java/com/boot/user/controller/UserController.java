@@ -42,13 +42,6 @@ public class UserController {
         return new ResponseEntity<>("User activated Succesfully!", HttpStatus.OK);
     }
 
-    @GetMapping("/id")
-    @ResponseBody
-    public ResponseEntity<UserDTO> findByUserId(@RequestParam long id) throws EntityNotFoundException {
-        UserDTO user = userService.getUserById(id);
-        return new ResponseEntity<>(user, HttpStatus.OK);
-    }
-
     @GetMapping("/users")
     @ResponseBody
     public ResponseEntity<List<UserDTO>> getAllUsers() throws EntityNotFoundException {

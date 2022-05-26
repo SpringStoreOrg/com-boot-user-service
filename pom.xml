@@ -103,19 +103,6 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
-        <!-- Datamodel entity -->
-        <dependency>
-            <groupId>com.github.GeorgeT88</groupId>
-            <artifactId>commons-datamodel-entity</artifactId>
-            <version>release-1.4</version>
-        </dependency>
-
-        <!-- Datamodel DTO -->
-        <dependency>
-            <groupId>com.github.GeorgeT88</groupId>
-            <artifactId>commons-datamodel-dto</artifactId>
-            <version>release-1.8</version>
-        </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>

@@ -1,6 +1,6 @@
 package com.boot.user.controller;
 
-import com.boot.services.dto.ProductDTO;
+import com.boot.user.dto.ProductDTO;
 import com.boot.user.dto.UserDTO;
 import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.exception.EntityNotFoundException;

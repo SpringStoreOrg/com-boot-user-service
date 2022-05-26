@@ -1,8 +1,8 @@
 package com.boot.user.service;
 
-import com.boot.services.model.Email;
 import com.boot.user.config.AppConfig;
 import com.boot.user.model.ConfirmationToken;
+import com.boot.user.model.Email;
 import com.boot.user.model.PasswordResetToken;
 import com.boot.user.model.User;
 import com.boot.user.util.Constants;

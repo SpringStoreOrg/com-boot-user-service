@@ -1,13 +1,12 @@
 package com.boot.user.client;
 
+import com.boot.user.dto.UserDTO;
+import com.boot.user.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import com.boot.services.dto.UserDTO;
-import com.boot.user.util.Constants;
 
 @Component
 public class CartServiceClient {
