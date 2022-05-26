@@ -68,6 +68,8 @@ public class UserFavoritesService {
 
         List<String> userFavoriteProducts =  user.getUserFavorites().stream().map(UserFavorite :: getProductName).collect(Collectors.toList());
 
-        return  productServiceClient.callGetAllProductsFromUserFavorites(userFavoriteProducts);
+        String productParam = userFavoriteProducts.stream().collect(Collectors.joining(","));
+
+        return  productServiceClient.callGetAllProductsFromUserFavorites(productParam);
     }
 }
