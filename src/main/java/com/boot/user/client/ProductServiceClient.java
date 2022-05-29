@@ -23,8 +23,8 @@ public class ProductServiceClient {
         return productServiceRestTemplate.getForEntity(Constants.GET_PRODUCT_BY_PRODUCT_NAME, ProductDTO.class, productName);
     }
 
-    public List<ProductDTO> callGetAllProductsFromUserFavorites(String productNames) {
+    public List<ProductDTO> callGetAllProductsFromUserFavorites(String productNames, Boolean includeInactive ) {
 
-        return Arrays.asList(Objects.requireNonNull(productServiceRestTemplate.getForEntity(Constants.GET_ALL_PRODUCTS_FOR_USER, ProductDTO[].class, productNames).getBody()));
+        return Arrays.asList(Objects.requireNonNull(productServiceRestTemplate.getForEntity(Constants.GET_ALL_PRODUCTS_FOR_USER, ProductDTO[].class, productNames, includeInactive).getBody()));
     }
 }

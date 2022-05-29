@@ -70,6 +70,6 @@ public class UserFavoritesService {
 
         String productParam = userFavoriteProducts.stream().collect(Collectors.joining(","));
 
-        return  productServiceClient.callGetAllProductsFromUserFavorites(productParam);
+        return  productServiceClient.callGetAllProductsFromUserFavorites(productParam, true);
     }
 }
