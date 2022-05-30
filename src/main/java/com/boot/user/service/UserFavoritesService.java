@@ -42,7 +42,6 @@ public class UserFavoritesService {
             userFavorite.setUser(user);
             userFavorite.setProductName(productName);
 
-            user.getUserFavorites().add(userFavorite);
             userFavoriteRepository.save(userFavorite);
 
             return userEntityToDto(user);
