@@ -4,7 +4,7 @@ public class Constants {
 
 	public static final String GET_PRODUCT_BY_PRODUCT_NAME = "/?productName={productName}";
 
-	public static final String GET_ALL_PRODUCTS_FOR_USER = "/details/?productNames={products}&includeInactive={includeInactive}";
+	public static final String GET_ALL_PRODUCTS_FOR_USER = "/?productNames={products}&includeInactive={includeInactive}";
 
 	public static final String DELETE_CART_BY_EMAIL =  "/?email={email}";
 
