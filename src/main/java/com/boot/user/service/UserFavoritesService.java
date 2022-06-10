@@ -10,6 +10,7 @@ import com.boot.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,7 @@ public class UserFavoritesService {
             user.getUserFavorites().add(userFavorite);
             userFavoriteRepository.save(userFavorite);
 
-            return getAllProductsFromUserFavorites(email);
+            return getProductDTOS(user);
         }
     }
 
@@ -56,14 +57,17 @@ public class UserFavoritesService {
 
         userFavoriteRepository.delete(userFavorite);
 
-        return getAllProductsFromUserFavorites(email);
+        return getProductDTOS(user);
     }
-
 
     public List<ProductDTO> getAllProductsFromUserFavorites(String email) {
 
         User user = userRepository.getUserByEmail(email);
 
+        return getProductDTOS(user);
+    }
+
+    private List<ProductDTO> getProductDTOS(@NotNull User user) {
         List<String> userFavoriteProducts = user.getUserFavorites().stream().map(UserFavorite::getProductName).collect(Collectors.toList());
 
         String productParam = String.join(",", userFavoriteProducts);
@@ -73,6 +77,8 @@ public class UserFavoritesService {
         } else {
             return new ArrayList<>();
         }
-
     }
+
+
+
 }
