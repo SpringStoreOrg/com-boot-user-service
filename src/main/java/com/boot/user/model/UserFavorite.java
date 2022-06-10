@@ -21,4 +21,12 @@ public class UserFavorite {
 
     @Column(name = "product_name")
     private String productName;
+
+    @Override
+    public String toString() {
+        return "UserFavorite{" +
+                "id=" + id +
+                ", productName='" + productName + '\'' +
+                '}';
+    }
 }

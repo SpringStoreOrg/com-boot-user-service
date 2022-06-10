@@ -1,9 +1,7 @@
 package com.boot.user.controller;
 
 import com.boot.user.dto.ProductDTO;
-import com.boot.user.dto.UserDTO;
 import com.boot.user.exception.DuplicateEntryException;
-import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.service.UserFavoritesService;
 import com.boot.user.util.Constants;
 import lombok.AllArgsConstructor;
@@ -24,19 +22,18 @@ public class UserFavoritesController {
     private UserFavoritesService userFavoritesService;
 
     @PostMapping ("/{email}/{productName}")
-    public ResponseEntity<UserDTO> addProductToUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email,
+    public ResponseEntity<List<ProductDTO>> addProductToUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email,
                                                              @Size(min = 2, max = 30, message = "Product Name size has to be between 2 and 30 characters!") @PathVariable("productName") String productName)
             throws DuplicateEntryException {
-        UserDTO user = userFavoritesService.addProductToUserFavorites(email, productName);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        List<ProductDTO> productList = userFavoritesService.addProductToUserFavorites(email, productName);
+        return new ResponseEntity<>(productList, HttpStatus.OK);
     }
 
     @DeleteMapping("/{email}/{productName}")
-    public ResponseEntity<UserDTO> removeProductFromUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email,
-                                                                  @Size(min = 2, max = 30, message = "Product Name size has to be between 2 and 30 characters!") @PathVariable("productName") String productName)
-            throws EntityNotFoundException {
-        UserDTO user = userFavoritesService.removeProductFromUserFavorites(email, productName);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public ResponseEntity<List<ProductDTO>> removeProductFromUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email,
+                                                                  @Size(min = 2, max = 30, message = "Product Name size has to be between 2 and 30 characters!") @PathVariable("productName") String productName) {
+        List<ProductDTO> productList = userFavoritesService.removeProductFromUserFavorites(email, productName);
+        return new ResponseEntity<>(productList, HttpStatus.OK);
     }
 
     @GetMapping("/{email}")

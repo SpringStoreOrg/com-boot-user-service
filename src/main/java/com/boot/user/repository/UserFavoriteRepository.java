@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface UserFavoriteRepository extends JpaRepository<UserFavorite, Long> {
 
     void deleteByUserAndProductName(User user, String productName);
+    UserFavorite findByUserAndProductName(User user, String productName);
 }
