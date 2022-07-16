@@ -29,6 +29,13 @@ public class UserFavoritesController {
         return new ResponseEntity<>(productList, HttpStatus.OK);
     }
 
+    @PutMapping("/{email}")
+    public ResponseEntity<List<ProductDTO>> addProductsToUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email,
+                                                                       @Size(min = 2, max = 90, message = "Products size has to be between 2 and 90 characters!") @RequestBody List<String> productNames) {
+        List<ProductDTO> productList = userFavoritesService.addProductsToUserFavorites(email, productNames);
+        return new ResponseEntity<>(productList, HttpStatus.OK);
+    }
+
     @DeleteMapping("/{email}/{productName}")
     public ResponseEntity<List<ProductDTO>> removeProductFromUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email,
                                                                   @Size(min = 2, max = 30, message = "Product Name size has to be between 2 and 30 characters!") @PathVariable("productName") String productName) {

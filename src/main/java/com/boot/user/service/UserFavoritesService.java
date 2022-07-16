@@ -49,6 +49,24 @@ public class UserFavoritesService {
     }
 
     @Transactional
+    public List<ProductDTO> addProductsToUserFavorites(String email, List<String> productNames) {
+        log.info("addProductsToUserFavorites - process started");
+        User user = userRepository.getUserByEmail(email);
+
+            for(String productName : productNames ) {
+
+                if (!user.getUserFavorites().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
+                    UserFavorite userFavorite = new UserFavorite();
+                    userFavorite.setUser(user);
+                    userFavorite.setProductName(productName);
+                    user.getUserFavorites().add(userFavorite);
+                    userFavoriteRepository.save(userFavorite);
+                }
+            }
+            return getProductDTOS(user);
+        }
+
+    @Transactional
     public List<ProductDTO> removeProductFromUserFavorites(String email, String productName) {
 
         User user = this.userRepository.getUserByEmail(email);
