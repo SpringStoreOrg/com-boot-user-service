@@ -1,6 +1,5 @@
 package com.boot.user.tests.controller;
 
-import com.boot.user.controller.UserController;
 import com.boot.user.dto.UserDTO;
 import com.boot.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,19 +12,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
-@SpringBootTest(classes = {UserService.class, UserController.class})
-@ActiveProfiles("test")
+@SpringBootTest
+@TestPropertySource(locations = "classpath:test.properties")
 public class UserControllerTest {
 
     @Autowired
@@ -47,13 +47,15 @@ public class UserControllerTest {
         UserDTO userDTO = getUserDTO();
         String requestJson = objectWriter.writeValueAsString(userDTO);
 
-        mockMvc.perform(post("http://localhost:8080/")
+        when(userService.addUser(userDTO)).thenReturn(userDTO);
+        mockMvc.perform(post("/")
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
                 .andExpect(status().isCreated())
                 .andExpect(content()
-                        .string("{\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\"," +
-                                "\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"deliveryAddress\":\"stret, no. 1\"}"));
+                        .string("{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\"," +
+                                "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"," +
+                                "\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}"));
 
         verify(userService).addUser(userDTO);
     }
