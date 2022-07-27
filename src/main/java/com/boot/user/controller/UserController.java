@@ -10,12 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import java.util.List;
 
+@Validated
 @Controller
 public class UserController {
 
@@ -30,7 +32,7 @@ public class UserController {
     }
 
     @PutMapping("/{email}")
-    public ResponseEntity<UserDTO> updateUserByEmail(@Valid @RequestBody UserDTO userDTO, @Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email) throws EntityNotFoundException {
+    public ResponseEntity<UserDTO> updateUserByEmail(@Valid @RequestBody UserDTO userDTO, @Email(message = "Invalid email!!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email) throws EntityNotFoundException {
         UserDTO user = userService.updateUserByEmail(email, userDTO);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }

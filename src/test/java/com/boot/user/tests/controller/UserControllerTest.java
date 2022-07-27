@@ -15,10 +15,16 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.util.NestedServletException;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,6 +42,8 @@ public class UserControllerTest {
 
     private ObjectWriter objectWriter;
 
+    private Validator validator;
+
     @Before
     public void init() {
         this.objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
@@ -48,8 +56,8 @@ public class UserControllerTest {
         String requestJson = objectWriter.writeValueAsString(userDTO);
 
         when(userService.addUser(userDTO)).thenReturn(userDTO);
+
         mockMvc.perform(post("/")
-                        .accept(MediaType.APPLICATION_JSON_VALUE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
                 .andExpect(status().isCreated())
                 .andExpect(content()
@@ -59,6 +67,63 @@ public class UserControllerTest {
 
         verify(userService).addUser(userDTO);
     }
+
+    @Test
+    public void addUserWithMissingFirstName() throws Exception {
+
+        UserDTO userDTO = getUserDTO();
+        userDTO.setFirstName("aa");
+        String requestJson = objectWriter.writeValueAsString(userDTO);
+
+        when(userService.addUser(userDTO)).thenReturn(userDTO);
+        mockMvc.perform(post("/")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
+                .andExpect(result -> assertTrue(result.getResolvedException().getMessage().contains("Min First name size is 3 characters!")));
+
+        verifyNoInteractions(userService);
+    }
+
+    @Test
+    public void updateUserByEmail() throws Exception {
+
+        UserDTO userDTO = getUserDTO();
+        userDTO.setFirstName("newTestName");
+
+        String requestJson = objectWriter.writeValueAsString(userDTO);
+
+        when(userService.updateUserByEmail(userDTO.getEmail(),userDTO)).thenReturn(userDTO);
+
+        mockMvc.perform(put("/" + userDTO.getEmail())
+                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .string("{\"id\":0,\"firstName\":\"newTestName\",\"lastName\":\"testLastName\"," +
+                                "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"," +
+                                "\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}"));
+
+        verify(userService).updateUserByEmail(userDTO.getEmail(),userDTO);
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void updateUserByEmailInvalidEmail() throws Exception {
+
+        UserDTO userDTO = getUserDTO();
+        userDTO.setFirstName("newTestName");
+
+        String requestJson = objectWriter.writeValueAsString(userDTO);
+
+        try{
+        mockMvc.perform(put("/" + "a")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
+                .andExpect(status().isInternalServerError());
+        }catch (NestedServletException e) {
+            throw (Exception) e.getCause();
+        }
+    }
+
+
 
     private UserDTO getUserDTO() {
         UserDTO userDTO = new UserDTO();

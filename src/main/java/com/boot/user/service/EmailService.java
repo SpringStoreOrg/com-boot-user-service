@@ -7,7 +7,6 @@ import com.boot.user.model.PasswordResetToken;
 import com.boot.user.model.User;
 import com.boot.user.util.Constants;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -24,7 +23,6 @@ import java.util.Map;
 @Slf4j
 @Service
 @AllArgsConstructor
-@NoArgsConstructor
 public class EmailService {
 
     private static final String CONFIRMATION_EMAIL_TEMPLATE = "/templates/email-template.vm";

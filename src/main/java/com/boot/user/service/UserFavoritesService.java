@@ -8,7 +8,6 @@ import com.boot.user.model.UserFavorite;
 import com.boot.user.repository.UserFavoriteRepository;
 import com.boot.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
-@NoArgsConstructor
 public class UserFavoritesService {
 
     private UserRepository userRepository;
