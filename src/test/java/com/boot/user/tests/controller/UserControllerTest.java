@@ -4,6 +4,7 @@ import com.boot.user.dto.UserDTO;
 import com.boot.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,18 +16,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.util.NestedServletException;
 
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
@@ -41,8 +35,6 @@ public class UserControllerTest {
     private UserService userService;
 
     private ObjectWriter objectWriter;
-
-    private Validator validator;
 
     @Before
     public void init() {
@@ -79,8 +71,7 @@ public class UserControllerTest {
         mockMvc.perform(post("/")
                         .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
                 .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
-                .andExpect(result -> assertTrue(result.getResolvedException().getMessage().contains("Min First name size is 3 characters!")));
+                .andExpect(jsonPath("$.message", Matchers.containsString("Min First name size is 3 characters!")));
 
         verifyNoInteractions(userService);
     }
@@ -106,7 +97,7 @@ public class UserControllerTest {
         verify(userService).updateUserByEmail(userDTO.getEmail(),userDTO);
     }
 
-    @Test(expected = ConstraintViolationException.class)
+    @Test
     public void updateUserByEmailInvalidEmail() throws Exception {
 
         UserDTO userDTO = getUserDTO();
@@ -114,13 +105,11 @@ public class UserControllerTest {
 
         String requestJson = objectWriter.writeValueAsString(userDTO);
 
-        try{
+
         mockMvc.perform(put("/" + "a")
                         .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
-                .andExpect(status().isInternalServerError());
-        }catch (NestedServletException e) {
-            throw (Exception) e.getCause();
-        }
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", Matchers.is("updateUserByEmail.email: Invalid email!!")));
     }
 
 

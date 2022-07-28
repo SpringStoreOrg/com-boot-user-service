@@ -3,12 +3,14 @@ package com.boot.user.exception;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import javax.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -70,6 +72,24 @@ public class GlobalExceptionHandler {
 	{
 		return createResponseEntity(HttpStatus.BAD_REQUEST,
 				unableToModifyDataException);
+	}
+
+	@ExceptionHandler(ConstraintViolationException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ResponseEntity<ApiError> constraintViolationException(
+			ConstraintViolationException constraintViolationException)
+	{
+		return createResponseEntity(HttpStatus.BAD_REQUEST,
+				constraintViolationException);
+	}
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ResponseEntity<ApiError> methodArgumentNotValidException(
+			MethodArgumentNotValidException methodArgumentNotValidException)
+	{
+		return createResponseEntity(HttpStatus.BAD_REQUEST,
+				methodArgumentNotValidException);
 	}
 
 }
