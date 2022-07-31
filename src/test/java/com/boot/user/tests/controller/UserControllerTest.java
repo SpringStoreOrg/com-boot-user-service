@@ -17,9 +17,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
+
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -112,7 +113,67 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.message", Matchers.is("updateUserByEmail.email: Invalid email!!")));
     }
 
+    @Test
+    public void confirmUserAccount() throws Exception {
 
+        String token = "testToken";
+
+        mockMvc.perform(put("/confirm/" + token)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().string("User activated Successfully!"));;
+
+        verify(userService).confirmUserAccount(token);
+    }
+
+    @Test
+    public void getAllUsers() throws Exception {
+
+        when(userService.getAllUsers()).thenReturn(Arrays.asList(
+                getUserDTO(),
+                getUserDTO()
+        ));
+
+        mockMvc.perform(get("/users")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}," +
+                        "{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}]"));
+
+        verify(userService).getAllUsers();
+    }
+
+    @Test
+    public void getUserByEmail() throws Exception {
+
+        UserDTO userDTO = getUserDTO();
+
+        String requestJson = objectWriter.writeValueAsString(userDTO);
+
+        when(userService.getUserByEmail(userDTO.getEmail())).thenReturn(userDTO);
+
+        mockMvc.perform(get("/" ).param("email", userDTO.getEmail())
+                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .string("{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\"," +
+                                "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"," +
+                                "\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}"));
+
+        verify(userService).getUserByEmail(userDTO.getEmail());
+    }
+
+    @Test
+    public void deleteUserByByEmail() throws Exception {
+
+        UserDTO userDTO = getUserDTO();
+
+        mockMvc.perform(delete("/" + userDTO.getEmail())
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+
+        verify(userService).deleteUserByEmail(userDTO.getEmail());
+    }
 
     private UserDTO getUserDTO() {
         UserDTO userDTO = new UserDTO();

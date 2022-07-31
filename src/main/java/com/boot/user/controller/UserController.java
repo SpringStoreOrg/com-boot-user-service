@@ -41,7 +41,7 @@ public class UserController {
     public ResponseEntity<String> confirmUserAccount(@PathVariable("token") String token)
             throws EntityNotFoundException, UnableToModifyDataException {
         userService.confirmUserAccount(token);
-        return new ResponseEntity<>("User activated Succesfully!", HttpStatus.OK);
+        return new ResponseEntity<>("User activated Successfully!", HttpStatus.OK);
     }
 
     @GetMapping("/users")
