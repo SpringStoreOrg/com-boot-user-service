@@ -1,18 +1,13 @@
 package com.boot.user.tests.controller;
 
 import com.boot.user.service.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.verify;
@@ -20,7 +15,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource(locations = "classpath:test.properties")
@@ -31,14 +25,6 @@ public class PasswordControllerTest {
 
     @MockBean
     private UserService userService;
-
-    private ObjectWriter objectWriter;
-
-    @Before
-    public void init() {
-        this.objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-    }
-
 
     @Test
     public void changeUserPassword() throws Exception {

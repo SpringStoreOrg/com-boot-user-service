@@ -5,16 +5,14 @@ import com.boot.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -23,7 +21,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource(locations = "classpath:test.properties")
@@ -35,11 +32,11 @@ public class UserControllerTest {
     @MockBean
     private UserService userService;
 
-    private ObjectWriter objectWriter;
+    private static ObjectWriter objectWriter;
 
-    @Before
-    public void init() {
-        this.objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
+    @BeforeAll
+    public static void setUp() {
+        objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
     }
 
     @Test
@@ -54,7 +51,7 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
                 .andExpect(status().isCreated())
                 .andExpect(content()
-                        .string("{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\"," +
+                        .json("{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\"," +
                                 "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"," +
                                 "\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}"));
 
@@ -62,7 +59,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void addUserWithMissingFirstName() throws Exception {
+    public void addUserWith_invalidFirstNameMinCharacters() throws Exception {
 
         UserDTO userDTO = getUserDTO();
         userDTO.setFirstName("aa");
@@ -91,7 +88,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
                 .andExpect(status().isOk())
                 .andExpect(content()
-                        .string("{\"id\":0,\"firstName\":\"newTestName\",\"lastName\":\"testLastName\"," +
+                        .json("{\"id\":0,\"firstName\":\"newTestName\",\"lastName\":\"testLastName\"," +
                                 "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"," +
                                 "\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}"));
 
@@ -139,7 +136,7 @@ public class UserControllerTest {
         mockMvc.perform(get("/users")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().string("[{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}," +
+                .andExpect(content().json("[{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}," +
                         "{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}]"));
 
         verify(userService).getAllUsers();
@@ -154,11 +151,11 @@ public class UserControllerTest {
 
         when(userService.getUserByEmail(userDTO.getEmail())).thenReturn(userDTO);
 
-        mockMvc.perform(get("/" ).param("email", userDTO.getEmail())
+        mockMvc.perform(get("/").param("email", userDTO.getEmail())
                         .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
                 .andExpect(status().isOk())
                 .andExpect(content()
-                        .string("{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\"," +
+                        .json("{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\"," +
                                 "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"," +
                                 "\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}"));
 
