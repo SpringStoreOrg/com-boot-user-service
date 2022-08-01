@@ -4,29 +4,25 @@ import com.boot.user.dto.ProductDTO;
 import com.boot.user.enums.ProductStatus;
 import com.boot.user.service.UserFavoritesService;
 import com.boot.user.tests.testDataUtils.TestDataUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource(locations = "classpath:test.properties")
@@ -37,13 +33,6 @@ public class UserFavoritesControllerTest {
 
     @MockBean
     private UserFavoritesService userFavoritesService;
-
-    private ObjectWriter objectWriter;
-
-    @Before
-    public void init() {
-        this.objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-    }
 
     @Test
     public void addProductToUserFavorites() throws Exception {
@@ -65,7 +54,46 @@ public class UserFavoritesControllerTest {
         verify(userFavoritesService).addProductToUserFavorites(email, productDTO.getName());
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"a","  ", "asdkasdjlasjkdalskdjasldakjdalkdjaslk", "123^^@test.com"})
+    @NullSource
+    public void addProductToUserFavorites_invalidEmail(String email) throws Exception {
 
+        ProductDTO productDTO = getProductDTO(1,"Green wood Chair 1");
+
+        when(userFavoritesService.addProductToUserFavorites(email, productDTO.getName())).thenReturn(Arrays.asList(
+                getProductDTO(1,"Green wood Chair 1"),
+                getProductDTO(2,"Green wood Chair 2"),
+                getProductDTO(3,"Green wood Chair 3"),
+                getProductDTO(4,"Green wood Chair 4")));
+
+        mockMvc.perform(post("/userFavorites/"+ email +"/"+ productDTO.getName())
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", Matchers.is("addProductToUserFavorites.email: Invalid email!")));
+
+        verifyNoInteractions(userFavoritesService);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"a", "asdkasdjlasjkdalskdjasldakjdalkdjaslk"})
+    public void addProductToUserFavorites_invalidProductName(String productName) throws Exception {
+
+        String email = "test@email.com";
+
+        when(userFavoritesService.addProductToUserFavorites(email, productName)).thenReturn(Arrays.asList(
+                getProductDTO(1,"Green wood Chair 1"),
+                getProductDTO(2,"Green wood Chair 2"),
+                getProductDTO(3,"Green wood Chair 3"),
+                getProductDTO(4,"Green wood Chair 4")));
+
+        mockMvc.perform(post("/userFavorites/"+ email +"/"+ productName)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", Matchers.containsString("Product Name size has to be between 2 and 30 characters!")));
+
+        verifyNoInteractions(userFavoritesService);
+    }
 
     private ProductDTO getProductDTO(long id, String productName) {
         ProductDTO productDTO = new ProductDTO();

@@ -111,6 +111,8 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", Matchers.is("updateUserByEmail.email: Invalid email!!")));
+
+        verifyNoInteractions(userService);
     }
 
     @Test
