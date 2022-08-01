@@ -8,12 +8,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.constraints.Email;
 
+@Validated
 @Controller
 @AllArgsConstructor
 @RequestMapping("/password")
@@ -25,7 +27,7 @@ public class PasswordController {
     public ResponseEntity<String> requestResetPassword(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
             throws EntityNotFoundException {
         userService.requestResetPassword(email);
-        return new ResponseEntity<>("Request to reset Password succesfully send!", HttpStatus.OK);
+        return new ResponseEntity<>("Request to reset Password successfully send!", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/change/{token}/{newPassword}/{confirmedNewPassword}", method = {
@@ -35,7 +37,7 @@ public class PasswordController {
                                                      @PathVariable("confirmedNewPassword") String confirmedNewPassword)
             throws EntityNotFoundException, UnableToModifyDataException {
         userService.changeUserPassword(token, newPassword, confirmedNewPassword);
-        return new ResponseEntity<>("Password succesfully changed!", HttpStatus.OK);
+        return new ResponseEntity<>("Password successfully changed!", HttpStatus.OK);
     }
 
 }
