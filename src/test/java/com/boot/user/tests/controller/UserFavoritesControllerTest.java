@@ -4,7 +4,10 @@ import com.boot.user.dto.ProductDTO;
 import com.boot.user.enums.ProductStatus;
 import com.boot.user.service.UserFavoritesService;
 import com.boot.user.tests.testDataUtils.TestDataUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
@@ -18,9 +21,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
@@ -33,6 +38,13 @@ public class UserFavoritesControllerTest {
 
     @MockBean
     private UserFavoritesService userFavoritesService;
+
+    private static ObjectWriter objectWriter;
+
+    @BeforeAll
+    public static void setUp() {
+        objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
+    }
 
     @Test
     public void addProductToUserFavorites() throws Exception {
@@ -93,6 +105,27 @@ public class UserFavoritesControllerTest {
                 .andExpect(jsonPath("$.message", Matchers.containsString("Product Name size has to be between 2 and 30 characters!")));
 
         verifyNoInteractions(userFavoritesService);
+    }
+
+    @Test
+    public void addProductsToUserFavorites() throws Exception {
+
+        String email = "test@email.com";
+        List<String> products = Arrays.asList("Green wood Chair 1", "Green wood Chair 2", "Green wood Chair 3");
+
+        String requestJson = objectWriter.writeValueAsString(products);
+
+        when(userFavoritesService.addProductsToUserFavorites(email, products)).thenReturn(Arrays.asList(
+                getProductDTO(1,"Green wood Chair 1"),
+                getProductDTO(2,"Green wood Chair 2"),
+                getProductDTO(3,"Green wood Chair 3")));
+
+        mockMvc.perform(put("/userFavorites/"+ email)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(content().json(TestDataUtils.readFileAsString("./src/test/resources/testdata/controller/addProductsToUserFavorites.json")));
+
+        verify(userFavoritesService).addProductsToUserFavorites(email, products);
     }
 
     private ProductDTO getProductDTO(long id, String productName) {
