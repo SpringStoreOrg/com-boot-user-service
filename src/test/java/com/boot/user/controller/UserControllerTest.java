@@ -1,4 +1,4 @@
-package com.boot.user.tests.controller;
+package com.boot.user.controller;
 
 import com.boot.user.dto.UserDTO;
 import com.boot.user.service.UserService;

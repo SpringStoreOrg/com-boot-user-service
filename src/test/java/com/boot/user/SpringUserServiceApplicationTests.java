@@ -1,4 +1,4 @@
-package com.boot.user.tests;
+package com.boot.user;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

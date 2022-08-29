@@ -1,4 +1,4 @@
-package com.boot.user.tests.testDataUtils;
+package com.boot.user.testDataUtils;
 
 import lombok.NoArgsConstructor;
 

@@ -1,9 +1,9 @@
-package com.boot.user.tests.controller;
+package com.boot.user.controller;
 
 import com.boot.user.dto.ProductDTO;
 import com.boot.user.enums.ProductStatus;
 import com.boot.user.service.UserFavoritesService;
-import com.boot.user.tests.testDataUtils.TestDataUtils;
+import com.boot.user.testDataUtils.TestDataUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.hamcrest.Matchers;
