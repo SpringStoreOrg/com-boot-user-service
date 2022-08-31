@@ -2,6 +2,7 @@ package com.boot.user.service;
 
 
 import com.boot.user.dto.UserDTO;
+import com.boot.user.model.ConfirmationToken;
 import com.boot.user.model.User;
 import com.boot.user.repository.ConfirmationTokenRepository;
 import com.boot.user.repository.PasswordResetTokenRepository;
@@ -19,7 +20,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
 
-import static com.boot.user.model.User.dtoToUserEntity;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -53,21 +53,28 @@ public class UserServiceTest {
     private PasswordResetTokenRepository passwordReserTokenRepository;
 
 
-
     @Test
-    public void addUser(){
-        User user = dtoToUserEntity(getUserDTO());
-             user.setCreatedOn(LocalDate.now());
+    public void addUser() {
+
+        ConfirmationToken confirmationToken = new ConfirmationToken(getUser());
 
         when(passwordEncoder.encode(getUserDTO().getPassword())).thenReturn("testPassword");
 
-        when(userRepository.save(any())).thenReturn(user);
+        when(userRepository.save(any())).thenReturn(getUser());
+        when(confirmationTokenRepository.save(any())).thenReturn(confirmationToken);
 
-        UserDTO returnedUser =   userService.addUser(getUserDTO());
+        doNothing().when(emailSenderService).sendConfirmationEmail(getUser(), confirmationToken);
 
-        verify(userRepository, times(1)).save(user);
+        User savedUser = userRepository.save(getUser());
+        confirmationTokenRepository.save(confirmationToken);
+        emailSenderService.sendConfirmationEmail(getUser(), confirmationToken);
 
-        Assert.assertEquals(returnedUser,getUserDTO());
+
+        verify(userRepository).save(getUser());
+        verify(confirmationTokenRepository).save(confirmationToken);
+        verify(emailSenderService).sendConfirmationEmail(getUser(), confirmationToken);
+
+        Assert.assertEquals(savedUser, getUser());
     }
 
     private UserDTO getUserDTO() {
@@ -82,6 +89,21 @@ public class UserServiceTest {
                 .setDeliveryAddress("stret, no. 1");
 
         return userDTO;
+    }
+
+    private User getUser() {
+        User user = new User();
+
+        user.setFirstName("testName")
+                .setLastName("testLastName")
+                .setPhoneNumber("0742000000")
+                .setPassword("testPassword")
+                .setEmail("jon278@gaailer.site")
+                .setRole("USER")
+                .setCreatedOn(LocalDate.now())
+                .setDeliveryAddress("stret, no. 1");
+
+        return user;
     }
 
 }
