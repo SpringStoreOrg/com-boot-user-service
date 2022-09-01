@@ -60,21 +60,21 @@ public class UserServiceTest {
 
         when(passwordEncoder.encode(getUserDTO().getPassword())).thenReturn("testPassword");
 
-        when(userRepository.save(any())).thenReturn(getUser());
+        when(userRepository.save(getUser())).thenReturn(getUser());
         when(confirmationTokenRepository.save(any())).thenReturn(confirmationToken);
 
         doNothing().when(emailSenderService).sendConfirmationEmail(getUser(), confirmationToken);
 
-        User savedUser = userRepository.save(getUser());
         confirmationTokenRepository.save(confirmationToken);
         emailSenderService.sendConfirmationEmail(getUser(), confirmationToken);
 
+        UserDTO savedUser = userService.addUser(getUserDTO());
 
         verify(userRepository).save(getUser());
         verify(confirmationTokenRepository).save(confirmationToken);
         verify(emailSenderService).sendConfirmationEmail(getUser(), confirmationToken);
 
-        Assert.assertEquals(savedUser, getUser());
+        Assert.assertEquals(savedUser, getUserDTO());
     }
 
     private UserDTO getUserDTO() {
