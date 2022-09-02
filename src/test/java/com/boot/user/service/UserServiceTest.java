@@ -11,6 +11,8 @@ import com.boot.user.validator.TokenValidator;
 import com.boot.user.validator.UserValidator;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -52,25 +54,24 @@ public class UserServiceTest {
     @Mock
     private PasswordResetTokenRepository passwordReserTokenRepository;
 
+    @Captor
+    private ArgumentCaptor<ConfirmationToken> confirmationTokenCaptor;
 
     @Test
     public void addUser() {
 
-        ConfirmationToken confirmationToken = new ConfirmationToken(getUser());
-
         when(passwordEncoder.encode(getUserDTO().getPassword())).thenReturn("testPassword");
-
         when(userRepository.save(getUser())).thenReturn(getUser());
-        when(confirmationTokenRepository.save(any())).thenReturn(confirmationToken);
-
-        doNothing().when(emailSenderService).sendConfirmationEmail(getUser(), confirmationToken);
-
-        confirmationTokenRepository.save(confirmationToken);
-        emailSenderService.sendConfirmationEmail(getUser(), confirmationToken);
+        when(confirmationTokenRepository.save(any())).thenReturn(any(ConfirmationToken.class));
 
         UserDTO savedUser = userService.addUser(getUserDTO());
 
         verify(userRepository).save(getUser());
+
+        verify(confirmationTokenRepository).save(confirmationTokenCaptor.capture());
+
+        ConfirmationToken confirmationToken = confirmationTokenCaptor.getValue();
+
         verify(confirmationTokenRepository).save(confirmationToken);
         verify(emailSenderService).sendConfirmationEmail(getUser(), confirmationToken);
 
