@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -75,7 +76,14 @@ public class UserServiceTest {
         verify(confirmationTokenRepository).save(confirmationToken);
         verify(emailSenderService).sendConfirmationEmail(getUser(), confirmationToken);
 
-        Assert.assertEquals(savedUser, getUserDTO());
+        Assert.assertEquals(getUserDTO(),savedUser);
+
+        Assert.assertNotNull(confirmationToken);
+        Assert.assertEquals(getUser(), confirmationToken.getUser());
+        Assert.assertEquals(String.class, confirmationToken.getConfirmationToken().getClass());
+        Assert.assertEquals(Date.class, confirmationToken.getCreatedDate().getClass());
+
+
     }
 
     private UserDTO getUserDTO() {
