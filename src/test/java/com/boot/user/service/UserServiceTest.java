@@ -150,6 +150,53 @@ public class UserServiceTest {
         verifyNoMoreInteractions(userRepository);
     }
 
+
+    @Test
+    public void updateUserByEmail() throws EntityNotFoundException {
+
+        when(userRepository.getUserByEmail(token().getUser().getEmail()))
+                .thenReturn(getUser()
+                        .setActivated(true));
+
+        UserDTO updatedUser =  userService.updateUserByEmail(getUserDTO().getEmail(),getUserDTO()
+                .setFirstName("newTestName")
+                .setLastName("newTestLastName")
+                .setPhoneNumber("0742999999")
+                .setEmail("jon278@gaailer.com")
+                .setRole("USER")
+                .setDeliveryAddress("stret, no. 12"));
+
+        verify(userRepository).save(getUser()
+                .setFirstName("newTestName")
+                .setLastName("newTestLastName")
+                .setPhoneNumber("0742999999")
+                .setEmail("jon278@gaailer.com")
+                .setRole("USER")
+                .setDeliveryAddress("stret, no. 12")
+                .setActivated(true).setLastUpdatedOn(LocalDate.now()));
+
+        assertEquals("newTestName", updatedUser.getFirstName());
+        assertEquals("newTestLastName", updatedUser.getLastName());
+        assertEquals("0742999999", updatedUser.getPhoneNumber());
+        assertEquals("jon278@gaailer.com", updatedUser.getEmail());
+        assertEquals("stret, no. 12", updatedUser.getDeliveryAddress());
+    }
+
+    @Test
+    public void updateUserByEmail_nullEmail() {
+
+        when(userRepository.getUserByEmail(any())).thenReturn(null);
+
+        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () ->
+                userService.updateUserByEmail(getUserDTO().getEmail(), getUserDTO()));
+
+        Assertions.assertEquals("Invalid Email address!", exception.getMessage());
+
+        verify(userRepository).getUserByEmail(token().getUser().getEmail());
+        verifyNoMoreInteractions(userRepository);
+    }
+
+
     private ConfirmationToken token() {
 
         GregorianCalendar calendar = new GregorianCalendar();
