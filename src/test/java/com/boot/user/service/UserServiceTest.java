@@ -23,8 +23,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -194,6 +196,33 @@ public class UserServiceTest {
 
         verify(userRepository).getUserByEmail(token().getUser().getEmail());
         verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test
+    public void getAllUsers() throws EntityNotFoundException {
+
+        List<User> userList = new ArrayList<>();
+        userList.add(getUser().setId(1));
+        userList.add(getUser().setId(2));
+
+        when(userRepository.findAll()).thenReturn(userList);
+
+        List<UserDTO> newUserList = userService.getAllUsers();
+
+        assertEquals(newUserList.size(),2);
+        verify(userRepository).findAll();
+    }
+
+    @Test
+    public void getAllUsers_emptyUserList() {
+        List<User> userList = new ArrayList<>();
+
+        when(userRepository.findAll()).thenReturn(userList);
+
+        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () ->
+                userService.getAllUsers());
+
+        Assertions.assertEquals("No user found in the Database!", exception.getMessage());
     }
 
 
