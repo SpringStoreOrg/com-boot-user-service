@@ -26,9 +26,10 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -80,12 +81,12 @@ public class UserServiceTest {
         verify(confirmationTokenRepository).save(confirmationToken);
         verify(emailSenderService).sendConfirmationEmail(getUser(), confirmationToken);
 
-        Assertions.assertEquals(getUserDTO(), savedUser);
+        assertEquals(getUserDTO(), savedUser);
 
-        Assertions.assertNotNull(confirmationToken);
-        Assertions.assertEquals(getUser(), confirmationToken.getUser());
-        Assertions.assertEquals(String.class, confirmationToken.getConfirmationToken().getClass());
-        Assertions.assertEquals(Date.class, confirmationToken.getCreatedDate().getClass());
+        assertNotNull(confirmationToken);
+        assertEquals(getUser(), confirmationToken.getUser());
+        assertNotNull(confirmationToken.getConfirmationToken());
+        assertNotNull(confirmationToken.getCreatedDate());
 
 
     }
@@ -113,7 +114,10 @@ public class UserServiceTest {
         EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () ->
                 userService.confirmUserAccount(token().getConfirmationToken()));
 
-        Assertions.assertEquals("Token not found!", exception.getMessage());
+        assertEquals("Token not found!", exception.getMessage());
+
+       verifyNoInteractions(tokenValidator);
+       verifyNoInteractions(userRepository);
     }
 
     @Test
@@ -125,7 +129,9 @@ public class UserServiceTest {
         EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () ->
             userService.confirmUserAccount(token().getConfirmationToken()));
 
-        Assertions.assertEquals("Token Expired!", exception.getMessage());
+        assertEquals("Token Expired!", exception.getMessage());
+
+        verifyNoInteractions(userRepository);
     }
 
     @Test
@@ -138,7 +144,10 @@ public class UserServiceTest {
         UnableToModifyDataException exception = Assertions.assertThrows(UnableToModifyDataException.class, () ->
             userService.confirmUserAccount(token().getConfirmationToken()));
 
-        Assertions.assertEquals("User was already confirmed!", exception.getMessage());
+        assertEquals("User was already confirmed!", exception.getMessage());
+
+        verify(userRepository).getUserByEmail(token().getUser().getEmail());
+        verifyNoMoreInteractions(userRepository);
     }
 
     private ConfirmationToken token() {
