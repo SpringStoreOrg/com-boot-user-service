@@ -11,7 +11,6 @@ import com.boot.user.repository.PasswordResetTokenRepository;
 import com.boot.user.repository.UserRepository;
 import com.boot.user.validator.TokenValidator;
 import com.boot.user.validator.UserValidator;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -28,8 +27,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -113,7 +111,7 @@ public class UserServiceTest {
 
         when(confirmationTokenRepository.findByConfirmationToken(any())).thenReturn(null);
 
-        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () ->
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 userService.confirmUserAccount(token().getConfirmationToken()));
 
         assertEquals("Token not found!", exception.getMessage());
@@ -128,7 +126,7 @@ public class UserServiceTest {
         when(confirmationTokenRepository.findByConfirmationToken(any())).thenReturn(token());
         when(tokenValidator.checkTokenAvailability(any())).thenReturn(true);
 
-        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () ->
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
             userService.confirmUserAccount(token().getConfirmationToken()));
 
         assertEquals("Token Expired!", exception.getMessage());
@@ -143,7 +141,7 @@ public class UserServiceTest {
         when(tokenValidator.checkTokenAvailability(any())).thenReturn(false);
         when(userRepository.getUserByEmail(token().getUser().getEmail())).thenReturn(getUser().setActivated(true));
 
-        UnableToModifyDataException exception = Assertions.assertThrows(UnableToModifyDataException.class, () ->
+        UnableToModifyDataException exception = assertThrows(UnableToModifyDataException.class, () ->
             userService.confirmUserAccount(token().getConfirmationToken()));
 
         assertEquals("User was already confirmed!", exception.getMessage());
@@ -166,7 +164,7 @@ public class UserServiceTest {
                 .setPhoneNumber("0742999999")
                 .setEmail("jon278@gaailer.com")
                 .setRole("USER")
-                .setDeliveryAddress("stret, no. 12"));
+                .setDeliveryAddress("street, no. 12"));
 
         verify(userRepository).save(getUser()
                 .setFirstName("newTestName")
@@ -174,14 +172,38 @@ public class UserServiceTest {
                 .setPhoneNumber("0742999999")
                 .setEmail("jon278@gaailer.com")
                 .setRole("USER")
-                .setDeliveryAddress("stret, no. 12")
+                .setDeliveryAddress("street, no. 12")
                 .setActivated(true).setLastUpdatedOn(LocalDate.now()));
 
         assertEquals("newTestName", updatedUser.getFirstName());
         assertEquals("newTestLastName", updatedUser.getLastName());
         assertEquals("0742999999", updatedUser.getPhoneNumber());
         assertEquals("jon278@gaailer.com", updatedUser.getEmail());
-        assertEquals("stret, no. 12", updatedUser.getDeliveryAddress());
+        assertEquals("street, no. 12", updatedUser.getDeliveryAddress());
+    }
+
+    @Test
+    public void updateUserByEmail_emptyUserDTO() throws EntityNotFoundException {
+
+        when(userRepository.getUserByEmail(token().getUser().getEmail()))
+                .thenReturn(getUser()
+                        .setActivated(true));
+
+        UserDTO updatedUser =  userService.updateUserByEmail(getUserDTO().getEmail(), new UserDTO());
+
+        verify(userRepository).save(getUser()
+                .setFirstName("testName")
+                .setLastName("testLastName")
+                .setPhoneNumber("0742000000")
+                .setEmail("jon278@gaailer.site")
+                .setDeliveryAddress("street, no. 1")
+                .setActivated(true).setLastUpdatedOn(LocalDate.now()));
+
+        assertEquals("testName", updatedUser.getFirstName());
+        assertEquals("testLastName", updatedUser.getLastName());
+        assertEquals("0742000000", updatedUser.getPhoneNumber());
+        assertEquals("jon278@gaailer.site", updatedUser.getEmail());
+        assertEquals("street, no. 1", updatedUser.getDeliveryAddress());
     }
 
     @Test
@@ -189,10 +211,10 @@ public class UserServiceTest {
 
         when(userRepository.getUserByEmail(any())).thenReturn(null);
 
-        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () ->
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 userService.updateUserByEmail(getUserDTO().getEmail(), getUserDTO()));
 
-        Assertions.assertEquals("Invalid Email address!", exception.getMessage());
+        assertEquals("Invalid Email address!", exception.getMessage());
 
         verify(userRepository).getUserByEmail(token().getUser().getEmail());
         verifyNoMoreInteractions(userRepository);
@@ -202,8 +224,8 @@ public class UserServiceTest {
     public void getAllUsers() throws EntityNotFoundException {
 
         List<User> userList = new ArrayList<>();
-        userList.add(getUser().setId(1));
-        userList.add(getUser().setId(2));
+        userList.add(getUser());
+        userList.add(getUser());
 
         when(userRepository.findAll()).thenReturn(userList);
 
@@ -211,6 +233,8 @@ public class UserServiceTest {
 
         assertEquals(newUserList.size(),2);
         verify(userRepository).findAll();
+
+        userList.stream().forEach(user -> assertEquals(getUser(), user));
     }
 
     @Test
@@ -219,12 +243,11 @@ public class UserServiceTest {
 
         when(userRepository.findAll()).thenReturn(userList);
 
-        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () ->
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 userService.getAllUsers());
 
-        Assertions.assertEquals("No user found in the Database!", exception.getMessage());
+        assertEquals("No user found in the Database!", exception.getMessage());
     }
-
 
     private ConfirmationToken token() {
 
@@ -249,7 +272,7 @@ public class UserServiceTest {
                 .setPassword("testPassword")
                 .setEmail("jon278@gaailer.site")
                 .setRole("USER")
-                .setDeliveryAddress("stret, no. 1");
+                .setDeliveryAddress("street, no. 1");
 
         return userDTO;
     }
@@ -264,7 +287,7 @@ public class UserServiceTest {
                 .setEmail("jon278@gaailer.site")
                 .setRole("USER")
                 .setCreatedOn(LocalDate.now())
-                .setDeliveryAddress("stret, no. 1");
+                .setDeliveryAddress("street, no. 1");
 
         return user;
     }
