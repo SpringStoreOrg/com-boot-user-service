@@ -249,6 +249,33 @@ public class UserServiceTest {
         assertEquals("No user found in the Database!", exception.getMessage());
     }
 
+    @Test
+    public void getUserByEmail() throws EntityNotFoundException {
+
+        when(userRepository.getUserByEmail(getUser().getEmail())).thenReturn(getUser());
+        when(userValidator.isEmailPresent(getUser().getEmail())).thenReturn(false);
+
+        UserDTO userDTO = userService.getUserByEmail(getUser().getEmail());
+
+        verify(userRepository).getUserByEmail(getUser().getEmail());
+        verify(userValidator).isEmailPresent(getUser().getEmail());
+
+        assertEquals(getUserDTO(), userDTO);
+    }
+
+    @Test
+    public void getUserByEmail_emailNotPresent() {
+        when(userValidator.isEmailPresent(getUser().getEmail())).thenReturn(true);
+        when(userRepository.getUserByEmail(getUser().getEmail())).thenReturn(getUser());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
+                userService.getUserByEmail(getUser().getEmail()));
+
+        assertEquals("Email: " + getUser().getEmail() + " not found in the Database!", exception.getMessage());
+        verifyNoInteractions(userRepository);
+
+    }
+
     private ConfirmationToken token() {
 
         GregorianCalendar calendar = new GregorianCalendar();
