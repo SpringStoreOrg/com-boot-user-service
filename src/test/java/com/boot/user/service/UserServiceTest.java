@@ -5,6 +5,7 @@ import com.boot.user.dto.UserDTO;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.exception.UnableToModifyDataException;
 import com.boot.user.model.ConfirmationToken;
+import com.boot.user.model.PasswordResetToken;
 import com.boot.user.model.User;
 import com.boot.user.repository.ConfirmationTokenRepository;
 import com.boot.user.repository.PasswordResetTokenRepository;
@@ -64,6 +65,9 @@ public class UserServiceTest {
     @Captor
     private ArgumentCaptor<ConfirmationToken> confirmationTokenCaptor;
 
+    @Captor
+    private ArgumentCaptor<PasswordResetToken> passwordResetTokenCaptor;
+    
     @Test
     public void addUser() {
 
@@ -271,6 +275,63 @@ public class UserServiceTest {
         assertEquals("Email: " + getUser().getEmail() + " not found in the Database!", exception.getMessage());
         verifyNoInteractions(userRepository);
 
+    }
+
+    @Test
+    public void deleteUserByEmail() throws EntityNotFoundException {
+        User user = getUser();
+
+        when(userValidator.isEmailPresent(user.getEmail())).thenReturn(false);
+
+        userService.deleteUserByEmail(user.getEmail());
+
+        verify(userRepository).deleteByEmail(user.getEmail());
+    }
+
+    @Test
+    public void deleteUserByEmail_emailNotPresent() {
+        when(userValidator.isEmailPresent(getUser().getEmail())).thenReturn(true);
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
+                userService.deleteUserByEmail(getUser().getEmail()));
+
+        assertEquals("Email: " + getUser().getEmail() + " not found in the Database!", exception.getMessage());
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    public void requestResetPassword() throws EntityNotFoundException {
+        User user = getUser();
+
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+
+        userService.requestResetPassword(user.getEmail());
+
+        verify(passwordReserTokenRepository).save(passwordResetTokenCaptor.capture());
+
+        PasswordResetToken passwordResetToken = passwordResetTokenCaptor.getValue();
+
+        verify(passwordReserTokenRepository).save(passwordResetToken);
+
+        verify(emailSenderService).sendPasswordResetEmail(user, passwordResetToken);
+
+        assertNotNull(passwordResetToken);
+        assertEquals(getUser(), passwordResetToken.getUser());
+        assertNotNull(passwordResetToken.getResetToken());
+        assertNotNull(passwordResetToken.getCreatedDate());
+
+    }
+
+    @Test
+    public void requestResetPassword_userNotFound() {
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
+                userService.requestResetPassword(getUser().getEmail()));
+
+        assertEquals("Invalid Email address!", exception.getMessage());
+
+        verifyNoInteractions(passwordReserTokenRepository);
+        verifyNoInteractions(emailSenderService);
     }
 
     private ConfirmationToken token() {
