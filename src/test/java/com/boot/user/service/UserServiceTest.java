@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import static com.boot.user.model.User.userEntityToDto;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -108,8 +109,6 @@ public class UserServiceTest {
 
     @Test
     public void confirmUserAccount_nullToken() {
-
-        when(confirmationTokenRepository.findByConfirmationToken(any())).thenReturn(null);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 userService.confirmUserAccount(token().getConfirmationToken()));
@@ -209,8 +208,6 @@ public class UserServiceTest {
     @Test
     public void updateUserByEmail_nullEmail() {
 
-        when(userRepository.getUserByEmail(any())).thenReturn(null);
-
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 userService.updateUserByEmail(getUserDTO().getEmail(), getUserDTO()));
 
@@ -234,7 +231,7 @@ public class UserServiceTest {
         assertEquals(newUserList.size(),2);
         verify(userRepository).findAll();
 
-        userList.stream().forEach(user -> assertEquals(getUser(), user));
+        newUserList.stream().forEach(user -> assertEquals(userEntityToDto(getUser()), user));
     }
 
     @Test
@@ -251,14 +248,15 @@ public class UserServiceTest {
 
     @Test
     public void getUserByEmail() throws EntityNotFoundException {
+        User user = getUser();
 
-        when(userRepository.getUserByEmail(getUser().getEmail())).thenReturn(getUser());
-        when(userValidator.isEmailPresent(getUser().getEmail())).thenReturn(false);
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(getUser());
+        when(userValidator.isEmailPresent(user.getEmail())).thenReturn(false);
 
-        UserDTO userDTO = userService.getUserByEmail(getUser().getEmail());
+        UserDTO userDTO = userService.getUserByEmail(user.getEmail());
 
-        verify(userRepository).getUserByEmail(getUser().getEmail());
-        verify(userValidator).isEmailPresent(getUser().getEmail());
+        verify(userRepository).getUserByEmail(user.getEmail());
+        verify(userValidator).isEmailPresent(user.getEmail());
 
         assertEquals(getUserDTO(), userDTO);
     }
@@ -266,7 +264,6 @@ public class UserServiceTest {
     @Test
     public void getUserByEmail_emailNotPresent() {
         when(userValidator.isEmailPresent(getUser().getEmail())).thenReturn(true);
-        when(userRepository.getUserByEmail(getUser().getEmail())).thenReturn(getUser());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 userService.getUserByEmail(getUser().getEmail()));
