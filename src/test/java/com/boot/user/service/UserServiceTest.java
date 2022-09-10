@@ -442,7 +442,8 @@ public class UserServiceTest {
     public void changeUserPassword_passwordAlreadyUsed() {
         User user = getUser();
 
-        String invaldNewPassword = "testPassword";
+        String invalidNewPassword = "testPassword";
+
         String testConfirmationToken = "testConfirmationToken";
         PasswordResetToken passwordResetToken = getPasswordResetToken();
 
@@ -450,13 +451,12 @@ public class UserServiceTest {
         when(tokenValidator.checkTokenAvailability(passwordResetToken.getCreatedDate())).thenReturn(false);
         when(userValidator.isEmailPresent(user.getEmail())).thenReturn(true);
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user.setActivated(true));
+        when(passwordEncoder.matches(invalidNewPassword, getUser().getPassword())).thenReturn(true);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userService.changeUserPassword(testConfirmationToken, invaldNewPassword ,invaldNewPassword));
+                userService.changeUserPassword(testConfirmationToken, invalidNewPassword ,invalidNewPassword));
 
-        assertEquals("Passwords do not match!", exception.getMessage());
-
-        verifyNoInteractions(passwordEncoder);
+        assertEquals("Please select another password, this one was already used last time!", exception.getMessage());
     }
 
     private PasswordResetToken getPasswordResetToken() {
