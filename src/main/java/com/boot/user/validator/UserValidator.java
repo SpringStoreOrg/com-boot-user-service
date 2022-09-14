@@ -16,7 +16,7 @@ public class UserValidator {
     private UserRepository userRepository;
 
     public boolean isEmailPresent(String email) {
-        return userRepository.getUserByEmail(email) == null;
+        return userRepository.getUserByEmail(email) != null;
     }
 
     public boolean isIdPresent(long id) {
