@@ -2,9 +2,6 @@ package com.boot.user.service;
 
 
 import com.boot.user.client.ProductServiceClient;
-import com.boot.user.dto.ProductDTO;
-import com.boot.user.dto.UserDTO;
-import com.boot.user.enums.ProductStatus;
 import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.model.User;
 import com.boot.user.model.UserFavorite;
@@ -23,8 +20,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @AutoConfigureMockMvc
@@ -51,20 +48,6 @@ public class UserFavoritesServiceTest {
     public void addProductToUserFavorites() throws DuplicateEntryException {
         User user =  getUser();
 
-        List<UserFavorite> userFavorites = new ArrayList<>();
-        UserFavorite userFavorite1 = new UserFavorite();
-
-        userFavorite1.setUser(user);
-        userFavorite1.setProductName("testProductName1");
-        userFavorites.add(userFavorite1);
-
-        UserFavorite userFavorite2 = new UserFavorite();
-        userFavorite2.setUser(user);
-        userFavorite2.setProductName("testProductName2");
-        userFavorites.add(userFavorite2);
-
-        user.setUserFavorites(userFavorites);
-
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
 
         userFavoritesService.addProductToUserFavorites(user.getEmail(), "testProductName3");
@@ -76,25 +59,18 @@ public class UserFavoritesServiceTest {
         verify(userFavoriteRepository).save(userFavoriteArgumentCaptorValue);
 
         verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2,testProductName3", true);
+
+        List<UserFavorite> userFavorites = user.getUserFavorites();
+        userFavorites.add(addUserFavorite(user,  "testProductName3"));
+
+        assertNotNull(userFavoriteArgumentCaptorValue);
+        assertEquals(getUser().setUserFavorites(userFavorites), userFavoriteArgumentCaptorValue.getUser());
+        assertNotNull(userFavoriteArgumentCaptorValue.getProductName());
     }
 
     @Test
     public void addProductToUserFavorites_duplicateProductName() {
         User user =  getUser();
-
-        List<UserFavorite> userFavorites = new ArrayList<>();
-        UserFavorite userFavorite1 = new UserFavorite();
-
-        userFavorite1.setUser(user);
-        userFavorite1.setProductName("testProductName1");
-        userFavorites.add(userFavorite1);
-
-        UserFavorite userFavorite2 = new UserFavorite();
-        userFavorite2.setUser(user);
-        userFavorite2.setProductName("testProductName2");
-        userFavorites.add(userFavorite2);
-
-        user.setUserFavorites(userFavorites);
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
 
@@ -107,35 +83,22 @@ public class UserFavoritesServiceTest {
     }
 
 
-    private ProductDTO getProductDTO(){
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setName("Black core-wood chair")
-                .setStock(3)
-                .setStatus(ProductStatus.ACTIVE)
-                .setPrice(10000)
-                .setPhotoLink("www.testPhoto.com")
-                .setDescription("Best core-wood black chair")
-                .setCategory("Chair");
 
-        return productDTO;
-    }
+    private UserFavorite addUserFavorite(User user, String productName){
 
-    private UserDTO getUserDTO() {
-        UserDTO userDTO = new UserDTO();
+        UserFavorite userFavorite = new UserFavorite();
+        userFavorite.setUser(user);
+        userFavorite.setProductName(productName);
 
-        userDTO.setFirstName("testName")
-                .setLastName("testLastName")
-                .setPhoneNumber("0742000000")
-                .setPassword("testPassword")
-                .setEmail("jon278@gaailer.site")
-                .setRole("USER")
-                .setDeliveryAddress("street, no. 1");
-
-        return userDTO;
+        return userFavorite;
     }
 
     private User getUser() {
         User user = new User();
+        List<UserFavorite> userFavorites = new ArrayList<>();
+
+        userFavorites.add(addUserFavorite(user,"testProductName1"));
+        userFavorites.add(addUserFavorite(user,"testProductName2"));
 
         user.setFirstName("testName")
                 .setLastName("testLastName")
@@ -145,6 +108,7 @@ public class UserFavoritesServiceTest {
                 .setRole("USER")
                 .setActivated(true)
                 .setCreatedOn(LocalDate.now())
+                .setUserFavorites(userFavorites)
                 .setDeliveryAddress("street, no. 1");
 
         return user;
