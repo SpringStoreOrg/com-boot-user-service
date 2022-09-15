@@ -141,8 +141,18 @@ public class UserFavoritesServiceTest {
         assertEquals(productDTOList,newProductDTOList);
     }
 
+    @Test
+    public void getAllProductsFromUserFavorites_userFavoritesEmpty()  {
+        User user =  getUser();
+        List<UserFavorite> userFavorites = new ArrayList<>();
+        user.setUserFavorites(userFavorites);
 
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
 
+        List<ProductDTO> newProductDTOList =  userFavoritesService.getAllProductsFromUserFavorites(user.getEmail());
+
+        assertTrue(newProductDTOList.isEmpty());
+    }
 
     private UserFavorite createUserFavorite(User user, String productName){
 
