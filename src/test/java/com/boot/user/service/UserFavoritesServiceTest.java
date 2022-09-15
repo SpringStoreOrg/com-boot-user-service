@@ -82,7 +82,26 @@ public class UserFavoritesServiceTest {
         verifyNoInteractions(userFavoriteRepository);
     }
 
+    @Test
+    public void addProductsToUserFavorites()  {
+        User user =  getUser();
 
+        List<String> productNames = new ArrayList<>();
+        productNames.add("testProductName3");
+        productNames.add("testProductName4");
+
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+
+        userFavoritesService.addProductsToUserFavorites(user.getEmail(), productNames);
+
+        verify(userFavoriteRepository, times(2)).save(userFavoriteArgumentCaptor.capture());
+
+        UserFavorite userFavoriteArgumentCaptorValue = userFavoriteArgumentCaptor.getValue();
+
+        verify(userFavoriteRepository).save(userFavoriteArgumentCaptorValue);
+
+        verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2,testProductName3,testProductName4", true);
+    }
 
     private UserFavorite addUserFavorite(User user, String productName){
 
