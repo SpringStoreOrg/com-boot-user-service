@@ -2,6 +2,8 @@ package com.boot.user.service;
 
 
 import com.boot.user.client.ProductServiceClient;
+import com.boot.user.dto.ProductDTO;
+import com.boot.user.enums.ProductStatus;
 import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.model.User;
 import com.boot.user.model.UserFavorite;
@@ -121,6 +123,26 @@ public class UserFavoritesServiceTest {
         verify(userFavoriteRepository).delete(userFavorite);
     }
 
+    @Test
+    public void getAllProductsFromUserFavorites()  {
+        User user =  getUser();
+
+        List<ProductDTO> productDTOList = new ArrayList<>();
+        productDTOList.add(getProductDTO("Yellow Chair"));
+        productDTOList.add(getProductDTO("Orange Chair"));
+
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(productServiceClient.callGetAllProductsFromUserFavorites("testProductName1,testProductName2", true)).thenReturn(productDTOList);
+
+        List<ProductDTO> newProductDTOList =  userFavoritesService.getAllProductsFromUserFavorites(user.getEmail());
+
+        verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2", true);
+        assertEquals(newProductDTOList.size(),2);
+        assertEquals(productDTOList,newProductDTOList);
+    }
+
+
+
 
     private UserFavorite createUserFavorite(User user, String productName){
 
@@ -150,6 +172,20 @@ public class UserFavoritesServiceTest {
                 .setDeliveryAddress("street, no. 1");
 
         return user;
+    }
+
+    private ProductDTO getProductDTO(String name) {
+        ProductDTO productDTO = new ProductDTO();
+
+        productDTO.setCategory("Chair")
+                .setDescription("Black wood chair")
+                .setPhotoLink("www.photolink.test")
+                .setPrice(10000)
+                .setStock(8)
+                .setName(name)
+                .setStatus(ProductStatus.ACTIVE);
+
+        return productDTO;
     }
 
 }
