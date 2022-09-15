@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @AutoConfigureMockMvc
@@ -61,7 +60,7 @@ public class UserFavoritesServiceTest {
         verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2,testProductName3", true);
 
         List<UserFavorite> userFavorites = user.getUserFavorites();
-        userFavorites.add(addUserFavorite(user,  "testProductName3"));
+        userFavorites.add(createUserFavorite(user,  "testProductName3"));
 
         assertNotNull(userFavoriteArgumentCaptorValue);
         assertEquals(getUser().setUserFavorites(userFavorites), userFavoriteArgumentCaptorValue.getUser());
@@ -103,7 +102,27 @@ public class UserFavoritesServiceTest {
         verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2,testProductName3,testProductName4", true);
     }
 
-    private UserFavorite addUserFavorite(User user, String productName){
+    @Test
+    public void removeProductFromUserFavorites()  {
+        User user =  getUser();
+        String productName = "testProductName2";
+        UserFavorite userFavorite = createUserFavorite(user, productName);
+
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(userFavoriteRepository.findByUserAndProductName(user, productName)).thenReturn(userFavorite);
+
+        userFavoritesService.removeProductFromUserFavorites(user.getEmail(), productName);
+
+        List<UserFavorite> userFavorites = user.getUserFavorites();
+        userFavorites.add(createUserFavorite(user,  productName));
+
+        verify(userRepository).getUserByEmail(getUser().getEmail());
+        verify(userFavoriteRepository).findByUserAndProductName(getUser().setUserFavorites(userFavorites), productName);
+        verify(userFavoriteRepository).delete(userFavorite);
+    }
+
+
+    private UserFavorite createUserFavorite(User user, String productName){
 
         UserFavorite userFavorite = new UserFavorite();
         userFavorite.setUser(user);
@@ -116,8 +135,8 @@ public class UserFavoritesServiceTest {
         User user = new User();
         List<UserFavorite> userFavorites = new ArrayList<>();
 
-        userFavorites.add(addUserFavorite(user,"testProductName1"));
-        userFavorites.add(addUserFavorite(user,"testProductName2"));
+        userFavorites.add(createUserFavorite(user,"testProductName1"));
+        userFavorites.add(createUserFavorite(user,"testProductName2"));
 
         user.setFirstName("testName")
                 .setLastName("testLastName")
