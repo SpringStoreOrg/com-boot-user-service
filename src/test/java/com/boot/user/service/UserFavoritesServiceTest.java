@@ -20,6 +20,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,7 +48,7 @@ public class UserFavoritesServiceTest {
 
     @Test
     public void addProductToUserFavorites() throws DuplicateEntryException {
-        User user =  getUser();
+        User user =  getUser("testProductName1,testProductName2");
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
 
@@ -65,13 +66,13 @@ public class UserFavoritesServiceTest {
         userFavorites.add(createUserFavorite(user,  "testProductName3"));
 
         assertNotNull(userFavoriteArgumentCaptorValue);
-        assertEquals(getUser().setUserFavorites(userFavorites), userFavoriteArgumentCaptorValue.getUser());
+        assertEquals(user.setUserFavorites(userFavorites), userFavoriteArgumentCaptorValue.getUser());
         assertNotNull(userFavoriteArgumentCaptorValue.getProductName());
     }
 
     @Test
     public void addProductToUserFavorites_duplicateProductName() {
-        User user =  getUser();
+        User user =  getUser("testProductName1,testProductName2");
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
 
@@ -85,7 +86,7 @@ public class UserFavoritesServiceTest {
 
     @Test
     public void addProductsToUserFavorites()  {
-        User user =  getUser();
+        User user =  getUser("testProductName1,testProductName2");
 
         List<String> productNames = new ArrayList<>();
         productNames.add("testProductName3");
@@ -106,7 +107,7 @@ public class UserFavoritesServiceTest {
 
     @Test
     public void removeProductFromUserFavorites()  {
-        User user =  getUser();
+        User user =  getUser("testProductName1,testProductName2");
         String productName = "testProductName2";
         UserFavorite userFavorite = createUserFavorite(user, productName);
 
@@ -118,14 +119,14 @@ public class UserFavoritesServiceTest {
         List<UserFavorite> userFavorites = user.getUserFavorites();
         userFavorites.add(createUserFavorite(user,  productName));
 
-        verify(userRepository).getUserByEmail(getUser().getEmail());
-        verify(userFavoriteRepository).findByUserAndProductName(getUser().setUserFavorites(userFavorites), productName);
+        verify(userRepository).getUserByEmail(user.getEmail());
+        verify(userFavoriteRepository).findByUserAndProductName(user.setUserFavorites(userFavorites), productName);
         verify(userFavoriteRepository).delete(userFavorite);
     }
 
     @Test
     public void getAllProductsFromUserFavorites()  {
-        User user =  getUser();
+        User user =  getUser("testProductName1,testProductName2");
 
         List<ProductDTO> productDTOList = new ArrayList<>();
         productDTOList.add(getProductDTO("Yellow Chair"));
@@ -136,6 +137,7 @@ public class UserFavoritesServiceTest {
 
         List<ProductDTO> newProductDTOList =  userFavoritesService.getAllProductsFromUserFavorites(user.getEmail());
 
+        verify(userRepository).getUserByEmail(user.getEmail());
         verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2", true);
         assertEquals(newProductDTOList.size(),2);
         assertEquals(productDTOList,newProductDTOList);
@@ -143,7 +145,7 @@ public class UserFavoritesServiceTest {
 
     @Test
     public void getAllProductsFromUserFavorites_userFavoritesEmpty()  {
-        User user =  getUser();
+        User user =  getUser("testProductName1,testProductName2");
         List<UserFavorite> userFavorites = new ArrayList<>();
         user.setUserFavorites(userFavorites);
 
@@ -151,6 +153,7 @@ public class UserFavoritesServiceTest {
 
         List<ProductDTO> newProductDTOList =  userFavoritesService.getAllProductsFromUserFavorites(user.getEmail());
 
+        verify(userRepository).getUserByEmail(user.getEmail());
         assertTrue(newProductDTOList.isEmpty());
     }
 
@@ -163,12 +166,12 @@ public class UserFavoritesServiceTest {
         return userFavorite;
     }
 
-    private User getUser() {
+    private User getUser(String productNames) {
         User user = new User();
         List<UserFavorite> userFavorites = new ArrayList<>();
+        List<String> productNamesList = new ArrayList<>(Arrays.asList(productNames.split(",")));
 
-        userFavorites.add(createUserFavorite(user,"testProductName1"));
-        userFavorites.add(createUserFavorite(user,"testProductName2"));
+        productNamesList.forEach(product ->userFavorites.add(createUserFavorite(user,product)));
 
         user.setFirstName("testName")
                 .setLastName("testLastName")
