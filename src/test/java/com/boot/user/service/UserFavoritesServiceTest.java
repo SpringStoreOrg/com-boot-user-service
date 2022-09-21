@@ -5,6 +5,7 @@ import com.boot.user.client.ProductServiceClient;
 import com.boot.user.dto.ProductDTO;
 import com.boot.user.enums.ProductStatus;
 import com.boot.user.exception.DuplicateEntryException;
+import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.model.User;
 import com.boot.user.model.UserFavorite;
 import com.boot.user.repository.UserFavoriteRepository;
@@ -47,7 +48,7 @@ public class UserFavoritesServiceTest {
     private ArgumentCaptor<UserFavorite> userFavoriteArgumentCaptor;
 
     @Test
-    public void addProductToUserFavorites() throws DuplicateEntryException {
+    public void addProductToUserFavorites() throws DuplicateEntryException, EntityNotFoundException {
         User user =  getUser("testProductName1,testProductName2");
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
@@ -85,7 +86,7 @@ public class UserFavoritesServiceTest {
     }
 
     @Test
-    public void addProductsToUserFavorites()  {
+    public void addProductsToUserFavorites() throws EntityNotFoundException {
         User user =  getUser("testProductName1,testProductName2");
 
         List<String> productNames = new ArrayList<>();
@@ -102,11 +103,14 @@ public class UserFavoritesServiceTest {
 
         verify(userFavoriteRepository).save(userFavoriteArgumentCaptorValue);
 
+        verify(userFavoriteRepository).save(createUserFavorite(user,"testProductName3"));
+        verify(userFavoriteRepository).save(createUserFavorite(user,"testProductName4"));
+
         verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2,testProductName3,testProductName4", true);
     }
 
     @Test
-    public void removeProductFromUserFavorites()  {
+    public void removeProductFromUserFavorites() throws EntityNotFoundException {
         User user =  getUser("testProductName1,testProductName2");
         String productName = "testProductName2";
         UserFavorite userFavorite = createUserFavorite(user, productName);
@@ -125,7 +129,22 @@ public class UserFavoritesServiceTest {
     }
 
     @Test
-    public void getAllProductsFromUserFavorites()  {
+    public void removeProductFromUserFavorites_userNull() {
+        User user =  getUser("testProductName1,testProductName2");
+        String productName = "testProductName2";
+
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
+                userFavoritesService.removeProductFromUserFavorites(user.getEmail(), productName));
+
+        assertEquals("Invalid Email address!", exception.getMessage());
+
+        verifyNoInteractions(userFavoriteRepository);
+    }
+
+    @Test
+    public void getAllProductsFromUserFavorites() throws EntityNotFoundException {
         User user =  getUser("testProductName1,testProductName2");
 
         List<ProductDTO> productDTOList = new ArrayList<>();
@@ -144,7 +163,7 @@ public class UserFavoritesServiceTest {
     }
 
     @Test
-    public void getAllProductsFromUserFavorites_userFavoritesEmpty()  {
+    public void getAllProductsFromUserFavorites_userFavoritesEmpty() throws EntityNotFoundException {
         User user =  getUser("testProductName1,testProductName2");
         List<UserFavorite> userFavorites = new ArrayList<>();
         user.setUserFavorites(userFavorites);
@@ -155,6 +174,7 @@ public class UserFavoritesServiceTest {
 
         verify(userRepository).getUserByEmail(user.getEmail());
         assertTrue(newProductDTOList.isEmpty());
+        verifyNoInteractions(productServiceClient);
     }
 
     private UserFavorite createUserFavorite(User user, String productName){
