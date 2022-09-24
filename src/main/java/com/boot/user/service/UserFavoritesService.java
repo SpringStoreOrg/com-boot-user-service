@@ -81,6 +81,10 @@ public class UserFavoritesService {
             throw new EntityNotFoundException("Invalid Email address!");
         }
         UserFavorite userFavorite = userFavoriteRepository.findByUserAndProductName(user, productName);
+        if (userFavorite == null) {
+            throw new EntityNotFoundException("User Favorite could not be found!");
+        }
+
         user.getUserFavorites().remove(userFavorite);
 
         userFavoriteRepository.delete(userFavorite);
