@@ -135,7 +135,7 @@ public class UserService {
 
     public UserDTO getUserByEmail(String email) throws EntityNotFoundException {
         log.info("getUserByEmail - process started");
-        if (userValidator.isEmailPresent(email)) {
+        if (!userValidator.isEmailPresent(email)) {
             throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
         }
 
@@ -146,7 +146,7 @@ public class UserService {
     @Transactional
     public void deleteUserByEmail(String email) throws EntityNotFoundException {
         log.info("deleteUserByEmail - process started");
-        if (userValidator.isEmailPresent(email)) {
+        if (!userValidator.isEmailPresent(email)) {
             throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
         }
 
@@ -184,7 +184,7 @@ public class UserService {
             }
 
             if (!newPassword.contentEquals(confirmedNewPassword)) {
-                throw new EntityNotFoundException("Passwords do not mactch!");
+                throw new EntityNotFoundException("Passwords do not match!");
             }
 
             if (passwordEncoder.matches(newPassword, userDto.getPassword())) {

@@ -3,6 +3,7 @@ package com.boot.user.service;
 import com.boot.user.client.ProductServiceClient;
 import com.boot.user.dto.ProductDTO;
 import com.boot.user.exception.DuplicateEntryException;
+import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.model.User;
 import com.boot.user.model.UserFavorite;
 import com.boot.user.repository.UserFavoriteRepository;
@@ -30,10 +31,13 @@ public class UserFavoritesService {
     private UserFavoriteRepository userFavoriteRepository;
 
     @Transactional
-    public List<ProductDTO> addProductToUserFavorites(String email, String productName) throws DuplicateEntryException {
+    public List<ProductDTO> addProductToUserFavorites(String email, String productName) throws DuplicateEntryException, EntityNotFoundException {
 
         User user = userRepository.getUserByEmail(email);
 
+        if (user == null) {
+            throw new EntityNotFoundException("Invalid Email address!");
+        }
         if (user.getUserFavorites().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
             throw new DuplicateEntryException("Product: " + productName + " was already added to favorites!");
         } else {
@@ -49,10 +53,13 @@ public class UserFavoritesService {
     }
 
     @Transactional
-    public List<ProductDTO> addProductsToUserFavorites(String email, List<String> productNames) {
+    public List<ProductDTO> addProductsToUserFavorites(String email, List<String> productNames) throws EntityNotFoundException {
         log.info("addProductsToUserFavorites - process started");
         User user = userRepository.getUserByEmail(email);
 
+        if (user == null) {
+            throw new EntityNotFoundException("Invalid Email address!");
+        }
             for(String productName : productNames ) {
 
                 if (!user.getUserFavorites().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
@@ -67,10 +74,17 @@ public class UserFavoritesService {
         }
 
     @Transactional
-    public List<ProductDTO> removeProductFromUserFavorites(String email, String productName) {
+    public List<ProductDTO> removeProductFromUserFavorites(String email, String productName) throws EntityNotFoundException {
 
         User user = this.userRepository.getUserByEmail(email);
+        if (user == null) {
+            throw new EntityNotFoundException("Invalid Email address!");
+        }
         UserFavorite userFavorite = userFavoriteRepository.findByUserAndProductName(user, productName);
+        if (userFavorite == null) {
+            throw new EntityNotFoundException("User Favorite could not be found!");
+        }
+
         user.getUserFavorites().remove(userFavorite);
 
         userFavoriteRepository.delete(userFavorite);
@@ -78,10 +92,13 @@ public class UserFavoritesService {
         return getProductDTOS(user);
     }
 
-    public List<ProductDTO> getAllProductsFromUserFavorites(String email) {
+    public List<ProductDTO> getAllProductsFromUserFavorites(String email) throws EntityNotFoundException {
 
         User user = userRepository.getUserByEmail(email);
 
+        if (user == null) {
+            throw new EntityNotFoundException("Invalid Email address!");
+        }
         return getProductDTOS(user);
     }
 
