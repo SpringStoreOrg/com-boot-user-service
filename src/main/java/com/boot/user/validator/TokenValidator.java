@@ -1,7 +1,8 @@
 package com.boot.user.validator;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+
+import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
