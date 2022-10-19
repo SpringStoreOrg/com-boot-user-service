@@ -26,6 +26,10 @@ jobs:
       - run:
           name: Test
           command: mvn test
+      - store_artifacts:
+          path: ./test-results/junit
+      - store_test_results:
+          path: ./test-results    
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
