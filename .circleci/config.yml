@@ -28,7 +28,17 @@ jobs:
           command: mvn test
       - store_test_results:
           path: ./target/surefire-reports    
-
+      - run:
+        name: Creating Artifacts
+        command: |
+          echo "artifact file" > /target/art-1;
+          mkdir /target/artifacts;
+          echo "artifact files in dir" > /target/artifacts/art-2;
+    - store_artifacts:
+        path: /target/art-1
+        destination: artifact-file
+    - store_artifacts:
+        path: /target/artifacts
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
