@@ -31,9 +31,9 @@ jobs:
       - run:
           name: Creating Artifacts
           command: |
-            echo "artifact file" > /target/art-1;
+            echo "artifact file" > /target;
       - store_artifacts:
-          path: /target/art-1
+          path: /target
           destination: artifact-file
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
