@@ -6,7 +6,9 @@ version: 2.1
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
   # Below is the definition of your job to build and test your app, you can rename and customize it as you want.
-  user-service-build-and-test:
+  build-and-test:
+    environment:
+      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
     # These next lines define a Docker executor: https://circleci.com/docs/2.0/executor-types/
     # You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # Be sure to update the Docker image tag below to openjdk version of your application.
@@ -18,7 +20,6 @@ jobs:
     steps:
       # Checkout the code as the first step.
       - checkout
-      # Use mvn clean and package as the standard maven build phase
       - run:
           name: Build
           command: mvn -B -DskipTests clean package
@@ -26,19 +27,15 @@ jobs:
       - run:
           name: Test
           command: mvn test
+      - run: mkdir -p $CIRCLE_TEST_REPORTS/junit/
+      - run: find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
       - store_test_results:
-          path: ./target/surefire-reports    
-      - run:
-          name: Creating Artifacts
-          command: |
-            echo "artifact file" > /target;
-      - store_artifacts:
-          path: /target
-          destination: artifact-file
+          path: /tmp/circleci-test-results/junit
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   sample: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - user-service-build-and-test
+      - build-and-test
