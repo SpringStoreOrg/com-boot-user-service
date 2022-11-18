@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.17.xsd">
+
+
+
+    <changeSet author="GeorgeT88" id="2022-11-17-19.01">
+
+        <preConditions onFail="HALT">
+            <not>
+                <tableExists schemaName="user" tableName="user"/>
+            </not>
+        </preConditions>
+
+        <createTable schemaName="user" tableName="user">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="first_name" type="varchar(150)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar(150)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delivery_address" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(150)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_on" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_activated" type="boolean"/>
+            <column name="last_updated_on" type="date"/>
+            <column name="role" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <rollback>
+            <dropTable schemaName="product" tableName="product" />
+        </rollback>
+
+    </changeSet>
+</databaseChangeLog>
