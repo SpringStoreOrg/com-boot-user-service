@@ -31,7 +31,7 @@
             <column name="delivery_address" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="password" type="varchar(50)">
+            <column name="password" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
             <column name="phone_number" type="varchar(25)">
