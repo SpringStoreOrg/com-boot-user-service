@@ -8,5 +8,8 @@
 
     <include file="1-create-user-table.xml" relativeToChangelogFile="true"/>
     <include file="2-create-testData-user.xml" relativeToChangelogFile="true"/>
+    <include file="3-create-confirmationToken-table.xml" relativeToChangelogFile="true"/>
+    <include file="4-create-userFavorite-table.xml" relativeToChangelogFile="true"/>
+    <include file="5-create-passwordResetToken-table.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
