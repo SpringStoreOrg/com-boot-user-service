@@ -25,7 +25,6 @@ import lombok.experimental.Accessors;
 public class ConfirmationToken {
 
     public ConfirmationToken() {
-
     }
 
     @Id

@@ -2,8 +2,6 @@ package com.boot.user.service;
 
 
 import com.boot.user.config.AppConfig;
-import com.boot.user.dto.ProductDTO;
-import com.boot.user.enums.ProductStatus;
 import com.boot.user.model.ConfirmationToken;
 import com.boot.user.model.User;
 import com.boot.user.model.UserFavorite;
@@ -16,13 +14,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.client.RestTemplate;
+
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDate;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @AutoConfigureMockMvc
@@ -57,6 +56,7 @@ public class EmailServiceTest {
 
         emailService.sendConfirmationEmail(user, confirmationToken);
 
+        assertNotNull(confirmationToken);
         verify(mimeMessage).setSubject("SpringStore confirmation Email");
     }
 
@@ -97,6 +97,7 @@ public class EmailServiceTest {
         Date dateToConvert = calendar.getTime();
 
         ConfirmationToken token = new ConfirmationToken();
+        token.setTokenId(2);
         token.setToken("ec9f508e-2063-4057-840f-efce2d1bbae5");
         token.setUser(getUser("testProductName1,testProductName2"));
         token.setCreatedDate(dateToConvert);
