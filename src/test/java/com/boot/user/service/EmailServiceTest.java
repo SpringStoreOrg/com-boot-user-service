@@ -9,6 +9,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.*;
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
-public class EmailServiceTest {
+ class EmailServiceTest {
 
     @InjectMocks
     EmailService emailService;
@@ -44,14 +45,16 @@ public class EmailServiceTest {
     @Mock
     MimeMessage mimeMessage;
 
+    @Value("${user.service.url}")
+    public String userServiceUrl;
 
 
     @Test
-    public void sendConfirmationEmail() throws MessagingException {
+     void sendConfirmationEmail() throws MessagingException {
         User user =  getUser("testProductName1,testProductName2");
         ConfirmationToken confirmationToken =  getToken();
         MimeMessage mimeMessage = mock(MimeMessage.class);
-        when(appConfig.userServiceRestTemplateUrl()).thenReturn(new RestTemplateBuilder().rootUri("http://localhost:8080").build());
+        when(appConfig.userServiceRestTemplateUrl()).thenReturn(new RestTemplateBuilder().rootUri(userServiceUrl).build());
         when(emailSender.createMimeMessage()).thenReturn(mimeMessage);
 
         emailService.sendConfirmationEmail(user, confirmationToken);
