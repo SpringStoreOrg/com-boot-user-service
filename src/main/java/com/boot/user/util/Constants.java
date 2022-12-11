@@ -2,6 +2,9 @@ package com.boot.user.util;
 
 public class Constants {
 
+	private Constants(){
+	}
+
 	public static final String GET_PRODUCT_BY_PRODUCT_NAME = "/?productName={productName}";
 
 	public static final String GET_ALL_PRODUCTS_FOR_USER = "/?productNames={products}&includeInactive={includeInactive}";

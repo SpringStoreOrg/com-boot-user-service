@@ -30,13 +30,15 @@ public class UserFavoritesService {
 
     private UserFavoriteRepository userFavoriteRepository;
 
+    private static final  String INVALID_EMAIL_ERROR = "Invalid Email address!";
+
     @Transactional
     public List<ProductDTO> addProductToUserFavorites(String email, String productName) throws DuplicateEntryException, EntityNotFoundException {
 
         User user = userRepository.getUserByEmail(email);
 
         if (user == null) {
-            throw new EntityNotFoundException("Invalid Email address!");
+            throw new EntityNotFoundException(INVALID_EMAIL_ERROR);
         }
         if (user.getUserFavorites().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
             throw new DuplicateEntryException("Product: " + productName + " was already added to favorites!");
@@ -58,11 +60,11 @@ public class UserFavoritesService {
         User user = userRepository.getUserByEmail(email);
 
         if (user == null) {
-            throw new EntityNotFoundException("Invalid Email address!");
+            throw new EntityNotFoundException(INVALID_EMAIL_ERROR);
         }
             for(String productName : productNames ) {
 
-                if (!user.getUserFavorites().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
+                if (user.getUserFavorites().stream().noneMatch(p -> productName.equals(p.getProductName()))) {
                     UserFavorite userFavorite = new UserFavorite();
                     userFavorite.setUser(user);
                     userFavorite.setProductName(productName);
@@ -78,7 +80,7 @@ public class UserFavoritesService {
 
         User user = this.userRepository.getUserByEmail(email);
         if (user == null) {
-            throw new EntityNotFoundException("Invalid Email address!");
+            throw new EntityNotFoundException(INVALID_EMAIL_ERROR);
         }
         UserFavorite userFavorite = userFavoriteRepository.findByUserAndProductName(user, productName);
         if (userFavorite == null) {
@@ -97,7 +99,7 @@ public class UserFavoritesService {
         User user = userRepository.getUserByEmail(email);
 
         if (user == null) {
-            throw new EntityNotFoundException("Invalid Email address!");
+            throw new EntityNotFoundException(INVALID_EMAIL_ERROR);
         }
         return getProductDTOS(user);
     }

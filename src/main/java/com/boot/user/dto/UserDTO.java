@@ -31,7 +31,7 @@ public class UserDTO {
 	@Size(max = 30, message = "Max Password size is 30 characters!")
 	private String password;
 
-	@Pattern(regexp="^(?=[07]{2})(?=[0-9]{10}).*", message = "Invalid Phone Number!")
+	@Pattern(regexp="^(?=[07]{2})(?=\\d{10}).*", message = "Invalid Phone Number!")
 	private String phoneNumber;
 
 	@Email(regexp="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "Invalid Email!")

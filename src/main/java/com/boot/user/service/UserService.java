@@ -67,7 +67,7 @@ public class UserService {
 
     public void confirmUserAccount(String confirmationToken)
             throws EntityNotFoundException, UnableToModifyDataException {
-        ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
+        ConfirmationToken token = confirmationTokenRepository.findByToken(confirmationToken);
 
         if (token != null) {
             if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {

@@ -17,8 +17,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@TestPropertySource(locations = "classpath:test.properties")
-public class PasswordControllerTest {
+@TestPropertySource(locations = "classpath:application-test.properties")
+ class PasswordControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -27,7 +27,7 @@ public class PasswordControllerTest {
     private UserService userService;
 
     @Test
-    public void changeUserPassword() throws Exception {
+     void changeUserPassword() throws Exception {
 
         String token = "qweqw-e1231-qwew-4324";
         String newPassword = "newPassword";
@@ -43,7 +43,7 @@ public class PasswordControllerTest {
     }
 
     @Test
-    public void requestResetPassword() throws Exception {
+     void requestResetPassword() throws Exception {
 
         String email = "test@email.com";
 

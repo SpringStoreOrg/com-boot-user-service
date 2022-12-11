@@ -61,7 +61,7 @@ public class User implements Serializable {
 
 	@JsonManagedReference
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY,  cascade = { CascadeType.ALL })
-	private List<UserFavorite> userFavorites;
+  	private transient List<UserFavorite> userFavorites;
 
 	@Column
 	private boolean isActivated;

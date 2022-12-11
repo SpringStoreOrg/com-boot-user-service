@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@TestPropertySource(locations = "classpath:test.properties")
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class UserControllerTest {
 
     @Autowired
@@ -40,7 +40,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void addUser() throws Exception {
+    void addUser() throws Exception {
 
         UserDTO userDTO = getUserDTO();
         String requestJson = objectWriter.writeValueAsString(userDTO);
@@ -48,7 +48,7 @@ public class UserControllerTest {
         when(userService.addUser(userDTO)).thenReturn(userDTO);
 
         mockMvc.perform(post("/")
-                .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
                 .andExpect(status().isCreated())
                 .andExpect(content()
                         .json("{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\"," +
@@ -59,7 +59,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void addUserWith_invalidFirstNameMinCharacters() throws Exception {
+    void addUserWith_invalidFirstNameMinCharacters() throws Exception {
 
         UserDTO userDTO = getUserDTO();
         userDTO.setFirstName("aa");
@@ -75,14 +75,14 @@ public class UserControllerTest {
     }
 
     @Test
-    public void updateUserByEmail() throws Exception {
+    void updateUserByEmail() throws Exception {
 
         UserDTO userDTO = getUserDTO();
         userDTO.setFirstName("newTestName");
 
         String requestJson = objectWriter.writeValueAsString(userDTO);
 
-        when(userService.updateUserByEmail(userDTO.getEmail(),userDTO)).thenReturn(userDTO);
+        when(userService.updateUserByEmail(userDTO.getEmail(), userDTO)).thenReturn(userDTO);
 
         mockMvc.perform(put("/" + userDTO.getEmail())
                         .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
@@ -92,11 +92,11 @@ public class UserControllerTest {
                                 "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"," +
                                 "\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}"));
 
-        verify(userService).updateUserByEmail(userDTO.getEmail(),userDTO);
+        verify(userService).updateUserByEmail(userDTO.getEmail(), userDTO);
     }
 
     @Test
-    public void updateUserByEmailInvalidEmail() throws Exception {
+    void updateUserByEmailInvalidEmail() throws Exception {
 
         UserDTO userDTO = getUserDTO();
         userDTO.setFirstName("newTestName");
@@ -113,20 +113,21 @@ public class UserControllerTest {
     }
 
     @Test
-    public void confirmUserAccount() throws Exception {
+    void confirmUserAccount() throws Exception {
 
         String token = "testToken";
 
         mockMvc.perform(put("/confirm/" + token)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().string("User activated Successfully!"));;
+                .andExpect(content().string("User activated Successfully!"));
+        ;
 
         verify(userService).confirmUserAccount(token);
     }
 
     @Test
-    public void getAllUsers() throws Exception {
+    void getAllUsers() throws Exception {
 
         when(userService.getAllUsers()).thenReturn(Arrays.asList(
                 getUserDTO(),
@@ -143,7 +144,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getUserByEmail() throws Exception {
+    void getUserByEmail() throws Exception {
 
         UserDTO userDTO = getUserDTO();
 
@@ -163,7 +164,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void deleteUserByByEmail() throws Exception {
+    void deleteUserByByEmail() throws Exception {
 
         UserDTO userDTO = getUserDTO();
 
@@ -186,7 +187,6 @@ public class UserControllerTest {
 
         return userDTO;
     }
-
 
 
 }

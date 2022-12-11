@@ -17,7 +17,7 @@
             <column name="token_id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="confirmation_token" type="varchar(100)">
+            <column name="token" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
             <column name="created_date" type="date">
@@ -32,7 +32,7 @@
                 baseTableSchemaName="user"
                 baseTableName="confirmation_token"
                 baseColumnNames="user_id"
-                constraintName="confirmation_token_f1"
+                constraintName="token_f1"
                 referencedTableSchemaName="user"
                 referencedTableName="user"
                 referencedColumnNames="id"/>
