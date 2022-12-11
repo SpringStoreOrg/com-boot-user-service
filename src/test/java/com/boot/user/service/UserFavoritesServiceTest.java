@@ -47,6 +47,8 @@ class UserFavoritesServiceTest {
     @Captor
     private ArgumentCaptor<UserFavorite> userFavoriteArgumentCaptor;
 
+    private static final  String INVALID_EMAIL_ERROR = "Invalid Email address!";
+
     @Test
     void addProductToUserFavorites() throws DuplicateEntryException, EntityNotFoundException {
         User user = getUser("testProductName1,testProductName2");
@@ -86,6 +88,20 @@ class UserFavoritesServiceTest {
     }
 
     @Test
+    void addProductToUserFavorites_user_null() {
+        User user = getUser("testProductName1,testProductName2");
+
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
+                userFavoritesService.addProductToUserFavorites(user.getEmail(), "testProductName2"));
+
+        assertEquals(INVALID_EMAIL_ERROR, exception.getMessage());
+
+        verifyNoInteractions(userFavoriteRepository);
+    }
+
+    @Test
     void addProductsToUserFavorites() throws EntityNotFoundException {
         User user = getUser("testProductName1,testProductName2");
 
@@ -110,6 +126,24 @@ class UserFavoritesServiceTest {
     }
 
     @Test
+    void addProductsToUserFavorites_user_null() {
+        User user = getUser("testProductName1,testProductName2");
+
+        List<String> productNames = new ArrayList<>();
+        productNames.add("testProductName3");
+        productNames.add("testProductName4");
+
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
+                userFavoritesService.addProductsToUserFavorites(user.getEmail(), productNames));
+
+        assertEquals(INVALID_EMAIL_ERROR, exception.getMessage());
+
+        verifyNoInteractions(userFavoriteRepository);
+    }
+
+    @Test
     void removeProductFromUserFavorites() throws EntityNotFoundException {
         User user = getUser("testProductName1,testProductName2");
         String productName = "testProductName2";
@@ -129,7 +163,21 @@ class UserFavoritesServiceTest {
     }
 
     @Test
-    void removeProductFromUserFavorites_userNull() {
+    void removeProductFromUserFavorites_user_null() {
+        User user = getUser("testProductName1,testProductName2");
+        String productName = "testProductName2";
+
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(userFavoriteRepository.findByUserAndProductName(user, productName)).thenReturn(null);
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
+                userFavoritesService.removeProductFromUserFavorites(user.getEmail(), productName));
+
+        assertEquals("User Favorite could not be found!", exception.getMessage());
+    }
+
+    @Test
+    void removeProductFromUserFavorites_userFavorite_null() {
         User user = getUser("testProductName1,testProductName2");
         String productName = "testProductName2";
 
@@ -138,7 +186,7 @@ class UserFavoritesServiceTest {
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 userFavoritesService.removeProductFromUserFavorites(user.getEmail(), productName));
 
-        assertEquals("Invalid Email address!", exception.getMessage());
+        assertEquals(INVALID_EMAIL_ERROR, exception.getMessage());
 
         verifyNoInteractions(userFavoriteRepository);
     }
@@ -174,6 +222,19 @@ class UserFavoritesServiceTest {
 
         verify(userRepository).getUserByEmail(user.getEmail());
         assertTrue(newProductDTOList.isEmpty());
+        verifyNoInteractions(productServiceClient);
+    }
+
+    @Test
+    void getAllProductsFromUserFavorites_user_null() {
+        User user = getUser("testProductName1,testProductName2");
+
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
+                userFavoritesService.getAllProductsFromUserFavorites(user.getEmail()));
+
+        assertEquals(INVALID_EMAIL_ERROR, exception.getMessage());
         verifyNoInteractions(productServiceClient);
     }
 
