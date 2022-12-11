@@ -478,6 +478,7 @@ class UserServiceTest {
         Date dateToConvert = calendar.getTime();
 
         ConfirmationToken token = new ConfirmationToken();
+        token.setTokenId(1);
         token.setToken("ec9f508e-2063-4057-840f-efce2d1bbae5");
         token.setUser(getUser());
         token.setCreatedDate(dateToConvert);
