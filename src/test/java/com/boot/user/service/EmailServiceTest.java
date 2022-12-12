@@ -129,11 +129,11 @@ import static org.mockito.Mockito.*;
         calendar.setGregorianChange(new Date(Long.MIN_VALUE));
         Date dateToConvert = calendar.getTime();
 
-        PasswordResetToken resetoken = new PasswordResetToken();
-        resetoken.setTokenId(2);
-        resetoken.setResetToken("ec9f508e-2063-4057-840f-efce2d1bbae5");
-        resetoken.setUser(getUser());
-        resetoken.setCreatedDate(dateToConvert);
-        return resetoken;
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setTokenId(3);
+        resetToken.setResetToken("ec9f508e-2063-4057-840f-efce2d1bbae5");
+        resetToken.setUser(getUser());
+        resetToken.setCreatedDate(dateToConvert);
+        return resetToken;
     }
 }

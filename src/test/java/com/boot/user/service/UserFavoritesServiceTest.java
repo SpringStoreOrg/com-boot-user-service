@@ -126,6 +126,23 @@ class UserFavoritesServiceTest {
     }
 
     @Test
+    void addProductsToUserFavorites_product_already_added() throws EntityNotFoundException {
+        User user = getUser();
+
+        List<String> productNames = new ArrayList<>();
+        productNames.add("testProductName1");
+        productNames.add("testProductName2");
+
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+
+        userFavoritesService.addProductsToUserFavorites(user.getEmail(), productNames);
+
+        verifyNoInteractions(userFavoriteRepository);
+
+        verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2", true);
+    }
+
+    @Test
     void addProductsToUserFavorites_user_null() {
         User user = getUser();
 
