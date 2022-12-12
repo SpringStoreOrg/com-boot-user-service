@@ -3,6 +3,7 @@ package com.boot.user.service;
 
 import com.boot.user.config.AppConfig;
 import com.boot.user.model.ConfirmationToken;
+import com.boot.user.model.PasswordResetToken;
 import com.boot.user.model.User;
 import com.boot.user.model.UserFavorite;
 import org.apache.velocity.app.VelocityEngine;
@@ -63,6 +64,20 @@ import static org.mockito.Mockito.*;
         verify(mimeMessage).setSubject("SpringStore confirmation Email");
     }
 
+    @Test
+    void sendPasswordResetEmail() throws MessagingException {
+        User user =  getUser();
+        PasswordResetToken resetToken =  getResetToken();
+        MimeMessage mimeMessage = mock(MimeMessage.class);
+        when(appConfig.userServiceRestTemplateUrl()).thenReturn(new RestTemplateBuilder().rootUri(userServiceUrl).build());
+        when(emailSender.createMimeMessage()).thenReturn(mimeMessage);
+
+        emailService.sendPasswordResetEmail(user, resetToken);
+
+        assertNotNull(resetToken);
+        verify(mimeMessage).setSubject("Password Reset Request");
+    }
+
     private UserFavorite createUserFavorite(User user, String productName){
 
         UserFavorite userFavorite = new UserFavorite();
@@ -107,4 +122,18 @@ import static org.mockito.Mockito.*;
         return token;
     }
 
+
+    private PasswordResetToken getResetToken() {
+
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setGregorianChange(new Date(Long.MIN_VALUE));
+        Date dateToConvert = calendar.getTime();
+
+        PasswordResetToken resetoken = new PasswordResetToken();
+        resetoken.setTokenId(2);
+        resetoken.setResetToken("ec9f508e-2063-4057-840f-efce2d1bbae5");
+        resetoken.setUser(getUser());
+        resetoken.setCreatedDate(dateToConvert);
+        return resetoken;
+    }
 }
