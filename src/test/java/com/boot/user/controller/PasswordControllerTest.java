@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         mockMvc.perform(put("/password/change/" + token + "/"+ newPassword+ "/"+confirmedNewPassword)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Password successfully changed!"));;
+                .andExpect(content().string("Password successfully changed!"));
 
         verify(userService).changeUserPassword(token, newPassword, confirmedNewPassword);
     }
@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         mockMvc.perform(put("/password/reset/" + email)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Request to reset Password successfully send!"));;
+                .andExpect(content().string("Request to reset Password successfully send!"));
 
         verify(userService).requestResetPassword(email);
     }

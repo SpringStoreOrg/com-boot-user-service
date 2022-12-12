@@ -17,10 +17,10 @@ public class PasswordResetToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "token_id")
-    private long tokenid;
+    @Column
+    private long tokenId;
 
-    @Column(name = "reset_token")
+    @Column
     private String resetToken;
 
     @Temporal(TemporalType.TIMESTAMP)

@@ -121,7 +121,6 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(content().string("User activated Successfully!"));
-        ;
 
         verify(userService).confirmUserAccount(token);
     }

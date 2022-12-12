@@ -51,7 +51,7 @@ import static org.mockito.Mockito.*;
 
     @Test
      void sendConfirmationEmail() throws MessagingException {
-        User user =  getUser("testProductName1,testProductName2");
+        User user =  getUser();
         ConfirmationToken confirmationToken =  getToken();
         MimeMessage mimeMessage = mock(MimeMessage.class);
         when(appConfig.userServiceRestTemplateUrl()).thenReturn(new RestTemplateBuilder().rootUri(userServiceUrl).build());
@@ -72,10 +72,10 @@ import static org.mockito.Mockito.*;
         return userFavorite;
     }
 
-    private User getUser(String productNames) {
+    private User getUser() {
         User user = new User();
         List<UserFavorite> userFavorites = new ArrayList<>();
-        List<String> productNamesList = new ArrayList<>(Arrays.asList(productNames.split(",")));
+        List<String> productNamesList = new ArrayList<>(Arrays.asList("testProductName1,testProductName2".split(",")));
 
         productNamesList.forEach(product ->userFavorites.add(createUserFavorite(user,product)));
 
@@ -102,7 +102,7 @@ import static org.mockito.Mockito.*;
         ConfirmationToken token = new ConfirmationToken();
         token.setTokenId(2);
         token.setToken("ec9f508e-2063-4057-840f-efce2d1bbae5");
-        token.setUser(getUser("testProductName1,testProductName2"));
+        token.setUser(getUser());
         token.setCreatedDate(dateToConvert);
         return token;
     }

@@ -51,7 +51,7 @@ class UserFavoritesServiceTest {
 
     @Test
     void addProductToUserFavorites() throws DuplicateEntryException, EntityNotFoundException {
-        User user = getUser("testProductName1,testProductName2");
+        User user = getUser();
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
 
@@ -75,7 +75,7 @@ class UserFavoritesServiceTest {
 
     @Test
     void addProductToUserFavorites_duplicateProductName() {
-        User user = getUser("testProductName1,testProductName2");
+        User user = getUser();
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
 
@@ -89,7 +89,7 @@ class UserFavoritesServiceTest {
 
     @Test
     void addProductToUserFavorites_user_null() {
-        User user = getUser("testProductName1,testProductName2");
+        User user = getUser();
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);
 
@@ -103,7 +103,7 @@ class UserFavoritesServiceTest {
 
     @Test
     void addProductsToUserFavorites() throws EntityNotFoundException {
-        User user = getUser("testProductName1,testProductName2");
+        User user = getUser();
 
         List<String> productNames = new ArrayList<>();
         productNames.add("testProductName3");
@@ -127,7 +127,7 @@ class UserFavoritesServiceTest {
 
     @Test
     void addProductsToUserFavorites_user_null() {
-        User user = getUser("testProductName1,testProductName2");
+        User user = getUser();
 
         List<String> productNames = new ArrayList<>();
         productNames.add("testProductName3");
@@ -145,7 +145,7 @@ class UserFavoritesServiceTest {
 
     @Test
     void removeProductFromUserFavorites() throws EntityNotFoundException {
-        User user = getUser("testProductName1,testProductName2");
+        User user = getUser();
         String productName = "testProductName2";
         UserFavorite userFavorite = createUserFavorite(user, productName);
 
@@ -164,7 +164,7 @@ class UserFavoritesServiceTest {
 
     @Test
     void removeProductFromUserFavorites_user_null() {
-        User user = getUser("testProductName1,testProductName2");
+        User user = getUser();
         String productName = "testProductName2";
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
@@ -178,7 +178,7 @@ class UserFavoritesServiceTest {
 
     @Test
     void removeProductFromUserFavorites_userFavorite_null() {
-        User user = getUser("testProductName1,testProductName2");
+        User user = getUser();
         String productName = "testProductName2";
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);
@@ -193,7 +193,7 @@ class UserFavoritesServiceTest {
 
     @Test
     void getAllProductsFromUserFavorites() throws EntityNotFoundException {
-        User user = getUser("testProductName1,testProductName2");
+        User user = getUser();
 
         List<ProductDTO> productDTOList = new ArrayList<>();
         productDTOList.add(getProductDTO("Yellow Chair"));
@@ -212,7 +212,7 @@ class UserFavoritesServiceTest {
 
     @Test
     void getAllProductsFromUserFavorites_userFavoritesEmpty() throws EntityNotFoundException {
-        User user = getUser("testProductName1,testProductName2");
+        User user = getUser();
         List<UserFavorite> userFavorites = new ArrayList<>();
         user.setUserFavorites(userFavorites);
 
@@ -227,7 +227,7 @@ class UserFavoritesServiceTest {
 
     @Test
     void getAllProductsFromUserFavorites_user_null() {
-        User user = getUser("testProductName1,testProductName2");
+        User user = getUser();
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);
 
@@ -247,10 +247,10 @@ class UserFavoritesServiceTest {
         return userFavorite;
     }
 
-    private User getUser(String productNames) {
+    private User getUser() {
         User user = new User();
         List<UserFavorite> userFavorites = new ArrayList<>();
-        List<String> productNamesList = new ArrayList<>(Arrays.asList(productNames.split(",")));
+        List<String> productNamesList = new ArrayList<>(Arrays.asList("testProductName1,testProductName2".split(",")));
 
         productNamesList.forEach(product -> userFavorites.add(createUserFavorite(user, product)));
 
