@@ -34,7 +34,7 @@ public class UserDTO {
 	@Pattern(regexp="^(?=[07]{2})(?=\\d{10}).*", message = "Invalid Phone Number!")
 	private String phoneNumber;
 
-	@Email(regexp="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "Invalid Email!")
+	@Email(message = "Invalid Email!")
 	private String email;
 
 
