@@ -15,8 +15,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.boot.user.model.User;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -27,16 +25,15 @@ import lombok.experimental.Accessors;
 public class ConfirmationToken {
 
     public ConfirmationToken() {
-
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "token_id")
-    private long tokenid;
+    @Column
+    private long tokenId;
 
-    @Column(name = "confirmation_token")
-    private String confirmationToken;
+    @Column
+    private String token;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
@@ -48,6 +45,6 @@ public class ConfirmationToken {
     public ConfirmationToken(User user) {
         this.user = user;
         createdDate = new Date();
-        confirmationToken = UUID.randomUUID().toString();
+        token = UUID.randomUUID().toString();
     }
 }

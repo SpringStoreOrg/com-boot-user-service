@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.17.xsd">
+
+    <changeSet author="GeorgeT88" id="2022-12-10-11.20">
+
+        <preConditions onFail="HALT">
+            <not>
+                <tableExists schemaName="user" tableName="confirmation_token"/>
+            </not>
+        </preConditions>
+
+        <createTable schemaName="user" tableName="confirmation_token">
+            <column name="token_id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="token" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableSchemaName="user"
+                baseTableName="confirmation_token"
+                baseColumnNames="user_id"
+                constraintName="token_f1"
+                referencedTableSchemaName="user"
+                referencedTableName="user"
+                referencedColumnNames="id"/>
+
+    </changeSet>
+</databaseChangeLog>

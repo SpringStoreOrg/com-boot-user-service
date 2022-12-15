@@ -43,7 +43,7 @@ public class EmailService {
         model.put("firstName", user.getFirstName());
         model.put("lastName", user.getLastName());
         model.put("path", appConfig.userServiceUrl + Constants.CONFIRM_USER_ACCOUNT);
-        model.put("confirmationToken", confirmationToken.getConfirmationToken());
+        model.put("confirmationToken", confirmationToken.getToken());
         model.put("signature", "www.springStore.com");
         email.setModel(model);
 

@@ -17,8 +17,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@TestPropertySource(locations = "classpath:test.properties")
-public class PasswordControllerTest {
+@TestPropertySource(locations = "classpath:application-test.properties")
+ class PasswordControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -27,7 +27,7 @@ public class PasswordControllerTest {
     private UserService userService;
 
     @Test
-    public void changeUserPassword() throws Exception {
+     void changeUserPassword() throws Exception {
 
         String token = "qweqw-e1231-qwew-4324";
         String newPassword = "newPassword";
@@ -37,20 +37,20 @@ public class PasswordControllerTest {
         mockMvc.perform(put("/password/change/" + token + "/"+ newPassword+ "/"+confirmedNewPassword)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Password successfully changed!"));;
+                .andExpect(content().string("Password successfully changed!"));
 
         verify(userService).changeUserPassword(token, newPassword, confirmedNewPassword);
     }
 
     @Test
-    public void requestResetPassword() throws Exception {
+     void requestResetPassword() throws Exception {
 
         String email = "test@email.com";
 
         mockMvc.perform(put("/password/reset/" + email)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Request to reset Password successfully send!"));;
+                .andExpect(content().string("Request to reset Password successfully send!"));
 
         verify(userService).requestResetPassword(email);
     }

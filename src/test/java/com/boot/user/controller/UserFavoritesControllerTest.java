@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@TestPropertySource(locations = "classpath:test.properties")
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class UserFavoritesControllerTest {
 
     @Autowired
@@ -47,19 +47,19 @@ public class UserFavoritesControllerTest {
     }
 
     @Test
-    public void addProductToUserFavorites() throws Exception {
+    void addProductToUserFavorites() throws Exception {
 
         String email = "test@email.com";
-        ProductDTO productDTO = getProductDTO(1,"Green wood Chair 1");
+        ProductDTO productDTO = getProductDTO(1, "Green wood Chair 1");
 
         when(userFavoritesService.addProductToUserFavorites(email, productDTO.getName())).thenReturn(Arrays.asList(
-                getProductDTO(1,"Green wood Chair 1"),
-                getProductDTO(2,"Green wood Chair 2"),
-                getProductDTO(3,"Green wood Chair 3"),
-                getProductDTO(4,"Green wood Chair 4")));
+                getProductDTO(1, "Green wood Chair 1"),
+                getProductDTO(2, "Green wood Chair 2"),
+                getProductDTO(3, "Green wood Chair 3"),
+                getProductDTO(4, "Green wood Chair 4")));
 
-        mockMvc.perform(post("/userFavorites/"+ email +"/"+ productDTO.getName())
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        mockMvc.perform(post("/userFavorites/" + email + "/" + productDTO.getName())
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(content().json(TestDataUtils.readFileAsString("./src/test/resources/testdata/controller/addProductToUserFavorites.json")));
 
@@ -67,19 +67,19 @@ public class UserFavoritesControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"a","  ", "asdkasdjlasjkdalskdjasldakjdalkdjaslk", "123^^@test.com"})
+    @ValueSource(strings = {"a", "  ", "asdkasdjlasjkdalskdjasldakjdalkdjaslk", "123^^@test.com"})
     @NullSource
-    public void addProductToUserFavorites_invalidEmail(String email) throws Exception {
+    void addProductToUserFavorites_invalidEmail(String email) throws Exception {
 
-        ProductDTO productDTO = getProductDTO(1,"Green wood Chair 1");
+        ProductDTO productDTO = getProductDTO(1, "Green wood Chair 1");
 
         when(userFavoritesService.addProductToUserFavorites(email, productDTO.getName())).thenReturn(Arrays.asList(
-                getProductDTO(1,"Green wood Chair 1"),
-                getProductDTO(2,"Green wood Chair 2"),
-                getProductDTO(3,"Green wood Chair 3"),
-                getProductDTO(4,"Green wood Chair 4")));
+                getProductDTO(1, "Green wood Chair 1"),
+                getProductDTO(2, "Green wood Chair 2"),
+                getProductDTO(3, "Green wood Chair 3"),
+                getProductDTO(4, "Green wood Chair 4")));
 
-        mockMvc.perform(post("/userFavorites/"+ email +"/"+ productDTO.getName())
+        mockMvc.perform(post("/userFavorites/" + email + "/" + productDTO.getName())
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", Matchers.is("addProductToUserFavorites.email: Invalid email!")));
@@ -89,17 +89,17 @@ public class UserFavoritesControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"a", "asdkasdjlasjkdalskdjasldakjdalkdjaslk"})
-    public void addProductToUserFavorites_invalidProductName(String productName) throws Exception {
+    void addProductToUserFavorites_invalidProductName(String productName) throws Exception {
 
         String email = "test@email.com";
 
         when(userFavoritesService.addProductToUserFavorites(email, productName)).thenReturn(Arrays.asList(
-                getProductDTO(1,"Green wood Chair 1"),
-                getProductDTO(2,"Green wood Chair 2"),
-                getProductDTO(3,"Green wood Chair 3"),
-                getProductDTO(4,"Green wood Chair 4")));
+                getProductDTO(1, "Green wood Chair 1"),
+                getProductDTO(2, "Green wood Chair 2"),
+                getProductDTO(3, "Green wood Chair 3"),
+                getProductDTO(4, "Green wood Chair 4")));
 
-        mockMvc.perform(post("/userFavorites/"+ email +"/"+ productName)
+        mockMvc.perform(post("/userFavorites/" + email + "/" + productName)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", Matchers.containsString("Product Name size has to be between 2 and 30 characters!")));
@@ -108,7 +108,7 @@ public class UserFavoritesControllerTest {
     }
 
     @Test
-    public void addProductsToUserFavorites() throws Exception {
+    void addProductsToUserFavorites() throws Exception {
 
         String email = "test@email.com";
         List<String> products = Arrays.asList("Green wood Chair 1", "Green wood Chair 2", "Green wood Chair 3");
@@ -116,11 +116,11 @@ public class UserFavoritesControllerTest {
         String requestJson = objectWriter.writeValueAsString(products);
 
         when(userFavoritesService.addProductsToUserFavorites(email, products)).thenReturn(Arrays.asList(
-                getProductDTO(1,"Green wood Chair 1"),
-                getProductDTO(2,"Green wood Chair 2"),
-                getProductDTO(3,"Green wood Chair 3")));
+                getProductDTO(1, "Green wood Chair 1"),
+                getProductDTO(2, "Green wood Chair 2"),
+                getProductDTO(3, "Green wood Chair 3")));
 
-        mockMvc.perform(put("/userFavorites/"+ email)
+        mockMvc.perform(put("/userFavorites/" + email)
                         .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
                 .andExpect(status().isOk())
                 .andExpect(content().json(TestDataUtils.readFileAsString("./src/test/resources/testdata/controller/addProductsToUserFavorites.json")));
@@ -142,7 +142,4 @@ public class UserFavoritesControllerTest {
 
         return productDTO;
     }
-
-
-
 }

@@ -9,5 +9,5 @@ import com.boot.user.model.ConfirmationToken;
 @Repository
 public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationToken, Long> {
 
-	 ConfirmationToken findByConfirmationToken(String confirmationToken);
+	 ConfirmationToken findByToken(String confirmationToken);
 }

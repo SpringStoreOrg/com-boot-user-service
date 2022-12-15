@@ -7,10 +7,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootTest(classes = SpringUserServiceApplicationTests.class)
 @EnableWebMvc
-public class SpringUserServiceApplicationTests {
+class SpringUserServiceApplicationTests {
 
-	@Test
-	public void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }
