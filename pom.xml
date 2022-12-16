@@ -185,6 +185,15 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>com/boot/user/model/*</exclude>
+                        <exclude>com/boot/user/dto/*</exclude>
+                        <exclude>com/boot/user/exception/*</exclude>
+                        <exclude>com/boot/user/client/*</exclude>
+                        <exclude>com/boot/user/exception/*</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
 
