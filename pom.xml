@@ -21,10 +21,11 @@
         <spring-cloud.version>2021.0.4</spring-cloud.version>
         <sonar.organization>georget88</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.exclusions>com/boot/user/model/*</sonar.exclusions>
-        <sonar.exclusions>com/boot/user/dto/*</sonar.exclusions>
-        <sonar.exclusions>com/boot/user/exception/*</sonar.exclusions>
-        <sonar.exclusions>com/boot/user/client/*</sonar.exclusions>
+        <sonar.exclusions>**/model/*</sonar.exclusions>
+        <sonar.exclusions>**/dto/*</sonar.exclusions>
+        <sonar.exclusions>**/exception/*</sonar.exclusions>
+        <sonar.exclusions>**/client/*</sonar.exclusions>
+        <sonar.exclusions>**/exception/*</sonar.exclusions>
     </properties>
 
     <dependencies>
