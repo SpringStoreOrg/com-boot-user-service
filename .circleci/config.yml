@@ -31,6 +31,7 @@ jobs:
       - run: find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
       - store_test_results:
           path: /tmp/circleci-test-results/junit
+  sonarcloud-analyze:
       - run:
           name: Analyze on SonarCloud
           command: mvn verify sonar:sonar -Dsonar.projectKey=GeorgeT88_com-boot-user-service
@@ -42,3 +43,4 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - build-and-test
+      - sonarcloud-analyze
