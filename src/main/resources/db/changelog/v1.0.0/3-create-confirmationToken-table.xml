@@ -20,7 +20,7 @@
             <column name="token" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_date" type="date">
+            <column name="created_date" type="timestamp">
                 <constraints nullable="false"/>
             </column>
             <column name="user_id" type="bigint">
