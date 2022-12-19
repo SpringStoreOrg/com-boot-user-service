@@ -37,6 +37,7 @@ jobs:
       - run:
           name: Trigger the IT Build Job
           command: |
+              echo $API_TOKEN_IT
               curl --location --request POST 'https://circleci.com/api/v2/project/github/GeorgeT88/com-boot-user-service-it/pipeline' \
               --header 'Content-Type: application/json' \
               -u "${API_TOKEN_IT}:"
