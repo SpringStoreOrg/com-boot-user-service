@@ -34,6 +34,14 @@ jobs:
       - run:
           name: Analyze on SonarCloud
           command: mvn verify sonar:sonar -Dsonar.projectKey=GeorgeT88_com-boot-user-service
+      - run:
+          name: Trigger the IT Build Job
+          command: |
+            printf "Triggering an com-boot-user-service-it build on the circleci-project-setup branch\n\n"
+
+            BUILD_INFO=$(curl -X POST -H -d \
+                "{}" \
+                "https://circleci.com/api/v1/project/$GeorgeT88/com-boot-user-service-it/tree/circleci-project-setup?circle-token=8e6746cdb60586d1bf54f999544dadd37c10473b")
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
