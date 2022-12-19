@@ -15,6 +15,6 @@ public class TokenValidator {
 
         return !LocalDateTime.now().isBefore(Instant.ofEpochMilli(date.getTime())
                 .atZone(ZoneId.systemDefault())
-                .toLocalDateTime().plusHours(1));
+                .toLocalDateTime().plusDays(1));
     }
 }

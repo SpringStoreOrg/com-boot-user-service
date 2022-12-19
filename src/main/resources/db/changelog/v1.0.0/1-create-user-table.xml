@@ -37,13 +37,13 @@
             <column name="phone_number" type="varchar(25)">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_on" type="date">
+            <column name="created_on" type="datetime">
                 <constraints nullable="false"/>
             </column>
             <column name="is_activated" type="boolean">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_updated_on" type="date"/>
+            <column name="last_updated_on" type="datetime"/>
             <column name="role" type="varchar(20)">
                 <constraints nullable="false"/>
             </column>

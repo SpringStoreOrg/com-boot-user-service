@@ -15,9 +15,9 @@
             <column name="delivery_address" value="street. test no. 1"/>
             <column name="password" value="$2a$10$8yeGpxtPDnCFzMDMWjQUbuhduMf.JkSwNce62FliLoJnQBywc7UB."/>
             <column name="phone_number" value="0742000000"/>
-            <column name="created_on" valueDate="2022-04-13"/>
+            <column name="created_on" valueDate="2022-04-13T13:14:15"/>
             <column name="is_activated" valueBoolean="true"/>
-            <column name="last_updated_on" value="2022-06-22"/>
+            <column name="last_updated_on" value="2022-06-22T13:14:15"/>
             <column name="role" value="USER"/>
         </insert>
 
@@ -28,9 +28,9 @@
             <column name="delivery_address" value="street. test no. 1"/>
             <column name="password" value="$2a$10$M.vByy/yzKYkCwQWmPf7wuQB2tVEZln3njEq8/tLnVKgZeTsK9x7e"/>
             <column name="phone_number" value="0742000000"/>
-            <column name="created_on" valueDate="2022-05-13"/>
+            <column name="created_on" valueDate="2022-05-13T13:14:15"/>
             <column name="is_activated" valueBoolean="true"/>
-            <column name="last_updated_on" value="2022-08-21"/>
+            <column name="last_updated_on" value="2022-08-21T13:14:15"/>
             <column name="role" value="USER"/>
         </insert>
 
@@ -41,9 +41,9 @@
             <column name="delivery_address" value="street. test no. 1"/>
             <column name="password" value="$2a$10$5WX0ukH1nkYH7YrCIqd7OOraNPSNz8.BSB6LTT7L8fCQS240W6Qw."/>
             <column name="phone_number" value="0742000000"/>
-            <column name="created_on" valueDate="2022-06-13"/>
+            <column name="created_on" valueDate="2022-06-13T13:14:15"/>
             <column name="is_activated" valueBoolean="true"/>
-            <column name="last_updated_on" value="2022-09-19"/>
+            <column name="last_updated_on" value="2022-09-19T13:14:15"/>
             <column name="role" value="USER"/>
         </insert>
 
@@ -54,9 +54,9 @@
             <column name="delivery_address" value="street. test no. 1"/>
             <column name="password" value="$2a$10$syNeUDEU8MgY9aVc1y21sO6tQ30qVesFiDZb1vxNcpEUIDfoFGBzO"/>
             <column name="phone_number" value="0742000000"/>
-            <column name="created_on" valueDate="2022-07-13"/>
+            <column name="created_on" valueDate="2022-07-13T13:14:15"/>
             <column name="is_activated" valueBoolean="true"/>
-            <column name="last_updated_on" value="2022-11-14"/>
+            <column name="last_updated_on" value="2022-11-14T13:14:15"/>
             <column name="role" value="USER"/>
         </insert>
 
@@ -67,9 +67,9 @@
             <column name="delivery_address" value="street. test no. 1"/>
             <column name="password" value="$2a$10$8vNPqsD9g8VXgvRqkBu0quxan5pTydVF4Dz2c5xFxg1MeIaVMFRZ2"/>
             <column name="phone_number" value="0742000000"/>
-            <column name="created_on" valueDate="2022-09-13"/>
+            <column name="created_on" valueDate="2022-09-13T13:14:15"/>
             <column name="is_activated" valueBoolean="true"/>
-            <column name="last_updated_on" value="2022-10-14"/>
+            <column name="last_updated_on" value="2022-10-14T13:14:15"/>
             <column name="role" value="USER"/>
         </insert>
 
