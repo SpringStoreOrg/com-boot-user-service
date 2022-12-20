@@ -45,9 +45,6 @@ jobs:
             --header 'Content-Type: application/json' \
             --header "Circle-Token: ${API_TOKEN_IT}"  \
             --data-raw '{
-                "parameters": {
-                    "node-v-1": "10.1.1"
-              }
             }' | jq -r '.id')
             echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
       - run: |
