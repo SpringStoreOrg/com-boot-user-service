@@ -43,9 +43,8 @@ jobs:
           command: |
             PIPELINE_ID=$(curl --location --request POST 'https://circleci.com/api/v2/project/github/GeorgeT88/com-boot-user-service-it/pipeline' \
             --header 'Content-Type: application/json' \
-            --header "Circle-Token: ${API_TOKEN_IT}"  \
-            --data-raw '{
-            }' | jq -r '.id')
+            --header "Circle-Token: ${API_TOKEN_IT}"  )
+
             echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
       - run: 
           name: Check the IT Build Job
@@ -58,7 +57,7 @@ jobs:
               STATUS =$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
             done
 
-            if ["$STATUS" == "success" ]; then
+            if [["$STATUS" == "success" ]]; then
               echo "Proceeding with build, as triggered pipeline was success"
               exit 0
             else
