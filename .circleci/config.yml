@@ -41,16 +41,14 @@ jobs:
       - run:
           name: Trigger the IT Build Job
           command: |
-              PIPELINE_ID=$(curl --location --request POST 'https://circleci.com/api/v2/project/github/GeorgeT88/com-boot-user-service-it/pipeline' \
-              echo still $PIPELINE_ID
-              echo still $API_TOKEN_IT
-              --header 'Content-Type: application/json' \
-              -u "${API_TOKEN_IT}:" )
-              echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
+            PIPELINE_ID=$(curl --location --request POST 'https://circleci.com/api/v2/project/github/GeorgeT88/com-boot-user-service-it/pipeline' \
+            --header 'Content-Type: application/json' \
+            -u "${API_TOKEN_IT}:" )
+            echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
       - run: |
           STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
-          while [ "$STATUS" == "pending" ]; do
-            echo still pending
+          while [ "$STATUS" == "running" ]; do
+            echo still running
             sleep 10
             STATUS=$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
           done
