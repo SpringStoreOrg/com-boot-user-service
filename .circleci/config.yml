@@ -45,22 +45,19 @@ jobs:
             --header 'Content-Type: application/json' \
             --header "Circle-Token: ${API_TOKEN_IT}"  )
             echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
-
-            STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
-
+            STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[0].status')
             while [ "$STATUS" == "running" ]; do
               echo still running
               sleep 10
-              STATUS =$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
+              STATUS =$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[0].status')
             done
-
             if [["$STATUS" == "success" ]]; then
               echo "Proceeding with build, as triggered pipeline was success"
               exit 0
             else
               echo "Stopping build, triggered pipeline was not a success"
               exit 1
-            fi    
+            fi      
 
 workflows:
   sample: # This is the name of the workflow, feel free to change it to better match your workflow.
