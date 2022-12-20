@@ -47,12 +47,12 @@ jobs:
 
             echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
 
-            STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
+            STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[0].status')
 
             while [ "$STATUS" == "running" ]; do
               echo still running
               sleep 10
-              STATUS =$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
+              STATUS =$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[0].status')
             done
 
             if [["$STATUS" == "success" ]]; then
