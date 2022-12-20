@@ -62,8 +62,8 @@ jobs:
               echo "Proceeding with build, as triggered pipeline was success"
               exit 0
             else
-            echo "Stopping build, triggered pipeline was not a success"
-            exit 1
+              echo "Stopping build, triggered pipeline was not a success"
+              exit 1
             fi    
 
 workflows:
