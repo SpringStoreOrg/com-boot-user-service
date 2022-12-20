@@ -56,7 +56,7 @@ jobs:
               STATUS =$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
             done
 
-            if [["$STATUS" == "success" ]]; then
+            if ["$STATUS" == "success" ]; then
               echo "Proceeding with build, as triggered pipeline was success"
               exit 0
             else
