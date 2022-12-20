@@ -47,8 +47,8 @@ jobs:
               echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
       - run: |
           STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
-          while [ "$STATUS" == "running" ]; do
-            echo still running
+          while [ "$STATUS" == "pending" ]; do
+            echo still pending
             sleep 10
             STATUS=$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
           done
