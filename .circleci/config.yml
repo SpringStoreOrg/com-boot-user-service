@@ -41,12 +41,11 @@ jobs:
       - run:
           name: Trigger the IT Build Job
           command: |
-              PIPELINE_ID=$(curl --location --request POST 'https://circleci.com/api/v2/project/github/GeorgeT88/com-boot-user-service-it/pipeline' \
-              --header 'Content-Type: application/json' \
-              --header "Circle-Token: ${API_TOKEN_IT}" \ )
+              PIPELINE_ID=$(curl --location --request POST "https://circleci.com/api/v2/project/github/GeorgeT88/com-boot-user-service-it/pipeline" \
+              --header "Content-Type: application/json" \
+              --header "Circle-Token: $API_TOKEN_IT" |  jq -r '.id')
+              PIPELINE=$PIPELINE_ID
               echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
-              echo $API_TOKEN_IT
-              echo $PIPELINE_ID
       - run: |
           STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
           echo $STATUS
@@ -61,7 +60,7 @@ jobs:
             echo "Proceeding with build, as triggered pipeline was success"
           else
             echo "Stopping build, triggered pipeline was not a success"
-          fi    
+          fi
 
 workflows:
   sample: # This is the name of the workflow, feel free to change it to better match your workflow.
