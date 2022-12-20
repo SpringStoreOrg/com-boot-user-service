@@ -41,23 +41,27 @@ jobs:
       - run:
           name: Trigger the IT Build Job
           command: |
-            PIPELINE_ID=$(curl --location --request POST 'https://circleci.com/api/v2/project/github/GeorgeT88/com-boot-user-service-it/pipeline' \
-            --header 'Content-Type: application/json' \
-            --header "Circle-Token: ${API_TOKEN_IT}"  )
-            echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
-            STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[0].status')
-            while [ "$STATUS" == "running" ]; do
-              echo still running
-              sleep 10
-              STATUS =$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[0].status')
-            done
-            if [["$STATUS" == "success" ]]; then
-              echo "Proceeding with build, as triggered pipeline was success"
-              exit 0
-            else
-              echo "Stopping build, triggered pipeline was not a success"
-              exit 1
-            fi      
+              PIPELINE_ID=$(curl --location --request POST 'https://circleci.com/api/v2/project/github/GeorgeT88/com-boot-user-service-it/pipeline' \
+              --header 'Content-Type: application/json' \
+              --header "Circle-Token: ${API_TOKEN_IT}" \ )
+              echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
+              echo $API_TOKEN_IT
+              echo $PIPELINE_ID
+      - run: |
+          STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
+          echo $STATUS
+          while [ "$STATUS" == "running" ]; do
+            echo still running
+            sleep 10
+            STATUS=$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
+          done
+
+          echo "finally done, checking final status: $STATUS"
+          if [[ "$STATUS" == "success" ]]; then
+            echo "Proceeding with build, as triggered pipeline was success"
+          else
+            echo "Stopping build, triggered pipeline was not a success"
+          fi    
 
 workflows:
   sample: # This is the name of the workflow, feel free to change it to better match your workflow.
