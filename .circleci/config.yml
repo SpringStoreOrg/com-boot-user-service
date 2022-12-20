@@ -43,11 +43,14 @@ jobs:
           command: |
             PIPELINE_ID=$(curl --location --request POST 'https://circleci.com/api/v2/project/github/GeorgeT88/com-boot-user-service-it/pipeline' \
             --header 'Content-Type: application/json' \
-            -u "${API_TOKEN_IT}:" )
+            --header "Circle-Token: ${API_TOKEN_IT}"  \
+            --data-raw '{
+                "parameters": {
+                    "node-v-1": "10.1.1"
+              }
+            }' | jq -r '.id')
             echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
-      - run: 
-          name: Check IT status
-          command: |
+      - run: |
             STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
 
             while [ "$STATUS" == "running" ]; do
