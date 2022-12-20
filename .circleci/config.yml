@@ -37,7 +37,7 @@ jobs:
       - run:
           name: "echo an env var that is part of our project"
           command: |
-            echo $API_TOKEN_IT # this env var must be set within the project   
+            echo $API_TOKEN_IT # this env var must be set within the project    
       - run:
           name: Trigger the IT Build Job
           command: |
