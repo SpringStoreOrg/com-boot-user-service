@@ -34,6 +34,16 @@ jobs:
       - run:
           name: Analyze on SonarCloud
           command: mvn verify sonar:sonar -Dsonar.projectKey=GeorgeT88_com-boot-user-service
+      - run:
+          name: "echo an env var that is part of our project"
+          command: |
+            echo $API_TOKEN_IT # this env var must be set within the project    
+      - run:
+          name: Trigger the IT Build Job
+          command: |
+              curl --location --request POST 'https://circleci.com/api/v2/project/github/GeorgeT88/com-boot-user-service-it/pipeline' \
+              --header 'Content-Type: application/json' \
+              -u "${API_TOKEN_IT}:"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -41,4 +51,4 @@ workflows:
   sample: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - build-and-test
+      - build-and-test 
