@@ -35,9 +35,7 @@ jobs:
               --header "Circle-Token: $API_TOKEN_IT" |  jq -r '.id')
               PIPELINE=$PIPELINE_ID
               echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
-      - run:
-          name: Check the IT Build Job
-          command: |
+  
               STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
               echo $STATUS
               while [ "$STATUS" == "running" ]; do
