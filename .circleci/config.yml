@@ -16,17 +16,17 @@ jobs:
       - run:
           name: Test
           command: mvn test
-      - run: mkdir -p $CIRCLE_TEST_REPORTS/junit/
-      - run: find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+      - run:
+          name: Create test reports folder
+          command: mkdir -p $CIRCLE_TEST_REPORTS/junit/
+      - run:
+          name: Save Test reports
+          command: find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
       - store_test_results:
           path: /tmp/circleci-test-results/junit
       - run:
-          name: Analyze on SonarCloud
-          command: mvn verify sonar:sonar -Dsonar.projectKey=GeorgeT88_com-boot-user-service
-      - run:
-          name: "echo an env var that is part of our project"
-          command: |
-            echo $API_TOKEN_IT # this env var must be set within the project    
+          name: SonarCloud Analyze
+          command: mvn verify sonar:sonar -Dsonar.projectKey=GeorgeT88_com-boot-user-service 
       - run:
           name: Trigger the IT Build Job
           command: |
@@ -36,13 +36,13 @@ jobs:
               PIPELINE=$PIPELINE_ID
               echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
       - run:
-          name: check the IT Build Job
+          name: Check the IT Build Job
           command: |
               STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
               echo $STATUS
               while [ "$STATUS" == "running" ]; do
                 echo still running
-                sleep 10
+                sleep 20
                 STATUS=$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
               done
 
