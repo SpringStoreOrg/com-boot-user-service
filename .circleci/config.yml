@@ -14,7 +14,7 @@ jobs:
           command: mvn -B -DskipTests clean package
       # Then run your tests!
       - run:
-          name: Test
+          name: Unit Tests Build Job
           command: mvn test
       - run:
           name: Create test reports folder
@@ -28,7 +28,7 @@ jobs:
           name: SonarCloud Analyze
           command: mvn verify sonar:sonar -Dsonar.projectKey=GeorgeT88_com-boot-user-service 
       - run:
-          name: Trigger the IT Build Job
+          name: Integration Tests Build Job
           command: |
               PIPELINE_ID=$(curl --location --request POST "https://circleci.com/api/v2/project/github/GeorgeT88/com-boot-user-service-it/pipeline" \
               --header "Content-Type: application/json" \
@@ -40,7 +40,7 @@ jobs:
               echo $STATUS
               while [ "$STATUS" == "running" ]; do
                 echo still running
-                sleep 20
+                sleep 200
                 STATUS=$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
               done
 
