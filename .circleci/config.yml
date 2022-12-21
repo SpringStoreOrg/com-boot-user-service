@@ -17,7 +17,7 @@ jobs:
           name: Unit Tests Build Job
           command: mvn test
       - run:
-          name: Create test reports folder
+          name: Create Test reports folder
           command: mkdir -p $CIRCLE_TEST_REPORTS/junit/
       - run:
           name: Save Test reports
@@ -40,7 +40,7 @@ jobs:
               echo $STATUS
               while [ "$STATUS" == "running" ]; do
                 echo still running
-                sleep 200
+                sleep 10
                 STATUS=$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
               done
 
@@ -52,6 +52,6 @@ jobs:
               fi
 
 workflows:
-  test user service: 
+  Test user service: 
     jobs:
       - build-and-test 
