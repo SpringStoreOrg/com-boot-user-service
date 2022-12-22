@@ -53,6 +53,6 @@ jobs:
               fi
 
 workflows:
-  user service build and test:
+  Test user service: 
     jobs:
       - build-and-test 
