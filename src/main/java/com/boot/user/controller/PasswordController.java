@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.constraints.Email;
 
@@ -23,15 +23,14 @@ public class PasswordController {
 
     private UserService userService;
 
-    @RequestMapping(value = "/reset/{email}", method = {RequestMethod.GET, RequestMethod.PUT})
+    @PutMapping(value = "/reset/{email}")
     public ResponseEntity<String> requestResetPassword(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
             throws EntityNotFoundException {
         userService.requestResetPassword(email);
         return new ResponseEntity<>("Request to reset Password successfully send!", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/change/{token}/{newPassword}/{confirmedNewPassword}", method = {
-            RequestMethod.GET, RequestMethod.PUT})
+    @PutMapping(value = "/change/{token}/{newPassword}/{confirmedNewPassword}")
     public ResponseEntity<String> changeUserPassword(@PathVariable("token") String token,
                                                      @PathVariable("newPassword") String newPassword,
                                                      @PathVariable("confirmedNewPassword") String confirmedNewPassword)

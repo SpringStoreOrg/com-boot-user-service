@@ -49,13 +49,9 @@ public class UserControllerTest {
 
         mockMvc.perform(post("/")
                         .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
-                .andExpect(status().isCreated())
-                .andExpect(content()
-                        .json("{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\"," +
-                                "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"," +
-                                "\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}"));
+                .andExpect(status().isCreated());
 
-        verify(userService).addUser(userDTO);
+     verify(userService).addUser(userDTO);
     }
 
     @Test

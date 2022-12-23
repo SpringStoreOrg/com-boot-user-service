@@ -1,5 +1,10 @@
 package com.boot.user.config;
 
+import com.fasterxml.classmate.TypeResolver;
+import com.google.common.base.Predicate;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.VelocityException;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.velocity.VelocityEngineFactory;
 import org.springframework.web.client.RestTemplate;
-
 import java.io.IOException;
 import java.util.Properties;
 
@@ -56,5 +60,13 @@ public class AppConfig {
 
         velocityEngineFactory.setVelocityProperties(props);
         return velocityEngineFactory.createVelocityEngine();
+    }
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .components(new Components())
+                .info(new Info().title("Contact Application API").description(
+                        "This is a sample Spring Boot RESTful service using springdoc-openapi and OpenAPI 3."));
     }
 }
