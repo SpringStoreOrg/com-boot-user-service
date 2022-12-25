@@ -53,7 +53,7 @@ public class UserDTO {
 	private String phoneNumber;
 
 	@Schema(description = "Email of the user.",
-			example = "test@test.gmail.com")
+			example = "jellofirsthand@gmail.com")
 	@Email(message = "Invalid Email!")
 	private String email;
 
