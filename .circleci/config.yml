@@ -48,6 +48,7 @@ jobs:
               if [[ "$STATUS" == "success" ]]; then
                 echo "Proceeding with build, as triggered pipeline was success"
               else
+                echo $STATUS
                 echo "Stopping build, triggered pipeline was not a success"
                 exit 1
               fi
