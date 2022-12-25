@@ -103,7 +103,7 @@ public class UserControllerTest {
         mockMvc.perform(put("/" + "a")
                         .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", Matchers.is("updateUserByEmail.email: Invalid email!!")));
+                .andExpect(jsonPath("$.message", Matchers.is("updateUserByEmail.email: Invalid email!")));
 
         verifyNoInteractions(userService);
     }
