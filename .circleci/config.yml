@@ -39,7 +39,7 @@ jobs:
               STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
               echo $STATUS
               sleep 15
-              while [ "$STATUS" == "running" ]; do
+              while [ "$STATUS" == "running" | "$STATUS" == "null" ]; do
                 echo still running
                 sleep 10
                 STATUS=$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
