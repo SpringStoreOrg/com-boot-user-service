@@ -1,6 +1,7 @@
 package com.boot.user.service;
 
 
+import com.boot.user.dto.ChangeUserPasswordDTO;
 import com.boot.user.dto.UserDTO;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.exception.UnableToModifyDataException;
@@ -69,7 +70,7 @@ class UserServiceTest {
     private ArgumentCaptor<PasswordResetToken> passwordResetTokenCaptor;
 
     @Test
-    void addUser() {
+    void testAddUser() {
 
         when(passwordEncoder.encode(getUserDTO().getPassword())).thenReturn("testPassword");
         when(userRepository.save(getUser())).thenReturn(getUser());
@@ -97,7 +98,7 @@ class UserServiceTest {
     }
 
     @Test
-    void confirmUserAccount() throws EntityNotFoundException, UnableToModifyDataException {
+    void testConfirmUserAccount() throws EntityNotFoundException, UnableToModifyDataException {
 
         ConfirmationToken token = getToken();
 
@@ -112,7 +113,7 @@ class UserServiceTest {
     }
 
     @Test
-    void confirmUserAccount_nullToken() {
+    void testConfirmUserAccount_nullToken() {
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 userService.confirmUserAccount(getToken().getToken()));
@@ -124,7 +125,7 @@ class UserServiceTest {
     }
 
     @Test
-    void confirmUserAccount_tokenExpired() {
+    void testConfirmUserAccount_tokenExpired() {
 
         when(confirmationTokenRepository.findByToken(any())).thenReturn(getToken());
         when(tokenValidator.checkTokenAvailability(any())).thenReturn(true);
@@ -138,7 +139,7 @@ class UserServiceTest {
     }
 
     @Test
-    void confirmUserAccount_userAlreadyConfirmed() {
+    void testConfirmUserAccount_userAlreadyConfirmed() {
 
         when(confirmationTokenRepository.findByToken(any())).thenReturn(getToken());
         when(tokenValidator.checkTokenAvailability(any())).thenReturn(false);
@@ -155,7 +156,7 @@ class UserServiceTest {
 
 
     @Test
-    void updateUserByEmail() throws EntityNotFoundException {
+    void testUpdateUserByEmail() throws EntityNotFoundException {
 
         when(userRepository.getUserByEmail(getToken().getUser().getEmail()))
                 .thenReturn(getUser()
@@ -186,7 +187,7 @@ class UserServiceTest {
     }
 
     @Test
-    void updateUserByEmail_emptyUserDTO() throws EntityNotFoundException {
+    void testUpdateUserByEmail_emptyUserDTO() throws EntityNotFoundException {
 
         when(userRepository.getUserByEmail(getToken().getUser().getEmail()))
                 .thenReturn(getUser()
@@ -210,7 +211,7 @@ class UserServiceTest {
     }
 
     @Test
-    void updateUserByEmail_nullEmail() {
+    void testUpdateUserByEmail_nullEmail() {
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 userService.updateUserByEmail(getUserDTO().getEmail(), getUserDTO()));
@@ -222,7 +223,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getAllUsers() throws EntityNotFoundException {
+    void testGetAllUsers() throws EntityNotFoundException {
 
         List<User> userList = new ArrayList<>();
         userList.add(getUser());
@@ -239,7 +240,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getAllUsers_emptyUserList() {
+    void testGetAllUsers_emptyUserList() {
         List<User> userList = new ArrayList<>();
 
         when(userRepository.findAll()).thenReturn(userList);
@@ -251,7 +252,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserByEmail() throws EntityNotFoundException {
+    void testGetUserByEmail() throws EntityNotFoundException {
         User user = getUser();
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(getUser());
@@ -266,7 +267,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserByEmail_emailNotPresent() {
+    void testGetUserByEmail_emailNotPresent() {
         when(userValidator.isEmailPresent(getUser().getEmail())).thenReturn(false);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
@@ -278,7 +279,7 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteUserByEmail() throws EntityNotFoundException {
+    void testDeleteUserByEmail() throws EntityNotFoundException {
         User user = getUser();
 
         when(userValidator.isEmailPresent(user.getEmail())).thenReturn(true);
@@ -289,7 +290,7 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteUserByEmail_emailNotPresent() {
+    void testDeleteUserByEmail_emailNotPresent() {
         when(userValidator.isEmailPresent(getUser().getEmail())).thenReturn(false);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
@@ -300,7 +301,7 @@ class UserServiceTest {
     }
 
     @Test
-    void requestResetPassword() throws EntityNotFoundException {
+    void testRequestResetPassword() throws EntityNotFoundException {
         User user = getUser();
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
@@ -323,7 +324,7 @@ class UserServiceTest {
     }
 
     @Test
-    void requestResetPassword_userNotFound() {
+    void testRequestResetPassword_userNotFound() {
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 userService.requestResetPassword(getUser().getEmail()));
@@ -335,12 +336,12 @@ class UserServiceTest {
     }
 
     @Test
-    void changeUserPassword() throws EntityNotFoundException, UnableToModifyDataException {
+    void testChangeUserPassword() throws EntityNotFoundException, UnableToModifyDataException {
 
         PasswordResetToken passwordResetToken = getPasswordResetToken();
         User user = getUser();
+
         String newPassword = "testNewPassword";
-        String testConfirmationToken = "testConfirmationToken";
 
         when(passwordReserTokenRepository.findByResetToken(any())).thenReturn(passwordResetToken);
         when(tokenValidator.checkTokenAvailability(passwordResetToken.getCreatedDate())).thenReturn(false);
@@ -348,9 +349,9 @@ class UserServiceTest {
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user.setActivated(true));
         when(passwordEncoder.matches(any(), any())).thenReturn(false);
 
-        userService.changeUserPassword(testConfirmationToken, newPassword, newPassword);
+        userService.changeUserPassword(changeUserPassword(passwordResetToken.getResetToken(),newPassword,newPassword));
 
-        verify(passwordReserTokenRepository).findByResetToken(testConfirmationToken);
+        verify(passwordReserTokenRepository).findByResetToken(passwordResetToken.getResetToken());
         verify(tokenValidator).checkTokenAvailability(passwordResetToken.getCreatedDate());
         verify(passwordEncoder).matches(newPassword, user.getPassword());
         verify(passwordEncoder).encode(newPassword);
@@ -359,13 +360,13 @@ class UserServiceTest {
     }
 
     @Test
-    void changeUserPassword_tokenNotFound() {
+    void testChangeUserPassword_tokenNotFound() {
 
         String newPassword = "testNewPassword";
         String testConfirmationToken = "testConfirmationToken";
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userService.changeUserPassword(testConfirmationToken, newPassword, newPassword));
+                userService.changeUserPassword(changeUserPassword(testConfirmationToken,newPassword,newPassword)));
 
         assertEquals("Token not found!", exception.getMessage());
 
@@ -375,7 +376,7 @@ class UserServiceTest {
     }
 
     @Test
-    void changeUserPassword_tokenExpired() {
+    void testChangeUserPassword_tokenExpired() {
 
         String newPassword = "testNewPassword";
         String testConfirmationToken = "testConfirmationToken";
@@ -385,18 +386,17 @@ class UserServiceTest {
         when(tokenValidator.checkTokenAvailability(passwordResetToken.getCreatedDate())).thenReturn(true);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userService.changeUserPassword(testConfirmationToken, newPassword, newPassword));
+                userService.changeUserPassword(changeUserPassword(testConfirmationToken,newPassword,newPassword)));
 
         assertEquals("Token Expired!", exception.getMessage());
 
         verifyNoInteractions(passwordEncoder);
         verifyNoInteractions(userValidator);
         verifyNoInteractions(userRepository);
-
     }
 
     @Test
-    void changeUserPassword_userNotActivated() {
+    void testChangeUserPassword_userNotActivated() {
         User user = getUser();
 
         String newPassword = "testNewPassword";
@@ -409,7 +409,7 @@ class UserServiceTest {
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
 
         UnableToModifyDataException exception = assertThrows(UnableToModifyDataException.class, () ->
-                userService.changeUserPassword(testConfirmationToken, newPassword, newPassword));
+                userService.changeUserPassword(changeUserPassword(testConfirmationToken,newPassword,newPassword)));
 
         assertEquals("User was not activated!", exception.getMessage());
 
@@ -417,7 +417,7 @@ class UserServiceTest {
     }
 
     @Test
-    void changeUserPassword_passwordsNotMatch() {
+    void testChangeUserPassword_passwordsNotMatch() {
         User user = getUser();
 
         String newPassword = "testNewPassword";
@@ -431,7 +431,7 @@ class UserServiceTest {
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user.setActivated(true));
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userService.changeUserPassword(testConfirmationToken, newPassword, invaldNewPassword));
+                userService.changeUserPassword(changeUserPassword(testConfirmationToken,newPassword,invaldNewPassword)));
 
         assertEquals("Passwords do not match!", exception.getMessage());
 
@@ -439,7 +439,7 @@ class UserServiceTest {
     }
 
     @Test
-    void changeUserPassword_passwordAlreadyUsed() {
+    void testChangeUserPassword_passwordAlreadyUsed() {
         User user = getUser();
 
         String invalidNewPassword = "testPassword";
@@ -454,7 +454,7 @@ class UserServiceTest {
         when(passwordEncoder.matches(invalidNewPassword, getUser().getPassword())).thenReturn(true);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userService.changeUserPassword(testConfirmationToken, invalidNewPassword, invalidNewPassword));
+                userService.changeUserPassword(changeUserPassword(testConfirmationToken,invalidNewPassword,invalidNewPassword)));
 
         assertEquals("Please select another password, this one was already used last time!", exception.getMessage());
     }
@@ -513,5 +513,14 @@ class UserServiceTest {
 
         return user;
     }
+    private ChangeUserPasswordDTO changeUserPassword(String token, String newPassword, String confirmedNewPassword){
+        ChangeUserPasswordDTO changeUserPasswordDTO = new ChangeUserPasswordDTO();
+        changeUserPasswordDTO.setToken(token);
+        changeUserPasswordDTO.setNewPassword(newPassword);
+        changeUserPasswordDTO.setConfirmedNewPassword(confirmedNewPassword);
+
+        return changeUserPasswordDTO;
+    }
+
 
 }

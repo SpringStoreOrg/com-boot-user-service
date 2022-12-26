@@ -34,6 +34,7 @@ jobs:
               --header "Content-Type: application/json" \
               --header "Circle-Token: $API_TOKEN_IT" |  jq -r '.id')
               PIPELINE=$PIPELINE_ID
+              sleep 60
               echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
   
               STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
@@ -48,6 +49,7 @@ jobs:
               if [[ "$STATUS" == "success" ]]; then
                 echo "Proceeding with build, as triggered pipeline was success"
               else
+                echo $STATUS
                 echo "Stopping build, triggered pipeline was not a success"
                 exit 1
               fi

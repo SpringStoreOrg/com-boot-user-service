@@ -5,9 +5,7 @@ import com.boot.user.enums.ProductStatus;
 import com.boot.user.service.UserFavoritesService;
 import com.boot.user.testDataUtils.TestDataUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
@@ -22,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,18 +35,14 @@ public class UserFavoritesControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockBean
     private UserFavoritesService userFavoritesService;
 
-    private static ObjectWriter objectWriter;
-
-    @BeforeAll
-    public static void setUp() {
-        objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-    }
-
     @Test
-    void addProductToUserFavorites() throws Exception {
+    void testAddProductToUserFavorites() throws Exception {
 
         String email = "test@email.com";
         ProductDTO productDTO = getProductDTO(1, "Green wood Chair 1");
@@ -69,7 +64,7 @@ public class UserFavoritesControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {"a", "  ", "asdkasdjlasjkdalskdjasldakjdalkdjaslk", "123^^@test.com"})
     @NullSource
-    void addProductToUserFavorites_invalidEmail(String email) throws Exception {
+    void testAddProductToUserFavorites_invalidEmail(String email) throws Exception {
 
         ProductDTO productDTO = getProductDTO(1, "Green wood Chair 1");
 
@@ -89,7 +84,7 @@ public class UserFavoritesControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"a", "asdkasdjlasjkdalskdjasldakjdalkdjaslk"})
-    void addProductToUserFavorites_invalidProductName(String productName) throws Exception {
+    void testAddProductToUserFavorites_invalidProductName(String productName) throws Exception {
 
         String email = "test@email.com";
 
@@ -108,12 +103,10 @@ public class UserFavoritesControllerTest {
     }
 
     @Test
-    void addProductsToUserFavorites() throws Exception {
+    void testAddProductsToUserFavorites() throws Exception {
 
         String email = "test@email.com";
         List<String> products = Arrays.asList("Green wood Chair 1", "Green wood Chair 2", "Green wood Chair 3");
-
-        String requestJson = objectWriter.writeValueAsString(products);
 
         when(userFavoritesService.addProductsToUserFavorites(email, products)).thenReturn(Arrays.asList(
                 getProductDTO(1, "Green wood Chair 1"),
@@ -121,9 +114,10 @@ public class UserFavoritesControllerTest {
                 getProductDTO(3, "Green wood Chair 3")));
 
         mockMvc.perform(put("/userFavorites/" + email)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(products)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(TestDataUtils.readFileAsString("./src/test/resources/testdata/controller/addProductsToUserFavorites.json")));
+                .andExpect(content().json(Objects.requireNonNull(TestDataUtils.readFileAsString("./src/test/resources/testdata/controller/addProductsToUserFavorites.json"))));
 
         verify(userFavoritesService).addProductsToUserFavorites(email, products);
     }

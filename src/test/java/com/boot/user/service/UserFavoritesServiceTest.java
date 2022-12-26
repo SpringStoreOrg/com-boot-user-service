@@ -50,7 +50,7 @@ class UserFavoritesServiceTest {
     private static final  String INVALID_EMAIL_ERROR = "Invalid Email address!";
 
     @Test
-    void addProductToUserFavorites() throws DuplicateEntryException, EntityNotFoundException {
+    void testAddProductToUserFavorites() throws DuplicateEntryException, EntityNotFoundException {
         User user = getUser();
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
@@ -74,7 +74,7 @@ class UserFavoritesServiceTest {
     }
 
     @Test
-    void addProductToUserFavorites_duplicateProductName() {
+    void testAddProductToUserFavorites_duplicateProductName() {
         User user = getUser();
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
@@ -88,7 +88,7 @@ class UserFavoritesServiceTest {
     }
 
     @Test
-    void addProductToUserFavorites_user_null() {
+    void testAddProductToUserFavorites_user_null() {
         User user = getUser();
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);
@@ -102,7 +102,7 @@ class UserFavoritesServiceTest {
     }
 
     @Test
-    void addProductsToUserFavorites() throws EntityNotFoundException {
+    void testAddProductsToUserFavorites() throws EntityNotFoundException {
         User user = getUser();
 
         List<String> productNames = new ArrayList<>();
@@ -126,7 +126,7 @@ class UserFavoritesServiceTest {
     }
 
     @Test
-    void addProductsToUserFavorites_product_already_added() throws EntityNotFoundException {
+    void testAddProductsToUserFavorites_product_already_added() throws EntityNotFoundException {
         User user = getUser();
 
         List<String> productNames = new ArrayList<>();
@@ -143,7 +143,7 @@ class UserFavoritesServiceTest {
     }
 
     @Test
-    void addProductsToUserFavorites_user_null() {
+    void testAddProductsToUserFavorites_user_null() {
         User user = getUser();
 
         List<String> productNames = new ArrayList<>();
@@ -161,7 +161,7 @@ class UserFavoritesServiceTest {
     }
 
     @Test
-    void removeProductFromUserFavorites() throws EntityNotFoundException {
+    void testRemoveProductFromUserFavorites() throws EntityNotFoundException {
         User user = getUser();
         String productName = "testProductName2";
         UserFavorite userFavorite = createUserFavorite(user, productName);
@@ -180,7 +180,7 @@ class UserFavoritesServiceTest {
     }
 
     @Test
-    void removeProductFromUserFavorites_user_null() {
+    void testRemoveProductFromUserFavorites_user_null() {
         User user = getUser();
         String productName = "testProductName2";
 
@@ -194,7 +194,7 @@ class UserFavoritesServiceTest {
     }
 
     @Test
-    void removeProductFromUserFavorites_userFavorite_null() {
+    void testRemoveProductFromUserFavorites_userFavorite_null() {
         User user = getUser();
         String productName = "testProductName2";
 
@@ -209,7 +209,7 @@ class UserFavoritesServiceTest {
     }
 
     @Test
-    void getAllProductsFromUserFavorites() throws EntityNotFoundException {
+    void testGetAllProductsFromUserFavorites() throws EntityNotFoundException {
         User user = getUser();
 
         List<ProductDTO> productDTOList = new ArrayList<>();
@@ -228,7 +228,7 @@ class UserFavoritesServiceTest {
     }
 
     @Test
-    void getAllProductsFromUserFavorites_userFavoritesEmpty() throws EntityNotFoundException {
+    void testGetAllProductsFromUserFavorites_userFavoritesEmpty() throws EntityNotFoundException {
         User user = getUser();
         List<UserFavorite> userFavorites = new ArrayList<>();
         user.setUserFavorites(userFavorites);
@@ -243,7 +243,7 @@ class UserFavoritesServiceTest {
     }
 
     @Test
-    void getAllProductsFromUserFavorites_user_null() {
+    void testGetAllProductsFromUserFavorites_user_null() {
         User user = getUser();
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);

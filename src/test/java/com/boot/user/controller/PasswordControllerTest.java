@@ -1,6 +1,8 @@
 package com.boot.user.controller;
 
+import com.boot.user.dto.ChangeUserPasswordDTO;
 import com.boot.user.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
- class PasswordControllerTest {
+class PasswordControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -26,24 +28,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @MockBean
     private UserService userService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
-     void changeUserPassword() throws Exception {
+    void testChangeUserPassword() throws Exception {
 
-        String token = "qweqw-e1231-qwew-4324";
-        String newPassword = "newPassword";
-        String confirmedNewPassword = "confirmedNewPassword";
+        ChangeUserPasswordDTO changeUserPasswordDTO = new ChangeUserPasswordDTO();
+        changeUserPasswordDTO.setToken("qweqw-e1231-qwew-4324");
+        changeUserPasswordDTO.setNewPassword("newPassword");
+        changeUserPasswordDTO.setConfirmedNewPassword("newPassword");
 
 
-        mockMvc.perform(put("/password/change/" + token + "/"+ newPassword+ "/"+confirmedNewPassword)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+        mockMvc.perform(put("/password/change/")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(changeUserPasswordDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Password successfully changed!"));
 
-        verify(userService).changeUserPassword(token, newPassword, confirmedNewPassword);
+        verify(userService).changeUserPassword(changeUserPasswordDTO);
     }
 
     @Test
-     void requestResetPassword() throws Exception {
+    void testRequestResetPassword() throws Exception {
 
         String email = "test@email.com";
 
