@@ -34,7 +34,7 @@ public class UserFavoritesController {
 
     @PutMapping("/{email}")
     public ResponseEntity<List<ProductDTO>> addProductsToUserFavorites(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email,
-                                                                       @Size(min = 2, max = 90, message = "Products size has to be between 2 and 90 characters!") @RequestBody List<String> productNames) throws EntityNotFoundException {
+                                                                       @Size(min = 1, max = 90, message = "Products size has to be between 1 and 90 characters!") @RequestBody List<String> productNames) throws EntityNotFoundException {
         List<ProductDTO> productList = userFavoritesService.addProductsToUserFavorites(email, productNames);
         return new ResponseEntity<>(productList, HttpStatus.OK);
     }

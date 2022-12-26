@@ -10,13 +10,16 @@ import com.boot.user.repository.UserFavoriteRepository;
 import com.boot.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,7 +33,7 @@ public class UserFavoritesService {
 
     private UserFavoriteRepository userFavoriteRepository;
 
-    private static final  String INVALID_EMAIL_ERROR = "Invalid Email address!";
+    private static final String INVALID_EMAIL_ERROR = "Invalid Email address!";
 
     @Transactional
     public List<ProductDTO> addProductToUserFavorites(String email, String productName) throws DuplicateEntryException, EntityNotFoundException {
@@ -62,18 +65,26 @@ public class UserFavoritesService {
         if (user == null) {
             throw new EntityNotFoundException(INVALID_EMAIL_ERROR);
         }
-            for(String productName : productNames ) {
 
-                if (user.getUserFavorites().stream().noneMatch(p -> productName.equals(p.getProductName()))) {
-                    UserFavorite userFavorite = new UserFavorite();
-                    userFavorite.setUser(user);
-                    userFavorite.setProductName(productName);
-                    user.getUserFavorites().add(userFavorite);
-                    userFavoriteRepository.save(userFavorite);
-                }
-            }
-            return getProductDTOS(user);
+        Set<String> useFavorites = new HashSet<>();
+        if (CollectionUtils.isNotEmpty(user.getUserFavorites())) {
+            user.getUserFavorites().stream().forEach(userFavorite -> useFavorites.add(userFavorite.getProductName()));
+        } else {
+            user.setUserFavorites(new ArrayList<>());
         }
+
+        productNames.forEach(productName -> {
+            if (!useFavorites.contains(productName)) {
+                UserFavorite userFavorite = new UserFavorite();
+                userFavorite.setUser(user);
+                userFavorite.setProductName(productName);
+                user.getUserFavorites().add(userFavorite);
+                userFavoriteRepository.save(userFavorite);
+            }
+        });
+
+        return getProductDTOS(user);
+    }
 
     @Transactional
     public List<ProductDTO> removeProductFromUserFavorites(String email, String productName) throws EntityNotFoundException {
@@ -105,17 +116,16 @@ public class UserFavoritesService {
     }
 
     private List<ProductDTO> getProductDTOS(@NotNull User user) {
-        List<String> userFavoriteProducts = user.getUserFavorites().stream().map(UserFavorite::getProductName).collect(Collectors.toList());
-
-        String productParam = String.join(",", userFavoriteProducts);
-
-        if (StringUtils.isNotBlank(productParam)) {
-            return productServiceClient.callGetAllProductsFromUserFavorites(productParam, true);
-        } else {
-            return new ArrayList<>();
+        List<UserFavorite> userFavorites = user.getUserFavorites();
+        if (CollectionUtils.isNotEmpty(userFavorites)) {
+            String productParam = userFavorites.stream()
+                    .map(UserFavorite::getProductName)
+                    .collect(Collectors.joining(","));
+            if (StringUtils.isNotBlank(productParam)) {
+                return productServiceClient.callGetAllProductsFromUserFavorites(productParam, true);
+            }
         }
+
+        return new ArrayList<>();
     }
-
-
-
 }
