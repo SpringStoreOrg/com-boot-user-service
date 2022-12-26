@@ -1,6 +1,7 @@
 package com.boot.user.service;
 
 
+import com.boot.user.dto.ChangeUserPasswordDTO;
 import com.boot.user.dto.UserDTO;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.exception.UnableToModifyDataException;
@@ -167,10 +168,10 @@ public class UserService {
         emailSenderService.sendPasswordResetEmail(user, confirmationToken);
     }
 
-    public void changeUserPassword(String confirmationToken, String newPassword, String confirmedNewPassword)
+    public void changeUserPassword(ChangeUserPasswordDTO changeUserPasswordDTO)
             throws  EntityNotFoundException, UnableToModifyDataException {
 
-        PasswordResetToken token = passwordReserTokenRepository.findByResetToken(confirmationToken);
+        PasswordResetToken token = passwordReserTokenRepository.findByResetToken(changeUserPasswordDTO.getToken());
 
         if (token != null) {
             if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
@@ -183,15 +184,15 @@ public class UserService {
                 throw new UnableToModifyDataException("User was not activated!");
             }
 
-            if (!newPassword.contentEquals(confirmedNewPassword)) {
+            if (!changeUserPasswordDTO.getNewPassword().contentEquals(changeUserPasswordDTO.getConfirmedNewPassword())) {
                 throw new EntityNotFoundException("Passwords do not match!");
             }
 
-            if (passwordEncoder.matches(newPassword, userDto.getPassword())) {
+            if (passwordEncoder.matches(changeUserPasswordDTO.getNewPassword(), userDto.getPassword())) {
                 throw new EntityNotFoundException("Please select another password, this one was already used last time!");
             }
 
-            userDto.setPassword(passwordEncoder.encode(newPassword));
+            userDto.setPassword(passwordEncoder.encode(changeUserPasswordDTO.getNewPassword()));
             updateUserByEmail(userDto.getEmail(), userDto);
 
         } else {

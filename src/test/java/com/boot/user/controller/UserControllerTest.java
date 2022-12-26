@@ -3,9 +3,7 @@ package com.boot.user.controller;
 import com.boot.user.dto.UserDTO;
 import com.boot.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,46 +22,42 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
-public class UserControllerTest {
+ class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockBean
     private UserService userService;
 
-    private static ObjectWriter objectWriter;
-
-    @BeforeAll
-    public static void setUp() {
-        objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-    }
-
     @Test
-    void addUser() throws Exception {
+    void testAddUser() throws Exception {
 
         UserDTO userDTO = getUserDTO();
-        String requestJson = objectWriter.writeValueAsString(userDTO);
 
         when(userService.addUser(userDTO)).thenReturn(userDTO);
 
         mockMvc.perform(post("/")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isCreated());
 
      verify(userService).addUser(userDTO);
     }
 
     @Test
-    void addUserWith_invalidFirstNameMinCharacters() throws Exception {
+    void testAddUserWith_invalidFirstNameMinCharacters() throws Exception {
 
         UserDTO userDTO = getUserDTO();
         userDTO.setFirstName("aa");
-        String requestJson = objectWriter.writeValueAsString(userDTO);
 
         when(userService.addUser(userDTO)).thenReturn(userDTO);
         mockMvc.perform(post("/")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", Matchers.containsString("Min First name size is 3 characters!")));
 
@@ -71,17 +65,16 @@ public class UserControllerTest {
     }
 
     @Test
-    void updateUserByEmail() throws Exception {
+    void testUpdateUserByEmail() throws Exception {
 
         UserDTO userDTO = getUserDTO();
         userDTO.setFirstName("newTestName");
 
-        String requestJson = objectWriter.writeValueAsString(userDTO);
-
         when(userService.updateUserByEmail(userDTO.getEmail(), userDTO)).thenReturn(userDTO);
 
         mockMvc.perform(put("/" + userDTO.getEmail())
-                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .json("{\"id\":0,\"firstName\":\"newTestName\",\"lastName\":\"testLastName\"," +
@@ -92,16 +85,14 @@ public class UserControllerTest {
     }
 
     @Test
-    void updateUserByEmailInvalidEmail() throws Exception {
+    void testUpdateUserByEmailInvalidEmail() throws Exception {
 
         UserDTO userDTO = getUserDTO();
         userDTO.setFirstName("newTestName");
 
-        String requestJson = objectWriter.writeValueAsString(userDTO);
-
-
         mockMvc.perform(put("/" + "a")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", Matchers.is("updateUserByEmail.email: Invalid email!")));
 
@@ -109,7 +100,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void confirmUserAccount() throws Exception {
+    void testConfirmUserAccount() throws Exception {
 
         String token = "testToken";
 
@@ -122,7 +113,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getAllUsers() throws Exception {
+    void testGetAllUsers() throws Exception {
 
         when(userService.getAllUsers()).thenReturn(Arrays.asList(
                 getUserDTO(),
@@ -139,16 +130,15 @@ public class UserControllerTest {
     }
 
     @Test
-    void getUserByEmail() throws Exception {
+    void testGetUserByEmail() throws Exception {
 
         UserDTO userDTO = getUserDTO();
-
-        String requestJson = objectWriter.writeValueAsString(userDTO);
 
         when(userService.getUserByEmail(userDTO.getEmail())).thenReturn(userDTO);
 
         mockMvc.perform(get("/").param("email", userDTO.getEmail())
-                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(requestJson))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .json("{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\"," +
@@ -159,7 +149,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void deleteUserByByEmail() throws Exception {
+    void testDeleteUserByByEmail() throws Exception {
 
         UserDTO userDTO = getUserDTO();
 

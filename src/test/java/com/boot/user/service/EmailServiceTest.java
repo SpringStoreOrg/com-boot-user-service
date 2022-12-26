@@ -40,18 +40,12 @@ import static org.mockito.Mockito.*;
     @Mock
     JavaMailSender emailSender;
 
-    @Mock
-    VelocityEngine velocityEngine;
-
-    @Mock
-    MimeMessage mimeMessage;
-
     @Value("${user.service.url}")
     public String userServiceUrl;
 
 
     @Test
-     void sendConfirmationEmail() throws MessagingException {
+     void testSendConfirmationEmail() throws MessagingException {
         User user =  getUser();
         ConfirmationToken confirmationToken =  getToken();
         MimeMessage mimeMessage = mock(MimeMessage.class);
@@ -65,7 +59,7 @@ import static org.mockito.Mockito.*;
     }
 
     @Test
-    void sendPasswordResetEmail() throws MessagingException {
+    void testSendPasswordResetEmail() throws MessagingException {
         User user =  getUser();
         PasswordResetToken resetToken =  getResetToken();
         MimeMessage mimeMessage = mock(MimeMessage.class);
