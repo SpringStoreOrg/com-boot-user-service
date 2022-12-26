@@ -43,18 +43,22 @@ public class UserFavoritesService {
         if (user == null) {
             throw new EntityNotFoundException(INVALID_EMAIL_ERROR);
         }
-        if (user.getUserFavorites().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
-            throw new DuplicateEntryException("Product: " + productName + " was already added to favorites!");
+
+        if (CollectionUtils.isNotEmpty(user.getUserFavorites())) {
+            if (user.getUserFavorites().stream().anyMatch(p -> productName.equals(p.getProductName()))) {
+                throw new DuplicateEntryException("Product: " + productName + " was already added to favorites!");
+            }
         } else {
-            UserFavorite userFavorite = new UserFavorite();
-
-            userFavorite.setUser(user);
-            userFavorite.setProductName(productName);
-            user.getUserFavorites().add(userFavorite);
-            userFavoriteRepository.save(userFavorite);
-
-            return getProductDTOS(user);
+            user.setUserFavorites(new ArrayList<>());
         }
+
+        UserFavorite userFavorite = new UserFavorite();
+        userFavorite.setUser(user);
+        userFavorite.setProductName(productName);
+        user.getUserFavorites().add(userFavorite);
+        userFavoriteRepository.save(userFavorite);
+
+        return getProductDTOS(user);
     }
 
     @Transactional
