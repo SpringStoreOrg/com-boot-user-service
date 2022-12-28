@@ -9,11 +9,11 @@
 
         <preConditions onFail="HALT">
             <not>
-                <tableExists schemaName="user" tableName="confirmation_token"/>
+                <tableExists tableName="confirmation_token"/>
             </not>
         </preConditions>
 
-        <createTable schemaName="user" tableName="confirmation_token">
+        <createTable tableName="confirmation_token">
             <column name="token_id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -29,11 +29,9 @@
         </createTable>
 
         <addForeignKeyConstraint
-                baseTableSchemaName="user"
                 baseTableName="confirmation_token"
                 baseColumnNames="user_id"
                 constraintName="token_f1"
-                referencedTableSchemaName="user"
                 referencedTableName="user"
                 referencedColumnNames="id"/>
 
