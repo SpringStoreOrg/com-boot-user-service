@@ -53,9 +53,11 @@ class UserFavoritesServiceTest {
     void testAddProductToUserFavorites() throws DuplicateEntryException, EntityNotFoundException {
         User user = getUser();
 
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(userRepository.getUserById(5)).thenReturn(user);
 
-        userFavoritesService.addProductToUserFavorites(user.getEmail(), "testProductName3");
+        when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
+
+        userFavoritesService.addProductToUserFavorites(5, "testProductName3");
 
         verify(userFavoriteRepository).save(userFavoriteArgumentCaptor.capture());
 
@@ -77,24 +79,28 @@ class UserFavoritesServiceTest {
     void testAddProductToUserFavorites_duplicateProductName() {
         User user = getUser();
 
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(userRepository.getUserById(5)).thenReturn(user);
+
+        when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
 
         DuplicateEntryException exception = assertThrows(DuplicateEntryException.class, () ->
-                userFavoritesService.addProductToUserFavorites(user.getEmail(), "testProductName2"));
+                userFavoritesService.addProductToUserFavorites(5, "testProductName2"));
 
         assertEquals("Product: testProductName2 was already added to favorites!", exception.getMessage());
 
-        verifyNoInteractions(userFavoriteRepository);
+        verify(userRepository).getUserById(5);
+        verify(userFavoriteRepository).findAllByUser(user);
+        verifyNoMoreInteractions(userFavoriteRepository);
     }
 
     @Test
     void testAddProductToUserFavorites_user_null() {
         User user = getUser();
 
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);
+        when(userRepository.getUserById(7)).thenReturn(null);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userFavoritesService.addProductToUserFavorites(user.getEmail(), "testProductName2"));
+                userFavoritesService.addProductToUserFavorites(7, "testProductName2"));
 
         assertEquals(INVALID_EMAIL_ERROR, exception.getMessage());
 
@@ -109,9 +115,11 @@ class UserFavoritesServiceTest {
         productNames.add("testProductName3");
         productNames.add("testProductName4");
 
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(userRepository.getUserById(3)).thenReturn(user);
 
-        userFavoritesService.addProductsToUserFavorites(user.getEmail(), productNames);
+        when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
+
+        userFavoritesService.addProductsToUserFavorites(3, productNames);
 
         verify(userFavoriteRepository, times(2)).save(userFavoriteArgumentCaptor.capture());
 
@@ -133,11 +141,16 @@ class UserFavoritesServiceTest {
         productNames.add("testProductName1");
         productNames.add("testProductName2");
 
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(userRepository.getUserById(4)).thenReturn(user);
 
-        userFavoritesService.addProductsToUserFavorites(user.getEmail(), productNames);
+        when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
 
-        verifyNoInteractions(userFavoriteRepository);
+        userFavoritesService.addProductsToUserFavorites(4, productNames);
+
+        verify(userRepository).getUserById(4);
+        verify(userFavoriteRepository).findAllByUser(user);
+
+        verifyNoMoreInteractions(userFavoriteRepository);
 
         verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2", true);
     }
@@ -150,10 +163,10 @@ class UserFavoritesServiceTest {
         productNames.add("testProductName3");
         productNames.add("testProductName4");
 
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);
+        when(userRepository.getUserById(2)).thenReturn(null);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userFavoritesService.addProductsToUserFavorites(user.getEmail(), productNames));
+                userFavoritesService.addProductsToUserFavorites(2, productNames));
 
         assertEquals(INVALID_EMAIL_ERROR, exception.getMessage());
 
@@ -166,15 +179,17 @@ class UserFavoritesServiceTest {
         String productName = "testProductName2";
         UserFavorite userFavorite = createUserFavorite(user, productName);
 
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(userRepository.getUserById(3)).thenReturn(user);
+        when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
         when(userFavoriteRepository.findByUserAndProductName(user, productName)).thenReturn(userFavorite);
 
-        userFavoritesService.removeProductFromUserFavorites(user.getEmail(), productName);
+        userFavoritesService.removeProductFromUserFavorites(3, productName);
 
         List<UserFavorite> userFavorites = user.getUserFavorites();
         userFavorites.add(createUserFavorite(user, productName));
 
-        verify(userRepository).getUserByEmail(user.getEmail());
+        verify(userRepository).getUserById(3);
+        verify(userFavoriteRepository).findAllByUser(user);
         verify(userFavoriteRepository).findByUserAndProductName(user.setUserFavorites(userFavorites), productName);
         verify(userFavoriteRepository).delete(userFavorite);
     }
@@ -184,24 +199,24 @@ class UserFavoritesServiceTest {
         User user = getUser();
         String productName = "testProductName2";
 
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(userRepository.getUserById(4)).thenReturn(user);
+        when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
         when(userFavoriteRepository.findByUserAndProductName(user, productName)).thenReturn(null);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userFavoritesService.removeProductFromUserFavorites(user.getEmail(), productName));
+                userFavoritesService.removeProductFromUserFavorites(4, productName));
 
         assertEquals("User Favorite could not be found!", exception.getMessage());
     }
 
     @Test
     void testRemoveProductFromUserFavorites_userFavorite_null() {
-        User user = getUser();
         String productName = "testProductName2";
 
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);
+        when(userRepository.getUserById(7)).thenReturn(null);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userFavoritesService.removeProductFromUserFavorites(user.getEmail(), productName));
+                userFavoritesService.removeProductFromUserFavorites(7, productName));
 
         assertEquals(INVALID_EMAIL_ERROR, exception.getMessage());
 
@@ -216,12 +231,13 @@ class UserFavoritesServiceTest {
         productDTOList.add(getProductDTO("Yellow Chair"));
         productDTOList.add(getProductDTO("Orange Chair"));
 
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(userRepository.getUserById(6)).thenReturn(user);
+        when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
         when(productServiceClient.callGetAllProductsFromUserFavorites("testProductName1,testProductName2", true)).thenReturn(productDTOList);
 
-        List<ProductDTO> newProductDTOList = userFavoritesService.getAllProductsFromUserFavorites(user.getEmail());
+        List<ProductDTO> newProductDTOList = userFavoritesService.getAllProductsFromUserFavorites(6);
 
-        verify(userRepository).getUserByEmail(user.getEmail());
+        verify(userRepository).getUserById(6);
         verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2", true);
         assertEquals(2, newProductDTOList.size());
         assertEquals(productDTOList, newProductDTOList);
@@ -233,23 +249,23 @@ class UserFavoritesServiceTest {
         List<UserFavorite> userFavorites = new ArrayList<>();
         user.setUserFavorites(userFavorites);
 
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+        when(userRepository.getUserById(8)).thenReturn(user);
+        when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
 
-        List<ProductDTO> newProductDTOList = userFavoritesService.getAllProductsFromUserFavorites(user.getEmail());
+        List<ProductDTO> newProductDTOList = userFavoritesService.getAllProductsFromUserFavorites(8);
 
-        verify(userRepository).getUserByEmail(user.getEmail());
+        verify(userRepository).getUserById(8);
         assertTrue(newProductDTOList.isEmpty());
         verifyNoInteractions(productServiceClient);
     }
 
     @Test
     void testGetAllProductsFromUserFavorites_user_null() {
-        User user = getUser();
 
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(null);
+        when(userRepository.getUserById(4)).thenReturn(null);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userFavoritesService.getAllProductsFromUserFavorites(user.getEmail()));
+                userFavoritesService.getAllProductsFromUserFavorites(4));
 
         assertEquals(INVALID_EMAIL_ERROR, exception.getMessage());
         verifyNoInteractions(productServiceClient);
