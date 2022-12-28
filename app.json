@@ -1,6 +1,14 @@
 {
-  "name": "User Service",
-  "description": "User Service project.",
-  "website": "www.springwebstore.com",
-  "success_url": "/actuator/health"
+  "name": "Eureka User Service",
+  "description": "Eureka User Service project.",
+  "website": "https://github.com/GeorgeT88/com-boot-user-service",
+  "success_url": "/",
+  "env": {
+    "EUREKA_URL": {
+      "description": "URL of the Eureka Server in the form http://<user>:<password>@<host>"
+    },
+    "DOMAIN_NAME": {
+      "description": "The domain name of this app. For example: <appname>.herokuapp.com"
+    }
+  }
 }
