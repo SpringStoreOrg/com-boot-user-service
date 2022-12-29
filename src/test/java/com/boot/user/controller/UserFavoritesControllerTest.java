@@ -4,6 +4,7 @@ import com.boot.user.dto.ProductDTO;
 import com.boot.user.enums.ProductStatus;
 import com.boot.user.service.UserFavoritesService;
 import com.boot.user.testDataUtils.TestDataUtils;
+import com.boot.user.util.Constants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -47,18 +48,19 @@ public class UserFavoritesControllerTest {
         String email = "test@email.com";
         ProductDTO productDTO = getProductDTO(1, "Green wood Chair 1");
 
-        when(userFavoritesService.addProductToUserFavorites(email, productDTO.getName())).thenReturn(Arrays.asList(
+        when(userFavoritesService.addProductToUserFavorites(3, productDTO.getName())).thenReturn(Arrays.asList(
                 getProductDTO(1, "Green wood Chair 1"),
                 getProductDTO(2, "Green wood Chair 2"),
                 getProductDTO(3, "Green wood Chair 3"),
                 getProductDTO(4, "Green wood Chair 4")));
 
         mockMvc.perform(post("/userFavorites/" + email + "/" + productDTO.getName())
-                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .header(Constants.USER_ID_HEADER, 3)
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(content().json(TestDataUtils.readFileAsString("./src/test/resources/testdata/controller/addProductToUserFavorites.json")));
 
-        verify(userFavoritesService).addProductToUserFavorites(email, productDTO.getName());
+        verify(userFavoritesService).addProductToUserFavorites(3, productDTO.getName());
     }
 
     @ParameterizedTest
@@ -68,14 +70,15 @@ public class UserFavoritesControllerTest {
 
         ProductDTO productDTO = getProductDTO(1, "Green wood Chair 1");
 
-        when(userFavoritesService.addProductToUserFavorites(email, productDTO.getName())).thenReturn(Arrays.asList(
+        when(userFavoritesService.addProductToUserFavorites(3, productDTO.getName())).thenReturn(Arrays.asList(
                 getProductDTO(1, "Green wood Chair 1"),
                 getProductDTO(2, "Green wood Chair 2"),
                 getProductDTO(3, "Green wood Chair 3"),
                 getProductDTO(4, "Green wood Chair 4")));
 
         mockMvc.perform(post("/userFavorites/" + email + "/" + productDTO.getName())
-                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .header(Constants.USER_ID_HEADER, 3)
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", Matchers.is("addProductToUserFavorites.email: Invalid email!")));
 
@@ -88,14 +91,15 @@ public class UserFavoritesControllerTest {
 
         String email = "test@email.com";
 
-        when(userFavoritesService.addProductToUserFavorites(email, productName)).thenReturn(Arrays.asList(
+        when(userFavoritesService.addProductToUserFavorites(3, productName)).thenReturn(Arrays.asList(
                 getProductDTO(1, "Green wood Chair 1"),
                 getProductDTO(2, "Green wood Chair 2"),
                 getProductDTO(3, "Green wood Chair 3"),
                 getProductDTO(4, "Green wood Chair 4")));
 
         mockMvc.perform(post("/userFavorites/" + email + "/" + productName)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .header(Constants.USER_ID_HEADER, 3)
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", Matchers.containsString("Product Name size has to be between 2 and 30 characters!")));
 
@@ -108,18 +112,19 @@ public class UserFavoritesControllerTest {
         String email = "test@email.com";
         List<String> products = Arrays.asList("Green wood Chair 1", "Green wood Chair 2", "Green wood Chair 3");
 
-        when(userFavoritesService.addProductsToUserFavorites(email, products)).thenReturn(Arrays.asList(
+        when(userFavoritesService.addProductsToUserFavorites(3, products)).thenReturn(Arrays.asList(
                 getProductDTO(1, "Green wood Chair 1"),
                 getProductDTO(2, "Green wood Chair 2"),
                 getProductDTO(3, "Green wood Chair 3")));
 
         mockMvc.perform(put("/userFavorites/" + email)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(products)))
+                .header(Constants.USER_ID_HEADER, 3)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(products)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(Objects.requireNonNull(TestDataUtils.readFileAsString("./src/test/resources/testdata/controller/addProductsToUserFavorites.json"))));
 
-        verify(userFavoritesService).addProductsToUserFavorites(email, products);
+        verify(userFavoritesService).addProductsToUserFavorites(3, products);
     }
 
     private ProductDTO getProductDTO(long id, String productName) {
