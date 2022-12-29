@@ -62,7 +62,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User activated Successfully", content = @Content),
             @ApiResponse(responseCode = "404", description = "Token not found", content = @Content)})
-    @PutMapping(value = "/confirm/{token}", consumes = {"application/json"})
+    @GetMapping(value = "/confirm/{token}")
     public ResponseEntity<String> confirmUserAccount(@PathVariable("token") String token)
             throws EntityNotFoundException, UnableToModifyDataException {
         userService.confirmUserAccount(token);

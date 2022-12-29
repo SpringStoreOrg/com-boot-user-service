@@ -104,7 +104,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         String token = "testToken";
 
-        mockMvc.perform(put("/confirm/" + token)
+        mockMvc.perform(get("/confirm/" + token)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(content().string("User activated Successfully!"));

@@ -44,8 +44,6 @@ public class UserFavoritesControllerTest {
 
     @Test
     void testAddProductToUserFavorites() throws Exception {
-
-        String email = "test@email.com";
         ProductDTO productDTO = getProductDTO(1, "Green wood Chair 1");
 
         when(userFavoritesService.addProductToUserFavorites(3, productDTO.getName())).thenReturn(Arrays.asList(
@@ -54,7 +52,7 @@ public class UserFavoritesControllerTest {
                 getProductDTO(3, "Green wood Chair 3"),
                 getProductDTO(4, "Green wood Chair 4")));
 
-        mockMvc.perform(post("/userFavorites/" + email + "/" + productDTO.getName())
+        mockMvc.perform(post("/userFavorites/" + productDTO.getName())
                 .header(Constants.USER_ID_HEADER, 3)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -64,32 +62,8 @@ public class UserFavoritesControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"a", "  ", "asdkasdjlasjkdalskdjasldakjdalkdjaslk", "123^^@test.com"})
-    @NullSource
-    void testAddProductToUserFavorites_invalidEmail(String email) throws Exception {
-
-        ProductDTO productDTO = getProductDTO(1, "Green wood Chair 1");
-
-        when(userFavoritesService.addProductToUserFavorites(3, productDTO.getName())).thenReturn(Arrays.asList(
-                getProductDTO(1, "Green wood Chair 1"),
-                getProductDTO(2, "Green wood Chair 2"),
-                getProductDTO(3, "Green wood Chair 3"),
-                getProductDTO(4, "Green wood Chair 4")));
-
-        mockMvc.perform(post("/userFavorites/" + email + "/" + productDTO.getName())
-                .header(Constants.USER_ID_HEADER, 3)
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", Matchers.is("addProductToUserFavorites.email: Invalid email!")));
-
-        verifyNoInteractions(userFavoritesService);
-    }
-
-    @ParameterizedTest
     @ValueSource(strings = {"a", "asdkasdjlasjkdalskdjasldakjdalkdjaslk"})
     void testAddProductToUserFavorites_invalidProductName(String productName) throws Exception {
-
-        String email = "test@email.com";
 
         when(userFavoritesService.addProductToUserFavorites(3, productName)).thenReturn(Arrays.asList(
                 getProductDTO(1, "Green wood Chair 1"),
@@ -97,7 +71,7 @@ public class UserFavoritesControllerTest {
                 getProductDTO(3, "Green wood Chair 3"),
                 getProductDTO(4, "Green wood Chair 4")));
 
-        mockMvc.perform(post("/userFavorites/" + email + "/" + productName)
+        mockMvc.perform(post("/userFavorites/" +  productName)
                 .header(Constants.USER_ID_HEADER, 3)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isBadRequest())
@@ -108,8 +82,6 @@ public class UserFavoritesControllerTest {
 
     @Test
     void testAddProductsToUserFavorites() throws Exception {
-
-        String email = "test@email.com";
         List<String> products = Arrays.asList("Green wood Chair 1", "Green wood Chair 2", "Green wood Chair 3");
 
         when(userFavoritesService.addProductsToUserFavorites(3, products)).thenReturn(Arrays.asList(
@@ -117,7 +89,7 @@ public class UserFavoritesControllerTest {
                 getProductDTO(2, "Green wood Chair 2"),
                 getProductDTO(3, "Green wood Chair 3")));
 
-        mockMvc.perform(put("/userFavorites/" + email)
+        mockMvc.perform(put("/userFavorites")
                 .header(Constants.USER_ID_HEADER, 3)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(products)))
