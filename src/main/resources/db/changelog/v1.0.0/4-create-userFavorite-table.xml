@@ -9,12 +9,12 @@
 
         <preConditions onFail="HALT">
             <not>
-                <tableExists schemaName="user" tableName="user_favorite"/>
+                <tableExists tableName="user_favorite"/>
             </not>
         </preConditions>
 
         <comment>Create user_favorite table.</comment>
-        <createTable schemaName="user" tableName="user_favorite">
+        <createTable tableName="user_favorite">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -27,11 +27,9 @@
         </createTable>
 
         <addForeignKeyConstraint
-                baseTableSchemaName="user"
                 baseTableName="user_favorite"
                 baseColumnNames="user_id"
                 constraintName="user_favorite_f1"
-                referencedTableSchemaName="user"
                 referencedTableName="user"
                 referencedColumnNames="id"/>
 
