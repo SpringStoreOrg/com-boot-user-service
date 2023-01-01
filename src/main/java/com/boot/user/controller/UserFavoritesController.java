@@ -4,7 +4,6 @@ import com.boot.user.dto.ProductDTO;
 import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.service.UserFavoritesService;
-import com.boot.user.util.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 import java.util.List;
 
