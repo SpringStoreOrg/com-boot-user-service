@@ -28,7 +28,7 @@
             <column name="email" type="varchar(100)">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="delivery_address" type="varchar(100)">
+            <column name="delivery_address" type="varchar(150)">
                 <constraints nullable="false"/>
             </column>
             <column name="password" type="varchar(100)">
