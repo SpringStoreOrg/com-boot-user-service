@@ -1,5 +1,5 @@
 [![CircleCI](https://circleci.com/gh/GeorgeT88/com-boot-user-service.svg?style=shield)](https://app.circleci.com/pipelines/github/GeorgeT88/com-boot-user-service?branch=main)   [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=GeorgeT88_com-boot-user-service&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=GeorgeT88_com-boot-user-service) [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/GeorgeT88/com-boot-user-service/graphs/commit-activity)
-
+       
 
 # Spring Boot "User-Microservice" Project
 
