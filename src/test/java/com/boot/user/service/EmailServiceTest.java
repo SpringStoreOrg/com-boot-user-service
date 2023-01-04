@@ -2,10 +2,7 @@ package com.boot.user.service;
 
 
 import com.boot.user.config.AppConfig;
-import com.boot.user.model.ConfirmationToken;
-import com.boot.user.model.PasswordResetToken;
-import com.boot.user.model.User;
-import com.boot.user.model.UserFavorite;
+import com.boot.user.model.*;
 import org.apache.velocity.app.VelocityEngine;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,6 +18,7 @@ import org.springframework.test.context.TestPropertySource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -93,9 +91,9 @@ import static org.mockito.Mockito.*;
                 .setPhoneNumber("0742000000")
                 .setPassword("testPassword")
                 .setEmail("jon278@gaailer.site")
-                .setRole("USER")
+                .setRoleList(Arrays.asList(new Role()))
                 .setActivated(true)
-                .setCreatedOn(LocalDate.now())
+                .setCreatedOn(LocalDateTime.now())
                 .setUserFavorites(userFavorites)
                 .setDeliveryAddress("street, no. 1");
 

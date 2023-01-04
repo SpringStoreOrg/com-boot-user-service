@@ -11,5 +11,8 @@
     <include file="3-create-confirmationToken-table.xml" relativeToChangelogFile="true"/>
     <include file="4-create-userFavorite-table.xml" relativeToChangelogFile="true"/>
     <include file="5-create-passwordResetToken-table.xml" relativeToChangelogFile="true"/>
+    <include file="6-create-role-table.xml" relativeToChangelogFile="true"/>
+    <include file="7-create-user-role-table.xml" relativeToChangelogFile="true"/>
+    <include file="8-create-testData-user-role.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

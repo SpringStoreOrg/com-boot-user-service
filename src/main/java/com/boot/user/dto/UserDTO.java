@@ -22,33 +22,29 @@ public class UserDTO {
 
 	@Schema(description = "Unique identifier of the user.",
 			example = "1")
-	@Id
 	private long id;
 
 	@Schema(description = "First name of the user.",
 			example = "Constantine")
-	@Column
 	@Size(min = 3, message = "Min First name size is 3 characters!")
 	@Size(max = 30, message = "Max First name size is 30 characters!")
 	private String firstName;
 
 	@Schema(description = "Last name of the user.",
 			example = "Abigail")
-	@Column
 	@Size(min = 3, message = "Min Last name size is 3 characters!")
 	@Size(max = 30, message = "Max Last name size is 30 characters!")
 	private String lastName;
 
 	@Schema(description = "Password of the user.",
 			example = "testPassword1234@@")
-	@Column
 	@Size(min = 8, message = "Min Password size is 8 characters!")
 	@Size(max = 30, message = "Max Password size is 30 characters!")
 	private String password;
 
 	@Schema(description = "Phone number of the user.",
 			example = "0740000000")
-	@Column
+
 	@Pattern(regexp="^(?=[07]{2})(?=\\d{10}).*", message = "Invalid Phone Number!")
 	private String phoneNumber;
 
@@ -65,8 +61,7 @@ public class UserDTO {
 
 	@Schema(description = "User role",
 			example = "USER")
-	@Column
-	private String role;
+	private List<String> roles;
 
 	private List<UserFavorite> userFavorites;
 	

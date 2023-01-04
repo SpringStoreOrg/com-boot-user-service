@@ -14,6 +14,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -79,7 +80,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(content()
                         .json("{\"id\":0,\"firstName\":\"newTestName\",\"lastName\":\"testLastName\"," +
                                 "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"," +
-                                "\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}"));
+                                "\"deliveryAddress\":\"stret, no. 1\",\"roles\":[\"ACCESS\", \"CREATE_ORDER\"],\"userFavorites\":null,\"activated\":false}"));
 
         verify(userService).updateUserByEmail(userDTO.getEmail(), userDTO);
     }
@@ -123,8 +124,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         mockMvc.perform(get("/users")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}," +
-                        "{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}]"));
+                .andExpect(content().json("[{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"deliveryAddress\":\"stret, no. 1\",\"roles\":[\"ACCESS\",\"CREATE_ORDER\"],\"userFavorites\":null,\"activated\":false}," +
+                        "{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"deliveryAddress\":\"stret, no. 1\",\"roles\":[\"ACCESS\",\"CREATE_ORDER\"],\"userFavorites\":null,\"activated\":false}]"));
 
         verify(userService).getAllUsers();
     }
@@ -143,7 +144,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(content()
                         .json("{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\"," +
                                 "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"," +
-                                "\"deliveryAddress\":\"stret, no. 1\",\"role\":null,\"userFavorites\":null,\"activated\":false}"));
+                                "\"deliveryAddress\":\"stret, no. 1\",\"roles\":[\"ACCESS\", \"CREATE_ORDER\"],\"userFavorites\":null,\"activated\":false}"));
 
         verify(userService).getUserByEmail(userDTO.getEmail());
     }
@@ -168,7 +169,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .setPhoneNumber("0742000000")
                 .setPassword("testPassword")
                 .setEmail("jon278@gaailer.site")
-                .setDeliveryAddress("stret, no. 1");
+                .setDeliveryAddress("stret, no. 1")
+                .setRoles(List.of("ACCESS", "CREATE_ORDER"));
 
         return userDTO;
     }

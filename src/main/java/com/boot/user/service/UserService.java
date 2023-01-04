@@ -10,6 +10,7 @@ import com.boot.user.model.PasswordResetToken;
 import com.boot.user.model.User;
 import com.boot.user.repository.ConfirmationTokenRepository;
 import com.boot.user.repository.PasswordResetTokenRepository;
+import com.boot.user.repository.RoleRepository;
 import com.boot.user.repository.UserRepository;
 import com.boot.user.validator.TokenValidator;
 import com.boot.user.validator.UserValidator;
@@ -21,8 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.boot.user.model.User.dtoToUserEntity;
@@ -47,15 +48,19 @@ public class UserService {
 
     private PasswordResetTokenRepository passwordReserTokenRepository;
 
+    private RoleRepository roleRepository;
+
     @Transactional
     public UserDTO addUser(@NotNull UserDTO userDTO) {
         log.info("addUser - process started");
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
-        userDTO.setRole("USER");
+        User inputUser = dtoToUserEntity(userDTO);
 
-        User user = userRepository.save(dtoToUserEntity(userDTO).setCreatedOn(LocalDate.now()));
+        inputUser.setRoleList(roleRepository.findAllInList(Arrays.asList("ACCESS", "CREATE_ORDER")));
+
+        User user = userRepository.save(inputUser);
 
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
 
@@ -114,7 +119,6 @@ public class UserService {
         if(StringUtils.isNotBlank(userDTO.getPhoneNumber())) {
             user.setPhoneNumber(userDTO.getPhoneNumber());
         }
-        user.setLastUpdatedOn(LocalDate.now());
 
         userRepository.save(user);
 

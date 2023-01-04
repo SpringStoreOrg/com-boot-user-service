@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.17.xsd">
+    <changeSet author="FlorinV" id="2023-01-03-19.01">
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(select id from user where email = 'jellofirsthand@gaa1iler.site')"/>
+            <column name="role_id" valueComputed="(select id from role where name = 'ACCESS')"/>
+        </insert>
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(select id from user where email = 'jellofirsthand@gaa1iler.site')"/>
+            <column name="role_id" valueComputed="(select id from role where name = 'CREATE_ORDER')"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(select id from user where email = 'skilletcheek@gaa1iler.site')"/>
+            <column name="role_id" valueComputed="(select id from role where name = 'ACCESS')"/>
+        </insert>
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(select id from user where email = 'skilletcheek@gaa1iler.site')"/>
+            <column name="role_id" valueComputed="(select id from role where name = 'CREATE_ORDER')"/>
+        </insert>
+
+<!--        titaniumtrustee@gaa1iler.site will be able just to login, bookmark favorites but not be able to add products to cart or to order-->
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(select id from user where email = 'titaniumtrustee@gaa1iler.site')"/>
+            <column name="role_id" valueComputed="(select id from role where name = 'ACCESS')"/>
+        </insert>
+
+<!--        airportstash@gaa1iler.site will be able to login and to add new products, manage stocks-->
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(select id from user where email = 'airportstash@gaa1iler.site')"/>
+            <column name="role_id" valueComputed="(select id from role where name = 'ACCESS')"/>
+        </insert>
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(select id from user where email = 'airportstash@gaa1iler.site')"/>
+            <column name="role_id" valueComputed="(select id from role where name = 'CREATE_PRODUCT')"/>
+        </insert>
+
+<!--        flamingolecture@gaa1iler.site will be able to login and manage users orders-->
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(select id from user where email = 'flamingolecture@gaa1iler.site')"/>
+            <column name="role_id" valueComputed="(select id from role where name = 'ACCESS')"/>
+        </insert>
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(select id from user where email = 'flamingolecture@gaa1iler.site')"/>
+            <column name="role_id" valueComputed="(select id from role where name = 'MANAGE_ORDERS')"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
