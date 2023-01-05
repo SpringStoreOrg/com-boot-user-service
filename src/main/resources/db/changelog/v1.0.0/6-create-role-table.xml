@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.17.xsd">
+    <changeSet author="FlorinV" id="2023-01-03-19.01">
+        <preConditions onFail="HALT">
+            <not>
+                <tableExists tableName="role"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="role">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(20)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <insert tableName="role">
+            <column name="id" value="1"/>
+            <column name="name" value="ACCESS"/>
+            <column name="description" value="Role that permits App login and basic browsing"/>
+        </insert>
+        <insert tableName="role">
+            <column name="id" value="2"/>
+            <column name="name" value="CREATE_ORDER"/>
+            <column name="description" value="Role that permits an user to create orders"/>
+        </insert>
+        <insert tableName="role">
+            <column name="id" value="3"/>
+            <column name="name" value="CREATE_PRODUCT"/>
+            <column name="description" value="Role that permits an user to create products"/>
+        </insert>
+        <insert tableName="role">
+            <column name="id" value="4"/>
+            <column name="name" value="MANAGE_ORDERS"/>
+            <column name="description" value="Role that permits an user to manage orders"/>
+        </insert>
+        <insert tableName="role">
+            <column name="id" value="5"/>
+            <column name="name" value="MANAGE_USERS"/>
+            <column name="description" value="Role that permits an user to manage orders"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

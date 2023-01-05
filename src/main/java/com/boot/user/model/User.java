@@ -13,7 +13,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Accessors(chain = true)
@@ -51,13 +54,16 @@ public class User implements Serializable {
 	private String deliveryAddress;
 
 	@Column
-	private LocalDate createdOn;
+	private LocalDateTime createdOn;
 
 	@Column
-	private LocalDate lastUpdatedOn;
+	private LocalDateTime lastUpdatedOn;
 	
-	@Column
-	private String role;
+	@ManyToMany
+	@JoinTable(name = "user_role",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "role_id"))
+	private List<Role> roleList;
 
 	@JsonManagedReference
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY,  cascade = { CascadeType.ALL })
@@ -65,6 +71,17 @@ public class User implements Serializable {
 
 	@Column
 	private boolean isActivated;
+
+	@PrePersist
+	public void create(){
+		this.createdOn = LocalDateTime.now();
+		this.lastUpdatedOn = LocalDateTime.now();
+	}
+
+	@PreUpdate
+	public void update(){
+		this.lastUpdatedOn = LocalDateTime.now();
+	}
 
 	public static UserDTO userEntityToDto(@NotNull User user) {
 		return new UserDTO()
@@ -75,7 +92,11 @@ public class User implements Serializable {
 				.setPhoneNumber(user.getPhoneNumber())
 				.setEmail(user.getEmail())
 				.setDeliveryAddress(user.getDeliveryAddress())
-				.setRole(user.getRole())
+				.setRoles(user.getRoleList()!=null
+						?user.getRoleList().stream()
+						.map(item->item.getName())
+						.collect(Collectors.toList())
+						:List.of())
 				.setUserFavorites(user.getUserFavorites())
 				.setActivated(user.isActivated());
 
@@ -90,7 +111,6 @@ public class User implements Serializable {
 				.setPhoneNumber(userDto.getPhoneNumber())
 				.setDeliveryAddress(userDto.getDeliveryAddress())
 				.setEmail(userDto.getEmail())
-				.setRole(userDto.getRole())
 				.setUserFavorites(userDto.getUserFavorites())
 				.setActivated(userDto.isActivated());
 	}

@@ -6,6 +6,7 @@ import com.boot.user.dto.ProductDTO;
 import com.boot.user.enums.ProductStatus;
 import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.exception.EntityNotFoundException;
+import com.boot.user.model.Role;
 import com.boot.user.model.User;
 import com.boot.user.model.UserFavorite;
 import com.boot.user.repository.UserFavoriteRepository;
@@ -19,7 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -292,9 +293,9 @@ class UserFavoritesServiceTest {
                 .setPhoneNumber("0742000000")
                 .setPassword("testPassword")
                 .setEmail("jon278@gaailer.site")
-                .setRole("USER")
+                .setRoleList(Arrays.asList(new Role()))
                 .setActivated(true)
-                .setCreatedOn(LocalDate.now())
+                .setCreatedOn(LocalDateTime.now())
                 .setUserFavorites(userFavorites)
                 .setDeliveryAddress("street, no. 1");
 
