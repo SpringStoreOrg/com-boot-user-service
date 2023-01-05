@@ -3,30 +3,23 @@ package com.boot.user.service;
 
 import com.boot.user.config.AppConfig;
 import com.boot.user.model.*;
-import org.apache.velocity.app.VelocityEngine;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.context.TestPropertySource;
-
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@ExtendWith(MockitoExtension.class)
  class EmailServiceTest {
 
     @InjectMocks
@@ -47,7 +40,6 @@ import static org.mockito.Mockito.*;
         User user =  getUser();
         ConfirmationToken confirmationToken =  getToken();
         MimeMessage mimeMessage = mock(MimeMessage.class);
-        when(appConfig.userServiceRestTemplateUrl()).thenReturn(new RestTemplateBuilder().rootUri(userServiceUrl).build());
         when(emailSender.createMimeMessage()).thenReturn(mimeMessage);
 
         emailService.sendConfirmationEmail(user, confirmationToken);
@@ -61,7 +53,6 @@ import static org.mockito.Mockito.*;
         User user =  getUser();
         PasswordResetToken resetToken =  getResetToken();
         MimeMessage mimeMessage = mock(MimeMessage.class);
-        when(appConfig.userServiceRestTemplateUrl()).thenReturn(new RestTemplateBuilder().rootUri(userServiceUrl).build());
         when(emailSender.createMimeMessage()).thenReturn(mimeMessage);
 
         emailService.sendPasswordResetEmail(user, resetToken);

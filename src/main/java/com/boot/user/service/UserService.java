@@ -14,9 +14,10 @@ import com.boot.user.repository.RoleRepository;
 import com.boot.user.repository.UserRepository;
 import com.boot.user.validator.TokenValidator;
 import com.boot.user.validator.UserValidator;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,24 +32,27 @@ import static com.boot.user.model.User.userEntityToDto;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    private UserValidator userValidator;
+    private final UserValidator userValidator;
 
-    private TokenValidator tokenValidator;
+    private final TokenValidator tokenValidator;
 
-    private ConfirmationTokenRepository confirmationTokenRepository;
+    private final ConfirmationTokenRepository confirmationTokenRepository;
 
-    private EmailService emailSenderService;
+    private final EmailService emailSenderService;
 
-    private PasswordResetTokenRepository passwordReserTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
+
+    @Value("${activated.users.regex}")
+    private String activatedUsersRegex;
 
     @Transactional
     public UserDTO addUser(@NotNull UserDTO userDTO) {
@@ -60,17 +64,23 @@ public class UserService {
 
         inputUser.setRoleList(roleRepository.findAllInList(Arrays.asList("ACCESS", "CREATE_ORDER")));
 
+        if (inputUser.getEmail().matches(activatedUsersRegex)) {
+            inputUser.setActivated(true);
+        }
         User user = userRepository.save(inputUser);
 
-        ConfirmationToken confirmationToken = new ConfirmationToken(user);
+        if (!inputUser.isActivated()) {
+            ConfirmationToken confirmationToken = new ConfirmationToken(user);
 
-        confirmationTokenRepository.save(confirmationToken);
+            confirmationTokenRepository.save(confirmationToken);
 
-        emailSenderService.sendConfirmationEmail(user, confirmationToken);
+            emailSenderService.sendConfirmationEmail(user, confirmationToken);
+        }
 
         return userEntityToDto(user);
     }
 
+    @Transactional
     public void confirmUserAccount(String confirmationToken)
             throws EntityNotFoundException, UnableToModifyDataException {
         ConfirmationToken token = confirmationTokenRepository.findByToken(confirmationToken);
@@ -92,6 +102,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public UserDTO updateUserByEmail(String email, @NotNull UserDTO userDTO) throws EntityNotFoundException {
         log.info("updateUserByEmail - process started");
 
@@ -158,6 +169,7 @@ public class UserService {
         userRepository.deleteByEmail(email);
     }
 
+    @Transactional
     public void requestResetPassword(String userEmail) throws EntityNotFoundException {
 
         User user = userRepository.getUserByEmail(userEmail);
@@ -167,15 +179,16 @@ public class UserService {
         }
         PasswordResetToken confirmationToken = new PasswordResetToken(user);
 
-        passwordReserTokenRepository.save(confirmationToken);
+        passwordResetTokenRepository.save(confirmationToken);
 
         emailSenderService.sendPasswordResetEmail(user, confirmationToken);
     }
 
+    @Transactional
     public void changeUserPassword(ChangeUserPasswordDTO changeUserPasswordDTO)
             throws  EntityNotFoundException, UnableToModifyDataException {
 
-        PasswordResetToken token = passwordReserTokenRepository.findByResetToken(changeUserPasswordDTO.getToken());
+        PasswordResetToken token = passwordResetTokenRepository.findByResetToken(changeUserPasswordDTO.getToken());
 
         if (token != null) {
             if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
