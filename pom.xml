@@ -202,6 +202,7 @@
                         <exclude>com/boot/user/exception/*</exclude>
                         <exclude>com/boot/user/client/*</exclude>
                         <exclude>com/boot/user/exception/*</exclude>
+                        <exclude>com/boot/user/validator/*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
