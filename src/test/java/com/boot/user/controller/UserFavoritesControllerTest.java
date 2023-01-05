@@ -24,8 +24,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
@@ -97,6 +96,41 @@ public class UserFavoritesControllerTest {
                 .andExpect(content().json(Objects.requireNonNull(TestDataUtils.readFileAsString("./src/test/resources/testdata/controller/addProductsToUserFavorites.json"))));
 
         verify(userFavoritesService).addProductsToUserFavorites(3, products);
+    }
+
+    @Test
+    void testRemoveProductToUserFavorites() throws Exception {
+        ProductDTO productDTO = getProductDTO(1, "Green wood Chair 1");
+
+        when(userFavoritesService.removeProductFromUserFavorites(4, productDTO.getName())).thenReturn(Arrays.asList(
+                getProductDTO(2, "Green wood Chair 2"),
+                getProductDTO(3, "Green wood Chair 3"),
+                getProductDTO(4, "Green wood Chair 4")));
+
+        mockMvc.perform(delete("/userFavorites/" + productDTO.getName())
+                        .header(Constants.USER_ID_HEADER, 4)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(TestDataUtils.readFileAsString("./src/test/resources/testdata/controller/removeProductFromUserFavorites.json")));
+
+        verify(userFavoritesService).removeProductFromUserFavorites(4, productDTO.getName());
+    }
+
+    @Test
+    void testGetAllProductsFromUserFavorites() throws Exception {
+        when(userFavoritesService.getAllProductsFromUserFavorites(5)).thenReturn(Arrays.asList(
+                getProductDTO(1, "Green wood Chair 1"),
+                getProductDTO(2, "Green wood Chair 2"),
+                getProductDTO(3, "Green wood Chair 3"),
+                getProductDTO(4, "Green wood Chair 4")));
+
+        mockMvc.perform(get("/userFavorites/")
+                        .header(Constants.USER_ID_HEADER, 5)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(TestDataUtils.readFileAsString("./src/test/resources/testdata/controller/getAllProductsFromUserFavorites.json")));
+
+        verify(userFavoritesService).getAllProductsFromUserFavorites(5);
     }
 
     private ProductDTO getProductDTO(long id, String productName) {
