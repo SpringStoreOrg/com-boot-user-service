@@ -56,6 +56,7 @@ jobs:
   check-status-of-triggered-pipeline:
     docker: 
       - image: cimg/base:2023.01
+    resource_class: small
     steps:
       - attach_workspace:
           at: workspace
