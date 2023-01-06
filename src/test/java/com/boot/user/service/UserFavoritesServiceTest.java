@@ -6,20 +6,20 @@ import com.boot.user.dto.ProductDTO;
 import com.boot.user.enums.ProductStatus;
 import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.exception.EntityNotFoundException;
+import com.boot.user.model.Role;
 import com.boot.user.model.User;
 import com.boot.user.model.UserFavorite;
 import com.boot.user.repository.UserFavoriteRepository;
 import com.boot.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,9 +27,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@ExtendWith(MockitoExtension.class)
 class UserFavoritesServiceTest {
 
     @InjectMocks
@@ -200,8 +198,6 @@ class UserFavoritesServiceTest {
         String productName = "testProductName2";
 
         when(userRepository.getUserById(4)).thenReturn(user);
-        when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
-        when(userFavoriteRepository.findByUserAndProductName(user, productName)).thenReturn(null);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 userFavoritesService.removeProductFromUserFavorites(4, productName));
@@ -292,9 +288,9 @@ class UserFavoritesServiceTest {
                 .setPhoneNumber("0742000000")
                 .setPassword("testPassword")
                 .setEmail("jon278@gaailer.site")
-                .setRole("USER")
+                .setRoleList(Arrays.asList(new Role()))
                 .setActivated(true)
-                .setCreatedOn(LocalDate.now())
+                .setCreatedOn(LocalDateTime.now())
                 .setUserFavorites(userFavorites)
                 .setDeliveryAddress("street, no. 1");
 

@@ -7,36 +7,33 @@ import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.exception.UnableToModifyDataException;
 import com.boot.user.model.ConfirmationToken;
 import com.boot.user.model.PasswordResetToken;
+import com.boot.user.model.Role;
 import com.boot.user.model.User;
 import com.boot.user.repository.ConfirmationTokenRepository;
 import com.boot.user.repository.PasswordResetTokenRepository;
+import com.boot.user.repository.RoleRepository;
 import com.boot.user.repository.UserRepository;
 import com.boot.user.validator.TokenValidator;
 import com.boot.user.validator.UserValidator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 import static com.boot.user.model.User.userEntityToDto;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
     @InjectMocks
@@ -47,6 +44,9 @@ class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private RoleRepository roleRepository;
 
     @Mock
     private UserValidator userValidator;
@@ -69,15 +69,22 @@ class UserServiceTest {
     @Captor
     private ArgumentCaptor<PasswordResetToken> passwordResetTokenCaptor;
 
+    @BeforeEach
+    public void setUp() {
+        ReflectionTestUtils.setField(userService, "activatedUsersRegex", ".*@springstore-test\\.com");
+    }
+
     @Test
     void testAddUser() {
 
         when(passwordEncoder.encode(getUserDTO().getPassword())).thenReturn("testPassword");
         when(userRepository.save(getUser())).thenReturn(getUser());
-        when(confirmationTokenRepository.save(any())).thenReturn(any(ConfirmationToken.class));
+        when(confirmationTokenRepository.save(any())).thenReturn(new ConfirmationToken());
+        when(roleRepository.findAllInList(eq(Arrays.asList("ACCESS", "CREATE_ORDER")))).thenReturn(Arrays.asList(getRole("ACCESS"), getRole("CREATE_ORDER")));
 
         UserDTO savedUser = userService.addUser(getUserDTO());
 
+        verify(roleRepository).findAllInList(eq(Arrays.asList("ACCESS", "CREATE_ORDER")));
         verify(userRepository).save(getUser());
 
         verify(confirmationTokenRepository).save(confirmationTokenCaptor.capture());
@@ -93,8 +100,33 @@ class UserServiceTest {
         assertEquals(getUser(), confirmationToken.getUser());
         assertNotNull(confirmationToken.getToken());
         assertNotNull(confirmationToken.getCreatedDate());
+    }
 
+    @Test
+    void testAddUserActivated() {
 
+        String testEmail = "test1234@springstore-test.com";
+        UserDTO userDTO = getUserDTO();
+        userDTO.setEmail(testEmail);
+
+        User user = getUser();
+        user.setEmail(testEmail);
+        user.setActivated(true);
+
+        when(passwordEncoder.encode(userDTO.getPassword())).thenReturn("testPassword");
+        when(userRepository.save(user)).thenReturn(user);
+        when(roleRepository.findAllInList(eq(Arrays.asList("ACCESS", "CREATE_ORDER")))).thenReturn(Arrays.asList(getRole("ACCESS"), getRole("CREATE_ORDER")));
+
+        UserDTO savedUser = userService.addUser(userDTO);
+
+        verify(passwordEncoder).encode(userDTO.getPassword());
+        verify(roleRepository).findAllInList(eq(Arrays.asList("ACCESS", "CREATE_ORDER")));
+        verify(userRepository).save(user);
+
+        verifyNoInteractions(confirmationTokenRepository, emailSenderService);
+
+        userDTO.setActivated(true);
+        assertEquals(userDTO, savedUser);
     }
 
     @Test
@@ -167,7 +199,7 @@ class UserServiceTest {
                 .setLastName("newTestLastName")
                 .setPhoneNumber("0742999999")
                 .setEmail("jon278@gaailer.com")
-                .setRole("USER")
+                .setRoles(Arrays.asList("ACCESS", "CREATE_ORDER"))
                 .setDeliveryAddress("street, no. 12"));
 
         verify(userRepository).save(getUser()
@@ -175,9 +207,9 @@ class UserServiceTest {
                 .setLastName("newTestLastName")
                 .setPhoneNumber("0742999999")
                 .setEmail("jon278@gaailer.com")
-                .setRole("USER")
+                .setRoleList(Arrays.asList(getRole("ACCESS"), getRole("CREATE_ORDER")))
                 .setDeliveryAddress("street, no. 12")
-                .setActivated(true).setLastUpdatedOn(LocalDate.now()));
+                .setActivated(true));
 
         assertEquals("newTestName", updatedUser.getFirstName());
         assertEquals("newTestLastName", updatedUser.getLastName());
@@ -201,7 +233,7 @@ class UserServiceTest {
                 .setPhoneNumber("0742000000")
                 .setEmail("jon278@gaailer.site")
                 .setDeliveryAddress("street, no. 1")
-                .setActivated(true).setLastUpdatedOn(LocalDate.now()));
+                .setActivated(true));
 
         assertEquals("testName", updatedUser.getFirstName());
         assertEquals("testLastName", updatedUser.getLastName());
@@ -254,6 +286,7 @@ class UserServiceTest {
     @Test
     void testGetUserByEmail() throws EntityNotFoundException {
         User user = getUser();
+        user.setRoleList(Arrays.asList(getRole("ACCESS"), getRole("CREATE_ORDER")));
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(getUser());
         when(userValidator.isEmailPresent(user.getEmail())).thenReturn(true);
@@ -356,7 +389,7 @@ class UserServiceTest {
         verify(passwordEncoder).matches(newPassword, user.getPassword());
         verify(passwordEncoder).encode(newPassword);
         verify(userRepository, times(2)).getUserByEmail(user.getEmail());
-        verify(userRepository).save(user.setLastUpdatedOn(LocalDate.now()));
+        verify(userRepository).save(user);
     }
 
     @Test
@@ -493,7 +526,7 @@ class UserServiceTest {
                 .setPhoneNumber("0742000000")
                 .setPassword("testPassword")
                 .setEmail("jon278@gaailer.site")
-                .setRole("USER")
+                .setRoles(Arrays.asList("ACCESS", "CREATE_ORDER"))
                 .setDeliveryAddress("street, no. 1");
 
         return userDTO;
@@ -507,12 +540,12 @@ class UserServiceTest {
                 .setPhoneNumber("0742000000")
                 .setPassword("testPassword")
                 .setEmail("jon278@gaailer.site")
-                .setRole("USER")
-                .setCreatedOn(LocalDate.now())
+                .setRoleList(Arrays.asList(getRole("ACCESS"), getRole("CREATE_ORDER")))
                 .setDeliveryAddress("street, no. 1");
 
         return user;
     }
+
     private ChangeUserPasswordDTO changeUserPassword(String token, String newPassword, String confirmedNewPassword){
         ChangeUserPasswordDTO changeUserPasswordDTO = new ChangeUserPasswordDTO();
         changeUserPasswordDTO.setToken(token);
@@ -522,5 +555,10 @@ class UserServiceTest {
         return changeUserPasswordDTO;
     }
 
+    private Role getRole(String name){
+        Role role = new Role();
+        role.setName(name);
 
+        return role;
+    }
 }

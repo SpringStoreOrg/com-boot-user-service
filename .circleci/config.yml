@@ -26,35 +26,72 @@ jobs:
           path: /tmp/circleci-test-results/junit
       - run:
           name: SonarCloud Analyze
-          command: mvn verify sonar:sonar -Dsonar.projectKey=GeorgeT88_com-boot-user-service 
-      - run:
-          name: Integration Tests Build Job
-          command: |
-              PIPELINE_ID=$(curl --location --request POST "https://circleci.com/api/v2/project/github/GeorgeT88/com-boot-user-service-it/pipeline" \
-              --header "Content-Type: application/json" \
-              --header "Circle-Token: $API_TOKEN_IT" |  jq -r '.id')
-              PIPELINE=$PIPELINE_ID
-              sleep 60
-              echo "export PIPELINE=$PIPELINE_ID" >> $BASH_ENV
-  
-              STATUS=$(curl "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
-              echo $STATUS
-              while [ "$STATUS" == "running" ]; do
-                echo still running
-                sleep 10
-                STATUS=$(curl -s "https://circleci.com/api/v2/pipeline/$PIPELINE/workflow?circle-token=$API_TOKEN_IT" | jq -r '.items[].status')
-              done
+          command: mvn verify sonar:sonar -Dsonar.projectKey=SpringStoreOrg_com-boot-user-service
 
-              echo "finally done, checking final status: $STATUS"
-              if [[ "$STATUS" == "success" ]]; then
-                echo "Proceeding with build, as triggered pipeline was success"
-              else
-                echo $STATUS
-                echo "Stopping build, triggered pipeline was not a success"
-                exit 1
-              fi
+  #trigger the com-boot-user-service-it pipeline
+  trigger-com-boot-user-service-it-pipeline:
+    docker: 
+      - image: cimg/base:2023.01
+    steps:
+      - run:
+          name: Ping another pipeline - com-boot-user-service-it
+          command: |
+            CREATED_PIPELINE=$(curl --request POST \
+              --url https://circleci.com/api/v2/project/github/SpringStoreOrg/com-boot-user-service-it/pipeline \
+              --header "Circle-Token: $API_TOKEN_com_boot_user_service_it" \
+              --header "content-type: application/json" \
+              --data '{"parameters":{"triggering-pipeline-id":"<< pipeline.id >>"}}' \
+            | jq -r '.id'
+            )
+            echo "my created pipeline"
+            echo $CREATED_PIPELINE
+            mkdir ~/workspace
+            echo $CREATED_PIPELINE > pipeline.txt
+      - persist_to_workspace:
+          root: .
+          paths: 
+            - pipeline.txt  
+
+  #check the status for com-boot-user-service-it triggered pipeline
+  check-status-of-triggered-pipeline:
+    docker: 
+      - image: cimg/base:2023.01
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: Check triggered workflow status
+          command: |
+            triggered_pipeline_id=$(cat workspace/pipeline.txt)
+            created_workflow_status=$(curl --request GET \
+                --url "https://circleci.com/api/v2/pipeline/${triggered_pipeline_id}/workflow" \
+                --header "Circle-Token: $API_TOKEN_com_boot_user_service_it" \
+                --header "content-type: application/json" \
+              | jq -r '.items[0].status'
+            )
+            echo $created_workflow_status
+            if [[ "$created_workflow_status" != "success" ]]; then
+              echo "Workflow not successful - ${created_workflow_status}"
+              (exit -1) 
+            fi
+            
+            echo "Created workflow successful"
 
 workflows:
-  user service build and test:
+  mvn-build-and-test:
     jobs:
-      - build-and-test 
+      - build-and-test
+      - trigger-com-boot-user-service-it-pipeline:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only: main
+      - wait-for-triggered-pipeline:
+          type: approval
+          requires: 
+            - trigger-com-boot-user-service-it-pipeline
+      - check-status-of-triggered-pipeline:
+          requires:
+            - wait-for-triggered-pipeline       
