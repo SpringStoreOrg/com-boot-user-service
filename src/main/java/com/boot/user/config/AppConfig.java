@@ -1,7 +1,5 @@
 package com.boot.user.config;
 
-import com.fasterxml.classmate.TypeResolver;
-import com.google.common.base.Predicate;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -15,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.velocity.VelocityEngineFactory;
 import org.springframework.web.client.RestTemplate;
+
 import java.io.IOException;
 import java.util.Properties;
 
