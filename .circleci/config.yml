@@ -26,7 +26,7 @@ jobs:
           path: /tmp/circleci-test-results/junit
       - run:
           name: SonarCloud Analyze
-          command: mvn verify sonar:sonar -Dsonar.projectKey=springstoreorg_com-boot-user-service 
+          command: mvn verify sonar:sonar -Dsonar.projectKey=SpringStoreOrg_com-boot-user-service
 
   #trigger the com-boot-user-service-it pipeline
   trigger-com-boot-user-service-it-pipeline:
