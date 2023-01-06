@@ -81,7 +81,7 @@ jobs:
 workflows:
   mvn-build-and-test:
     jobs:
-      - build-and-test
+      - build-and-test:
           filters:
             branches:
               only: main
