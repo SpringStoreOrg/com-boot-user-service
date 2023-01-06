@@ -78,7 +78,7 @@ workflows:
   mvn-build-and-test:
     jobs:
       - build-and-test
-      - trigger-com-boot-user-service-it-pipelin:
+      - trigger-com-boot-user-service-it-pipeline:
           requires:
             - build-and-test
           filters:
@@ -87,7 +87,7 @@ workflows:
       - wait-for-triggered-pipeline:
           type: approval
           requires: 
-            - trigger-com-boot-user-service-it-pipelin
+            - trigger-com-boot-user-service-it-pipeline
       - check-status-of-triggered-pipeline:
           requires:
             - wait-for-triggered-pipeline       
