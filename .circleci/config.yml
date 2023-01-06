@@ -30,6 +30,9 @@ jobs:
 
   #trigger the com-boot-user-service-it pipeline
   trigger-com-boot-user-service-it-pipeline:
+    docker: 
+      - image: cimg/base:2023.01
+    steps:
       - run:
           name: Ping another pipeline - com-boot-user-service-it
           command: |
