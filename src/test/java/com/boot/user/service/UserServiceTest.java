@@ -3,6 +3,7 @@ package com.boot.user.service;
 
 import com.boot.user.dto.ChangeUserPasswordDTO;
 import com.boot.user.dto.UserDTO;
+import com.boot.user.exception.EmailAlreadyUsedException;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.exception.UnableToModifyDataException;
 import com.boot.user.model.ConfirmationToken;
@@ -76,7 +77,7 @@ class UserServiceTest {
 
     @Test
     void testAddUser() {
-
+        when(userRepository.existsByEmail(getUserDTO().getEmail())).thenReturn(false);
         when(passwordEncoder.encode(getUserDTO().getPassword())).thenReturn("testPassword");
         when(userRepository.save(getUser())).thenReturn(getUser());
         when(confirmationTokenRepository.save(any())).thenReturn(new ConfirmationToken());
@@ -84,6 +85,7 @@ class UserServiceTest {
 
         UserDTO savedUser = userService.addUser(getUserDTO());
 
+        verify(userRepository).existsByEmail(getUserDTO().getEmail());
         verify(roleRepository).findAllInList(eq(Arrays.asList("ACCESS", "CREATE_ORDER")));
         verify(userRepository).save(getUser());
 
@@ -113,12 +115,14 @@ class UserServiceTest {
         user.setEmail(testEmail);
         user.setActivated(true);
 
+        when(userRepository.existsByEmail(testEmail)).thenReturn(false);
         when(passwordEncoder.encode(userDTO.getPassword())).thenReturn("testPassword");
         when(userRepository.save(user)).thenReturn(user);
         when(roleRepository.findAllInList(eq(Arrays.asList("ACCESS", "CREATE_ORDER")))).thenReturn(Arrays.asList(getRole("ACCESS"), getRole("CREATE_ORDER")));
 
         UserDTO savedUser = userService.addUser(userDTO);
 
+        verify(userRepository).existsByEmail(testEmail);
         verify(passwordEncoder).encode(userDTO.getPassword());
         verify(roleRepository).findAllInList(eq(Arrays.asList("ACCESS", "CREATE_ORDER")));
         verify(userRepository).save(user);
@@ -127,6 +131,19 @@ class UserServiceTest {
 
         userDTO.setActivated(true);
         assertEquals(userDTO, savedUser);
+    }
+
+    @Test
+    void testAddUserAlreadyExists() {
+        when(userRepository.existsByEmail(getUserDTO().getEmail())).thenReturn(true);
+        try{
+            userService.addUser(getUserDTO());
+            fail("Exception should have been thrown");
+        }catch (EmailAlreadyUsedException e){
+            verify(userRepository).existsByEmail(getUserDTO().getEmail());
+            verifyNoMoreInteractions(userRepository);
+            verifyNoInteractions(confirmationTokenRepository, emailSenderService);
+        }
     }
 
     @Test

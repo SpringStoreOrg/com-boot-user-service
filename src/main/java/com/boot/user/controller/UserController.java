@@ -1,6 +1,7 @@
 package com.boot.user.controller;
 
 import com.boot.user.dto.UserDTO;
+import com.boot.user.exception.EmailAlreadyUsedException;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.exception.UnableToModifyDataException;
 import com.boot.user.service.UserService;
@@ -14,21 +15,25 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
+import java.util.ArrayList;
 import java.util.List;
 
 @Validated
 @Controller
 @AllArgsConstructor
 @Tag(name = "user", description = "the User API")
+@Log4j2
 public class UserController {
 
     private UserService userService;
@@ -100,5 +105,37 @@ public class UserController {
             throws EntityNotFoundException {
         userService.deleteUserByEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException exception) {
+        log.error(exception.getMessage(), exception);
+        ErrorResponse error = new ErrorResponse();
+        exception.getBindingResult().getFieldErrors().stream().forEach(item -> {
+            error.messages.add(new ErrorMessage(item.getField(), item.getDefaultMessage()));
+        });
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EmailAlreadyUsedException.class)
+    public ResponseEntity<ErrorResponse> emailAlreadyUsedException(EmailAlreadyUsedException exception) {
+        log.error(exception.getMessage(), exception);
+        ErrorResponse error = new ErrorResponse();
+        error.messages.add(new ErrorMessage("email", "Email is already used"));
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    class ErrorResponse {
+        public List<ErrorMessage> messages = new ArrayList<>();
+    }
+
+    class ErrorMessage {
+        public String fieldKey;
+        public String message;
+
+        public ErrorMessage(String fieldKey, String message) {
+            this.fieldKey = fieldKey;
+            this.message = message;
+        }
     }
 }
