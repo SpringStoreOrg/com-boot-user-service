@@ -1,6 +1,7 @@
 package com.boot.user.controller;
 
 import com.boot.user.dto.UserDTO;
+import com.boot.user.exception.EmailAlreadyUsedException;
 import com.boot.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -8,12 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -54,19 +52,65 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-    void testAddUserWith_invalidFirstNameMinCharacters() throws Exception {
+    void testAddUserWith_invalidInput() throws Exception {
 
-        UserDTO userDTO = getUserDTO();
+        UserDTO userDTO = new UserDTO();
         userDTO.setFirstName("aa");
-
-        when(userService.addUser(userDTO)).thenReturn(userDTO);
+        userDTO.setLastName("bb");
+        userDTO.setEmail("abc");
+        userDTO.setPhoneNumber("123");
+        userDTO.setDeliveryAddress("a");
         mockMvc.perform(post("/")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", Matchers.containsString("Min First name size is 3 characters!")));
+                .andExpect(content().json("{\n" +
+                        "   \"messages\":[\n" +
+                        "      {\n" +
+                        "         \"fieldKey\":\"email\",\n" +
+                        "         \"message\":\"Invalid Email!\"\n" +
+                        "      },\n" +
+                        "      {\n" +
+                        "         \"fieldKey\":\"deliveryAddress\",\n" +
+                        "         \"message\":\"Min Delivery address size is 8 characters!\"\n" +
+                        "      },\n" +
+                        "      {\n" +
+                        "         \"fieldKey\":\"firstName\",\n" +
+                        "         \"message\":\"Min First name size is 3 characters!\"\n" +
+                        "      },\n" +
+                        "      {\n" +
+                        "         \"fieldKey\":\"phoneNumber\",\n" +
+                        "         \"message\":\"Invalid Phone Number!\"\n" +
+                        "      },\n" +
+                        "      {\n" +
+                        "         \"fieldKey\":\"lastName\",\n" +
+                        "         \"message\":\"Min Last name size is 3 characters!\"\n" +
+                        "      }\n" +
+                        "   ]\n" +
+                        "}"));
 
         verifyNoInteractions(userService);
+    }
+
+    @Test
+    void testAddUserWithDuplicateEmail() throws Exception {
+
+        UserDTO userDTO = getUserDTO();
+        when(userService.addUser(userDTO)).thenThrow(new EmailAlreadyUsedException());
+        mockMvc.perform(post("/")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(userDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json("{\n" +
+                        "   \"messages\":[\n" +
+                        "      {\n" +
+                        "         \"fieldKey\":\"email\",\n" +
+                        "         \"message\":\"Email is already used\"\n" +
+                        "      }\n" +
+                        "   ]\n" +
+                        "}"));
+
+        verify(userService).addUser(userDTO);
     }
 
     @Test

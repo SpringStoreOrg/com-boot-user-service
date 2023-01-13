@@ -3,6 +3,7 @@ package com.boot.user.service;
 
 import com.boot.user.dto.ChangeUserPasswordDTO;
 import com.boot.user.dto.UserDTO;
+import com.boot.user.exception.EmailAlreadyUsedException;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.exception.UnableToModifyDataException;
 import com.boot.user.model.ConfirmationToken;
@@ -57,6 +58,10 @@ public class UserService {
     @Transactional
     public UserDTO addUser(@NotNull UserDTO userDTO) {
         log.info("addUser - process started");
+
+        if(userRepository.existsByEmail(userDTO.getEmail())){
+            throw new EmailAlreadyUsedException();
+        }
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
