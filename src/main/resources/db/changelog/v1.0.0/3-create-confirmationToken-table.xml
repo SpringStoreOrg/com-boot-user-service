@@ -33,7 +33,8 @@
                 baseColumnNames="user_id"
                 constraintName="token_f1"
                 referencedTableName="user"
-                referencedColumnNames="id"/>
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
 
     </changeSet>
 </databaseChangeLog>
