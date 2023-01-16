@@ -64,30 +64,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\n" +
-                        "   \"messages\":[\n" +
-                        "      {\n" +
-                        "         \"fieldKey\":\"email\",\n" +
-                        "         \"message\":\"Invalid Email!\"\n" +
-                        "      },\n" +
-                        "      {\n" +
-                        "         \"fieldKey\":\"deliveryAddress\",\n" +
-                        "         \"message\":\"Min Delivery address size is 8 characters!\"\n" +
-                        "      },\n" +
-                        "      {\n" +
-                        "         \"fieldKey\":\"firstName\",\n" +
-                        "         \"message\":\"Min First name size is 3 characters!\"\n" +
-                        "      },\n" +
-                        "      {\n" +
-                        "         \"fieldKey\":\"phoneNumber\",\n" +
-                        "         \"message\":\"Invalid Phone Number!\"\n" +
-                        "      },\n" +
-                        "      {\n" +
-                        "         \"fieldKey\":\"lastName\",\n" +
-                        "         \"message\":\"Min Last name size is 3 characters!\"\n" +
-                        "      }\n" +
-                        "   ]\n" +
-                        "}"));
+                .andExpect(jsonPath("$.message", Matchers.containsString("Min First name size is 3 characters!")))
+                .andExpect(jsonPath("$.message", Matchers.containsString("Min Last name size is 3 characters!")))
+                .andExpect(jsonPath("$.message", Matchers.containsString("Invalid Email!")))
+                .andExpect(jsonPath("$.message", Matchers.containsString("Min Delivery address size is 8 characters!")))
+                .andExpect(jsonPath("$.message", Matchers.containsString("Invalid Phone Number!")))
+                .andExpect(jsonPath("$.error", Matchers.is("Bad Request")));
 
         verifyNoInteractions(userService);
     }
@@ -101,14 +83,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\n" +
-                        "   \"messages\":[\n" +
-                        "      {\n" +
-                        "         \"fieldKey\":\"email\",\n" +
-                        "         \"message\":\"Email is already used\"\n" +
-                        "      }\n" +
-                        "   ]\n" +
-                        "}"));
+                .andExpect(jsonPath("$.message", Matchers.is("Email is already used")))
+                .andExpect(jsonPath("$.error", Matchers.is("Bad Request")));
 
         verify(userService).addUser(userDTO);
     }
