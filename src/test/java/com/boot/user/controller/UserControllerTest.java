@@ -96,7 +96,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     void testAddUserWithDuplicateEmail() throws Exception {
 
         UserDTO userDTO = getUserDTO();
-        when(userService.addUser(userDTO)).thenThrow(new EmailAlreadyUsedException());
+        when(userService.addUser(userDTO)).thenThrow(new EmailAlreadyUsedException("Email is already used"));
         mockMvc.perform(post("/")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(userDTO)))

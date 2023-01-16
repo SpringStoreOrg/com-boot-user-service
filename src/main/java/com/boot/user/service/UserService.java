@@ -60,7 +60,7 @@ public class UserService {
         log.info("addUser - process started");
 
         if(userRepository.existsByEmail(userDTO.getEmail())){
-            throw new EmailAlreadyUsedException();
+            throw new EmailAlreadyUsedException("Email is already used");
         }
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));

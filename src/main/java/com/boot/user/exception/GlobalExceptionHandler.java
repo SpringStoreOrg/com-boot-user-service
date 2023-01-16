@@ -92,4 +92,12 @@ public class GlobalExceptionHandler {
 				methodArgumentNotValidException);
 	}
 
+	@ExceptionHandler(EmailAlreadyUsedException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ResponseEntity<ApiError> emailAlreadyUsedException(
+			EmailAlreadyUsedException emailAlreadyUsedException)
+	{
+		return createResponseEntity(HttpStatus.BAD_REQUEST,
+				emailAlreadyUsedException);
+	}
 }
