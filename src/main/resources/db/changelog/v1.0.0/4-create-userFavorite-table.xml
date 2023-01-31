@@ -31,7 +31,7 @@
                 baseColumnNames="user_id"
                 constraintName="user_favorite_f1"
                 referencedTableName="user"
-                referencedColumnNames="id"/>
+                referencedColumnNames="id"
                 onDelete="CASCADE"/>
     </changeSet>
 </databaseChangeLog>
