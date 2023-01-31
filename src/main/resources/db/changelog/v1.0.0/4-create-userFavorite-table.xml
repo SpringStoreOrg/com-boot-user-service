@@ -32,6 +32,6 @@
                 constraintName="user_favorite_f1"
                 referencedTableName="user"
                 referencedColumnNames="id"/>
-
+                onDelete="CASCADE"/>
     </changeSet>
 </databaseChangeLog>
