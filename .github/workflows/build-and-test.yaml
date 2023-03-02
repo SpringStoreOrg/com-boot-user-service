@@ -31,4 +31,4 @@ jobs:
       - name: SonarCloud Analyze
         run: |
           echo ${{ sonar.projectKey }}
-          mvn verify sonar:sonar -Dsonar.projectKey=SpringStoreOrg_com-boot-user-service
+          mvn verify sonar:sonar -D"sonar.projectKey=SpringStoreOrg_com-boot-user-service"
