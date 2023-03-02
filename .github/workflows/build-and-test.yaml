@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}
     steps:
       # Checkout the code as the first step.
       - name: Checkout
@@ -29,7 +28,13 @@ jobs:
       - name: Save Test reports
         run: |
           find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
-      - name: SonarCloud Analyze
-        run: |
-          echo $SONAR_TOKEN
-          mvn verify sonar:sonar -Dsonar.projectKey=SpringStoreOrg_com-boot-user-service
+      - name: Analyze with SonarCloud
+        uses: SonarSource/sonarcloud-github-action
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+        with:
+          # Additional arguments for the sonarcloud scanner
+          args:
+            -Dsonar.projectKey=SpringStoreOrg_com-boot-user-service
+            -Dsonar.organization=springstoreorg
