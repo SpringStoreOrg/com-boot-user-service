@@ -12,14 +12,14 @@ jobs:
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
     steps:
       # Checkout the code as the first step.
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v3
       # Build
       - name: Build
         run: |
           mvn -B -DskipTests clean package
       # Then run your tests!
-      - name: Unit Tests Build Job
+      - name: Unit Tests
         run: |
           mvn test
       - name: Create Test reports folder
@@ -28,7 +28,6 @@ jobs:
       - name: Save Test reports
         run: |
           find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
-      # - name: SonarCloud Analyze
-      #   run: |
-      #     echo ${{ sonar.projectKey }}
-      #     mvn verify sonar:sonar -D"sonar.projectKey=SpringStoreOrg_com-boot-user-service"
+      - name: SonarCloud Analyze
+        run: |
+          mvn verify sonar:sonar -Dsonar.projectKey=SpringStoreOrg_com-boot-user-service
