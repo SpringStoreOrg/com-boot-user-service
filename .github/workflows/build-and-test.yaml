@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+      SONAR_TOKEN: $SONAR_TOKEN
     steps:
       # Checkout the code as the first step.
       - name: Checkout
