@@ -28,7 +28,7 @@ jobs:
       - name: Save Test reports
         run: |
           find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
-      - name: SonarCloud Analyze
-        run: |
-          echo ${{ sonar.projectKey }}
-          mvn verify sonar:sonar -D"sonar.projectKey=SpringStoreOrg_com-boot-user-service"
+      # - name: SonarCloud Analyze
+      #   run: |
+      #     echo ${{ sonar.projectKey }}
+      #     mvn verify sonar:sonar -D"sonar.projectKey=SpringStoreOrg_com-boot-user-service"
