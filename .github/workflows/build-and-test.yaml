@@ -1,0 +1,33 @@
+name: Build and test
+
+on:
+  push:
+    branches:
+      - "feature/github_worklow"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+    steps:
+      # Checkout the code as the first step.
+      - name: checkout
+        uses: actions/checkout@v1
+      # Build
+      - name: Build
+        run: |
+          mvn -B -DskipTests clean package
+      # Then run your tests!
+      - name: Unit Tests Build Job
+        run: |
+          mvn test
+      - name: Create Test reports folder
+        run: |
+          mkdir -p $CIRCLE_TEST_REPORTS/junit/
+      - name: Save Test reports
+        run: |
+          find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+      - name: SonarCloud Analyze
+        run: |
+          mvn verify sonar:sonar -Dsonar.projectKey=SpringStoreOrg_com-boot-user-service
