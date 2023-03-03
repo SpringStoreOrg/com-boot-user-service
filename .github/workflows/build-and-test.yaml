@@ -5,7 +5,7 @@ on:
     - cron: '0 5 * * 1-5'
   push:
     branches:
-      - "main"
+      - "feature/github_workflow"
   pull_request:
     branches:
       - "main"
@@ -29,14 +29,23 @@ jobs:
       - name: Unit Tests
         run: |
           mvn test
+      - name: List
+        run: |
+          ls -la $CIRCLE_TEST_REPORTS/junit/**
       - name: Create Test reports folder
         run: |
           mkdir -p $CIRCLE_TEST_REPORTS/junit/
       - name: Save Test reports
         run: |
           find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+      - name: List
+        run: |
+          ls -la $CIRCLE_TEST_REPORTS/junit/**
       - name: SonarCloud Analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
         run: |
           mvn verify sonar:sonar -Dsonar.projectKey=SpringStoreOrg_com-boot-user-service -Dsonar.organization=springstoreorg
+      - name: List
+        run: |
+          ls -la $CIRCLE_TEST_REPORTS/junit/**
