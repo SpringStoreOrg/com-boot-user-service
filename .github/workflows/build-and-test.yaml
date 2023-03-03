@@ -45,5 +45,5 @@ jobs:
         if: success() || failure()    # run this step even if previous step failed
         with:
           name: Test Report           # Name of the check run which will be created
-          path: '${{ var.TEST_REPORTS_FOLDER }}/junit/*.xml'    # Path to test results
+          path: '${{ env.TEST_REPORTS_FOLDER }}/junit/*.xml'    # Path to test results
           reporter: java-junit 
