@@ -2,7 +2,7 @@ name: Build and test
 
 on:
   schedule:
-    - cron: '35 13 * * 1-5'
+    - cron: '0 15 * * 1-5'
   push:
     branches:
       - "**"
