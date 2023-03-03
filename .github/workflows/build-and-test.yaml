@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     container: cimg/openjdk:11.0
     env:
-      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+      TEST_REPORTS_FOLDER: /tmp/test-results
     steps:
       # Checkout the code as the first step.
       - name: Checkout
@@ -31,21 +31,19 @@ jobs:
           mvn test
       - name: Create Test reports folder
         run: |
-          mkdir -p $CIRCLE_TEST_REPORTS/junit/
-      - name: List
-        run: |
-          ls -la $CIRCLE_TEST_REPORTS/junit/
+          mkdir -p $TEST_REPORTS_FOLDER/junit/
       - name: Save Test reports
         run: |
-          find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
-      - name: List
-        run: |
-          ls -la $CIRCLE_TEST_REPORTS/junit/
+          find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $TEST_REPORTS_FOLDER/junit/ \;
       - name: SonarCloud Analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
         run: |
           mvn verify sonar:sonar -Dsonar.projectKey=SpringStoreOrg_com-boot-user-service -Dsonar.organization=springstoreorg
-      - name: List
-        run: |
-          ls -la $CIRCLE_TEST_REPORTS/junit/
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
+        with:
+          name: Tests            # Name of the check run which will be created
+          path: '$TEST_REPORTS_FOLDER/junit/*.xml'    # Path to test results
+          reporter: java-junit 
