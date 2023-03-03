@@ -8,6 +8,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    container: cimg/openjdk:11.0
     env:
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
     steps:
