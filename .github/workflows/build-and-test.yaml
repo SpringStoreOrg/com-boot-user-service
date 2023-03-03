@@ -1,0 +1,49 @@
+name: Build and test
+
+on:
+  schedule:
+    - cron: '0 5 * * 1-5'
+  push:
+    branches:
+      - "feature/github_workflow"
+  pull_request:
+    branches:
+      - "main"
+
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    container: cimg/openjdk:11.0
+    env:
+      TEST_REPORTS_FOLDER: /tmp/test-results
+    steps:
+      # Checkout the code as the first step.
+      - name: Checkout
+        uses: actions/checkout@v3
+      # Build
+      - name: Build
+        run: |
+          mvn -B -DskipTests clean package
+      # Then run your tests!
+      - name: Unit Tests
+        run: |
+          mvn test
+      - name: Create Test reports folder
+        run: |
+          mkdir -p $TEST_REPORTS_FOLDER/junit/
+      - name: Save Test reports
+        run: |
+          find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $TEST_REPORTS_FOLDER/junit/ \;
+      - name: SonarCloud Analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+        run: |
+          mvn verify sonar:sonar -Dsonar.projectKey=SpringStoreOrg_com-boot-user-service -Dsonar.organization=springstoreorg
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
+        with:
+          name: Test Report           # Name of the check run which will be created
+          path: '${{ env.TEST_REPORTS_FOLDER }}/junit/*.xml'    # Path to test results
+          reporter: java-junit 
