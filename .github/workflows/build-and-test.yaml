@@ -34,13 +34,13 @@ jobs:
           mkdir -p $CIRCLE_TEST_REPORTS/junit/
       - name: List
         run: |
-          ls -la $CIRCLE_TEST_REPORTS/junit/**
+          ls -la $CIRCLE_TEST_REPORTS/junit/
       - name: Save Test reports
         run: |
           find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
       - name: List
         run: |
-          ls -la $CIRCLE_TEST_REPORTS/junit/**
+          ls -la $CIRCLE_TEST_REPORTS/junit/
       - name: SonarCloud Analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
@@ -48,4 +48,4 @@ jobs:
           mvn verify sonar:sonar -Dsonar.projectKey=SpringStoreOrg_com-boot-user-service -Dsonar.organization=springstoreorg
       - name: List
         run: |
-          ls -la $CIRCLE_TEST_REPORTS/junit/**
+          ls -la $CIRCLE_TEST_REPORTS/junit/
