@@ -29,12 +29,12 @@ jobs:
       - name: Unit Tests
         run: |
           mvn test
-      - name: List
-        run: |
-          ls -la $CIRCLE_TEST_REPORTS/junit/**
       - name: Create Test reports folder
         run: |
           mkdir -p $CIRCLE_TEST_REPORTS/junit/
+      - name: List
+        run: |
+          ls -la $CIRCLE_TEST_REPORTS/junit/**
       - name: Save Test reports
         run: |
           find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
