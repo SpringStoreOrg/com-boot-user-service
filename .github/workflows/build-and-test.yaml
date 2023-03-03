@@ -45,5 +45,5 @@ jobs:
         if: success() || failure()    # run this step even if previous step failed
         with:
           name: Tests            # Name of the check run which will be created
-          path: '/tmp/test-results/junit/*.xml'    # Path to test results
+          path: '$TEST_REPORTS_FOLDER/junit/*.xml'    # Path to test results
           reporter: java-junit 
