@@ -1,5 +1,6 @@
 package com.boot.user.controller;
 
+import com.boot.user.dto.PhotoDTO;
 import com.boot.user.dto.ProductDTO;
 import com.boot.user.enums.ProductStatus;
 import com.boot.user.service.UserFavoritesService;
@@ -23,6 +24,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -140,11 +142,17 @@ public class UserFavoritesControllerTest {
     private ProductDTO getProductDTO(long id, String productName) {
         ProductDTO productDTO = new ProductDTO();
 
+        PhotoDTO  photoDTO = new PhotoDTO();
+        photoDTO.setImage("test.trewredqw.com");
+
+        List<PhotoDTO> photoDTOList = new ArrayList<>();
+        photoDTOList.add(photoDTO);
+
         productDTO.setId(id)
                 .setName(productName)
                 .setCategory("Chair")
                 .setDescription("Best green wood Chair")
-                .setPhotoLink("www.asqweqwdasdad.com")
+                .setPhotoLinks(photoDTOList)
                 .setPrice(10000)
                 .setStatus(ProductStatus.ACTIVE)
                 .setStock(12);

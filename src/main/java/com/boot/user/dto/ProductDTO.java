@@ -12,6 +12,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Data
 @Accessors(chain = true)
@@ -32,9 +33,7 @@ public class ProductDTO {
 	@Positive(message = "Product price should be positive number!")
 	private long price;
 
-	@Size(min = 3,message = "Min Product photo link size is 3 characters!")
-	@Size(max = 600,message = "Max Product photo link size is 600 characters!")
-	private String photoLink;
+	private List<PhotoDTO> photoLinks;
 
 	@Size(min = 3, message = "Min category name size is 3 characters!")
 	@Size(max = 30, message = "Max category name size is 30 characters!")

@@ -2,6 +2,7 @@ package com.boot.user.service;
 
 
 import com.boot.user.client.ProductServiceClient;
+import com.boot.user.dto.PhotoDTO;
 import com.boot.user.dto.ProductDTO;
 import com.boot.user.enums.ProductStatus;
 import com.boot.user.exception.DuplicateEntryException;
@@ -300,9 +301,15 @@ class UserFavoritesServiceTest {
     private ProductDTO getProductDTO(String name) {
         ProductDTO productDTO = new ProductDTO();
 
+        PhotoDTO photoDTO = new PhotoDTO();
+        photoDTO.setImage("test.trewredqw.com");
+
+        List<PhotoDTO> photoDTOList = new ArrayList<>();
+        photoDTOList.add(photoDTO);
+
         productDTO.setCategory("Chair")
                 .setDescription("Black wood chair")
-                .setPhotoLink("www.photolink.test")
+                .setPhotoLinks(photoDTOList)
                 .setPrice(10000)
                 .setStock(8)
                 .setName(name)
