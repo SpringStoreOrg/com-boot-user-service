@@ -1,5 +1,7 @@
 package com.boot.user.config;
 
+import com.boot.user.client.RetrieveMessageErrorDecoder;
+import feign.codec.ErrorDecoder;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -20,31 +22,6 @@ import java.util.Properties;
 
 @Configuration
 public class AppConfig {
-
-    @Value("${cart.service.url}")
-    private String cartServiceUrl;
-
-    @Value("${product.service.url}")
-    private String productServiceUrl;
-
-    @Value("${user.service.url}")
-    public String userServiceUrl;
-
-    @Bean(name = "cartServiceRestTemplate")
-    public RestTemplate cartServiceRestTemplateUrl() {
-        return new RestTemplateBuilder().rootUri(cartServiceUrl).build();
-    }
-
-    @Bean(name = "productServiceRestTemplate")
-    public RestTemplate productServiceRestTemplateUrl() {
-        return new RestTemplateBuilder().rootUri(productServiceUrl).build();
-    }
-
-    @Bean(name = "userServiceRestTemplate")
-    public RestTemplate userServiceRestTemplateUrl() {
-        return new RestTemplateBuilder().rootUri(userServiceUrl).build();
-    }
-
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -67,5 +44,10 @@ public class AppConfig {
                 .components(new Components())
                 .info(new Info().title("User Application API").description(
                         "This is Spring Boot RESTful service using springdoc-openapi and OpenAPI 3."));
+    }
+
+    @Bean
+    public ErrorDecoder errorDecoder() {
+        return new RetrieveMessageErrorDecoder();
     }
 }
