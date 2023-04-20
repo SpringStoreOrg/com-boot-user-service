@@ -1,14 +1,14 @@
 package com.boot.user.service;
 
-import com.boot.user.config.AppConfig;
 import com.boot.user.model.ConfirmationToken;
 import com.boot.user.model.Email;
 import com.boot.user.model.PasswordResetToken;
 import com.boot.user.model.User;
 import com.boot.user.util.Constants;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.app.VelocityEngine;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -22,14 +22,15 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class EmailService {
 
     private static final String CONFIRMATION_EMAIL_TEMPLATE = "/templates/email-template.vm";
 
     private static final String RESET_PASSWORD_EMAIL_TEMPLATE = "/templates/reset-password-email-template.vm";
 
-    AppConfig appConfig;
+    @Value("${user.service.url}")
+    public String userServiceUrl;
 
     JavaMailSender emailSender;
 
@@ -42,7 +43,7 @@ public class EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put("firstName", user.getFirstName());
         model.put("lastName", user.getLastName());
-        model.put("path", appConfig.userServiceUrl + Constants.CONFIRM_USER_ACCOUNT);
+        model.put("path", userServiceUrl + Constants.CONFIRM_USER_ACCOUNT);
         model.put("confirmationToken", confirmationToken.getToken());
         model.put("signature", "www.springStore.com");
         email.setModel(model);
@@ -71,7 +72,7 @@ public class EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put("firstName", user.getFirstName());
         model.put("lastName", user.getLastName());
-        model.put("path", appConfig.userServiceUrl + Constants.PASSWORD_RESET_EMAIL);
+        model.put("path", userServiceUrl + Constants.PASSWORD_RESET_EMAIL);
         model.put("passwordResetToken", passwordResetToken.getResetToken());
         model.put("location", "Cluj");
         model.put("signature", "www.springStore.com");

@@ -21,7 +21,7 @@
         <spring-cloud.version>2021.0.4</spring-cloud.version>
         <sonar.organization>springstoreorg</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.exclusions>**/client/*,**/dto/*,**/exception/*,**/model/*</sonar.exclusions>
+        <sonar.exclusions>**/client/*,**/dto/*,**/exception/*,**/model/*,**/config/*</sonar.exclusions>
     </properties>
 
     <dependencies>
@@ -40,7 +40,12 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-feign</artifactId>
+            <version>1.4.7.RELEASE</version>
         </dependency>
 
         <!-- Spring dependencies -->
