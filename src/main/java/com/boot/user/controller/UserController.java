@@ -58,7 +58,7 @@ public class UserController {
     @PutMapping(value = "/{email}", consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<UserDTO> updateUserByEmail(@Parameter(description = "User to be updated.",
             required = true, schema = @Schema(implementation = UserDTO.class)) @Valid @RequestBody UserDTO userDTO,
-                                                     @Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email) throws EntityNotFoundException {
+                                                     @Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email){
         UserDTO user = userService.updateUserByEmail(email, userDTO);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -68,8 +68,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User activated Successfully", content = @Content),
             @ApiResponse(responseCode = "404", description = "Token not found", content = @Content)})
     @GetMapping(value = "/confirm/{token}")
-    public ResponseEntity<String> confirmUserAccount(@PathVariable("token") String token)
-            throws EntityNotFoundException, UnableToModifyDataException {
+    public ResponseEntity<String> confirmUserAccount(@PathVariable("token") String token){
         userService.confirmUserAccount(token);
         return new ResponseEntity<>("User activated Successfully!", HttpStatus.OK);
     }
@@ -80,7 +79,7 @@ public class UserController {
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDTO.class))))})
     @GetMapping("/users")
     @ResponseBody
-    public ResponseEntity<List<UserDTO>> getAllUsers() throws EntityNotFoundException {
+    public ResponseEntity<List<UserDTO>> getAllUsers(){
         List<UserDTO> userList = userService.getAllUsers();
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
@@ -91,7 +90,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content)})
     @GetMapping
     @ResponseBody
-    public ResponseEntity<UserDTO> getUserByEmail(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @RequestParam String email) throws EntityNotFoundException {
+    public ResponseEntity<UserDTO> getUserByEmail(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @RequestParam String email){
         UserDTO user = userService.getUserByEmail(email);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -101,8 +100,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User successfully deleted", content = @Content()),
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content)})
     @DeleteMapping("/{email}")
-    public ResponseEntity<UserDTO> deleteUserByByEmail(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
-            throws EntityNotFoundException {
+    public ResponseEntity<UserDTO> deleteUserByByEmail(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email){
         userService.deleteUserByEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }

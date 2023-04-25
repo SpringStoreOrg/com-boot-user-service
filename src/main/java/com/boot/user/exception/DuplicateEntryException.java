@@ -1,7 +1,7 @@
 
 package com.boot.user.exception;
 
-public class DuplicateEntryException extends Exception {
+public class DuplicateEntryException extends RuntimeException {
 
 	/**
 	 * 

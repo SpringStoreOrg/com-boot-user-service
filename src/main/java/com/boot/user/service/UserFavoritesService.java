@@ -36,7 +36,7 @@ public class UserFavoritesService {
     private static final String INVALID_EMAIL_ERROR = "Invalid Email address!";
 
     @Transactional
-    public List<ProductDTO> addProductToUserFavorites(long userId, String productName) throws DuplicateEntryException, EntityNotFoundException {
+    public List<ProductDTO> addProductToUserFavorites(long userId, String productName){
 
         User user = userRepository.getUserById(userId);
 
@@ -63,7 +63,7 @@ public class UserFavoritesService {
     }
 
     @Transactional
-    public List<ProductDTO> addProductsToUserFavorites(long userId, List<String> productNames) throws EntityNotFoundException {
+    public List<ProductDTO> addProductsToUserFavorites(long userId, List<String> productNames){
         log.info("addProductsToUserFavorites - process started");
         User user = userRepository.getUserById(userId);
 
@@ -93,7 +93,7 @@ public class UserFavoritesService {
     }
 
     @Transactional
-    public List<ProductDTO> removeProductFromUserFavorites(long userId, String productName) throws EntityNotFoundException {
+    public List<ProductDTO> removeProductFromUserFavorites(long userId, String productName){
 
         User user = this.userRepository.getUserById(userId);
         if (user == null) {
@@ -113,7 +113,7 @@ public class UserFavoritesService {
         return getProductDTOS(user);
     }
 
-    public List<ProductDTO> getAllProductsFromUserFavorites(long userId) throws EntityNotFoundException {
+    public List<ProductDTO> getAllProductsFromUserFavorites(long userId){
 
         User user = userRepository.getUserById(userId);
 

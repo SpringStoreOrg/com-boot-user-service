@@ -86,8 +86,7 @@ public class UserService {
     }
 
     @Transactional
-    public void confirmUserAccount(String confirmationToken)
-            throws EntityNotFoundException, UnableToModifyDataException {
+    public void confirmUserAccount(String confirmationToken){
         ConfirmationToken token = confirmationTokenRepository.findByToken(confirmationToken);
 
         if (token != null) {
@@ -108,7 +107,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO updateUserByEmail(String email, @NotNull UserDTO userDTO) throws EntityNotFoundException {
+    public UserDTO updateUserByEmail(String email, @NotNull UserDTO userDTO){
         log.info("updateUserByEmail - process started");
 
         User user = userRepository.getUserByEmail(email);
@@ -154,7 +153,7 @@ public class UserService {
         return userDTOList;
     }
 
-    public UserDTO getUserByEmail(String email) throws EntityNotFoundException {
+    public UserDTO getUserByEmail(String email){
         log.info("getUserByEmail - process started");
         if (!userValidator.isEmailPresent(email)) {
             throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
@@ -165,7 +164,7 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUserByEmail(String email) throws EntityNotFoundException {
+    public void deleteUserByEmail(String email){
         log.info("deleteUserByEmail - process started");
         if (!userValidator.isEmailPresent(email)) {
             throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
@@ -175,7 +174,7 @@ public class UserService {
     }
 
     @Transactional
-    public void requestResetPassword(String userEmail) throws EntityNotFoundException {
+    public void requestResetPassword(String userEmail){
 
         User user = userRepository.getUserByEmail(userEmail);
 

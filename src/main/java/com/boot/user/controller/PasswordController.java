@@ -33,8 +33,7 @@ public class PasswordController {
 
     @Operation(summary = "Request reset password", tags = {"password"})
     @PutMapping(value = "/reset/{email}")
-    public ResponseEntity<String> requestResetPassword(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email)
-            throws EntityNotFoundException {
+    public ResponseEntity<String> requestResetPassword(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email) {
         userService.requestResetPassword(email);
         return new ResponseEntity<>("Request to reset Password successfully send!", HttpStatus.OK);
     }
@@ -43,8 +42,7 @@ public class PasswordController {
     @PutMapping(value = "/change")
     public ResponseEntity<String> changeUserPassword(@Parameter(description = "New user Password to change. Cannot null or empty.",
             required = true, schema = @Schema(implementation = ChangeUserPasswordDTO.class))
-                                                         @Valid @RequestBody ChangeUserPasswordDTO changeUserPasswordDTO)
-            throws EntityNotFoundException, UnableToModifyDataException {
+                                                         @Valid @RequestBody ChangeUserPasswordDTO changeUserPasswordDTO){
         userService.changeUserPassword(changeUserPasswordDTO);
         return new ResponseEntity<>("Password successfully changed!", HttpStatus.OK);
     }
