@@ -30,14 +30,13 @@ public class EmailService {
     private static final String RESET_PASSWORD_EMAIL_TEMPLATE = "/templates/reset-password-email-template.vm";
 
     @Value("${user.service.url}")
-    public String userServiceUrl;
+    private String userServiceUrl;
 
-    JavaMailSender emailSender;
+    private final JavaMailSender emailSender;
 
-    VelocityEngine velocityEngine;
+    private final VelocityEngine velocityEngine;
 
     public void sendConfirmationEmail(@NotNull User user, @NotNull ConfirmationToken confirmationToken) {
-
         Email email = new Email();
 
         Map<String, Object> model = new HashMap<>();
@@ -61,7 +60,7 @@ public class EmailService {
 
             emailSender.send(mimeMessageHelper.getMimeMessage());
         } catch (MessagingException e) {
-            log.info("Exception by sending confirmation email: {}", (Object) e.getStackTrace());
+            log.error("Exception by sending confirmation email", e);
         }
     }
 
@@ -92,8 +91,7 @@ public class EmailService {
             emailSender.send(mimeMessageHelper.getMimeMessage());
 
         } catch (MessagingException e) {
-
-            log.info("Exception by trying to send password reset email: {}", (Object) e.getStackTrace());
+            log.error("Exception by trying to send password reset email:", e);
         }
     }
 
@@ -102,7 +100,7 @@ public class EmailService {
         try {
             content.append(VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, templatePath, model));
         } catch (Exception e) {
-            log.info("Exception by getting content from the email template: {}", (Object) e.getStackTrace());
+            log.error("Exception by getting content from the email template", e);
         }
         return content.toString();
     }
