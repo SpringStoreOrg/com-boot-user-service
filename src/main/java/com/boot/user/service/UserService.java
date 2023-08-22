@@ -7,12 +7,10 @@ import com.boot.user.exception.EmailAlreadyUsedException;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.exception.UnableToModifyDataException;
 import com.boot.user.model.ConfirmationToken;
+import com.boot.user.model.CustomerMessage;
 import com.boot.user.model.PasswordResetToken;
 import com.boot.user.model.User;
-import com.boot.user.repository.ConfirmationTokenRepository;
-import com.boot.user.repository.PasswordResetTokenRepository;
-import com.boot.user.repository.RoleRepository;
-import com.boot.user.repository.UserRepository;
+import com.boot.user.repository.*;
 import com.boot.user.validator.TokenValidator;
 import com.boot.user.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +50,8 @@ public class UserService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     private final RoleRepository roleRepository;
+
+    private final CustomerMessageRepository customerMessageRepository;
 
     @Value("${activated.users.regex}")
     private String activatedUsersRegex;
@@ -219,6 +220,14 @@ public class UserService {
         } else {
             throw new EntityNotFoundException("Token not found!");
         }
+    }
+
+    @Transactional
+    public void saveCustomerMessage(@NotNull CustomerMessage customerMessage) {
+        log.info("customerMessage - process started");
+
+        customerMessage.setCreatedOn(LocalDateTime.now());
+        customerMessageRepository.save(customerMessage);
     }
 
 }

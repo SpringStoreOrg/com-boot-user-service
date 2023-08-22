@@ -14,5 +14,6 @@
     <include file="6-create-role-table.xml" relativeToChangelogFile="true"/>
     <include file="7-create-user-role-table.xml" relativeToChangelogFile="true"/>
     <include file="8-create-testData-user-role.xml" relativeToChangelogFile="true"/>
+    <include file="9-create-customer-message-table.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
