@@ -106,7 +106,7 @@ public class UserController {
 
     @Operation(summary = "Save customer message", tags = {"customerMessage"})
     @PostMapping(value = "/customerMessage")
-    public ResponseEntity<String> sendEmailFromUser(@RequestBody CustomerMessage customerMessage) {
+    public ResponseEntity<String> sendEmailFromUser(@Valid @RequestBody CustomerMessage customerMessage) {
         userService.saveCustomerMessage(customerMessage);
         return new ResponseEntity<>("Customer Message saved!", HttpStatus.OK);
     }

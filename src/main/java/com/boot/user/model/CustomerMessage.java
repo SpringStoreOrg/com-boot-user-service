@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
@@ -25,19 +27,29 @@ public class CustomerMessage {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @Size(min = 3, message = "Min Last name size is 3 characters!")
+    @Size(max = 30, message = "Max Last name size is 30 characters!")
     @Column
     private String name;
 
-    @Size(min = 3, max = 50)
+    @Email(message = "Invalid Email!")
     @Column
     private String email;
 
+    @Pattern(regexp="^(?=[07]{2})(?=\\d{10}).*", message = "Invalid Phone Number!")
     @Column
     private String phoneNumber;
 
+    @Size(min = 2, message = "Min comment size is 2 characters!")
+    @Size(max = 600, message = "Max comment size is 600 characters!")
     @Column
     private String comment;
 
     @Column
     private LocalDateTime createdOn;
+
+    @PrePersist
+    public void create(){
+        this.createdOn = LocalDateTime.now();
+    }
 }

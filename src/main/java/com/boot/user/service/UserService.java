@@ -226,7 +226,6 @@ public class UserService {
     public void saveCustomerMessage(@NotNull CustomerMessage customerMessage) {
         log.info("customerMessage - process started");
 
-        customerMessage.setCreatedOn(LocalDateTime.now());
         customerMessageRepository.save(customerMessage);
     }
 
