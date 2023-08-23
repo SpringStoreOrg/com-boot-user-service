@@ -28,11 +28,13 @@ public class CustomerMessage {
     private long id;
 
     @Size(min = 3, message = "Min Last name size is 3 characters!")
-    @Size(max = 30, message = "Max Last name size is 30 characters!")
+    @Size(max = 50, message = "Max Last name size is 50 characters!")
     @Column
     private String name;
 
     @Email(message = "Invalid Email!")
+    @Size(min = 3, message = "Min email size is 3 characters!")
+    @Size(max = 100, message = "Max email size is 100 characters!")
     @Column
     private String email;
 
@@ -41,7 +43,7 @@ public class CustomerMessage {
     private String phoneNumber;
 
     @Size(min = 2, message = "Min comment size is 2 characters!")
-    @Size(max = 600, message = "Max comment size is 600 characters!")
+    @Size(max = 550, message = "Max comment size is 600 characters!")
     @Column
     private String comment;
 

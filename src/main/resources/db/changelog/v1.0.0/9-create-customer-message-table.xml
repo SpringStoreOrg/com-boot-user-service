@@ -25,7 +25,7 @@
             <column name="email" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="phone_number" type="varchar(25)">
+            <column name="phone_number" type="varchar(19)">
                 <constraints nullable="false"/>
             </column>
             <column name="comment" type="varchar(550)">
