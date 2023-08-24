@@ -43,7 +43,7 @@ public class CustomerMessage {
     private String phoneNumber;
 
     @Size(min = 2, message = "Min comment size is 2 characters!")
-    @Size(max = 550, message = "Max comment size is 600 characters!")
+    @Size(max = 550, message = "Max comment size is 550 characters!")
     @Column
     private String comment;
 
