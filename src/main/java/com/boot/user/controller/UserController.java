@@ -2,8 +2,7 @@ package com.boot.user.controller;
 
 import com.boot.user.dto.UserDTO;
 import com.boot.user.exception.EmailAlreadyUsedException;
-import com.boot.user.exception.EntityNotFoundException;
-import com.boot.user.exception.UnableToModifyDataException;
+import com.boot.user.model.CustomerMessage;
 import com.boot.user.service.UserService;
 import com.boot.user.util.Constants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -103,6 +102,13 @@ public class UserController {
     public ResponseEntity<UserDTO> deleteUserByByEmail(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email){
         userService.deleteUserByEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "Save customer message", tags = {"customerMessage"})
+    @PostMapping(value = "/customerMessage")
+    public ResponseEntity<String> sendEmailFromUser(@Valid @RequestBody CustomerMessage customerMessage) {
+        userService.saveCustomerMessage(customerMessage);
+        return new ResponseEntity<>("Customer Message saved!", HttpStatus.OK);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
