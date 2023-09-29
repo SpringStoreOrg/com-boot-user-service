@@ -185,7 +185,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         when(userService.getUserByEmail(userDTO.getEmail())).thenReturn(userDTO);
 
-        mockMvc.perform(get("/").param("email", userDTO.getEmail())
+        mockMvc.perform(get("/"+ userDTO.getEmail())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isOk())
