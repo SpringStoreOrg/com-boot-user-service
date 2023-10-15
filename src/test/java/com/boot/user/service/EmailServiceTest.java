@@ -83,10 +83,9 @@ import static org.mockito.Mockito.*;
                 .setPassword("testPassword")
                 .setEmail("jon278@gaailer.site")
                 .setRoleList(Arrays.asList(new Role()))
-                .setActivated(true)
+                .setVerified(true)
                 .setCreatedOn(LocalDateTime.now())
-                .setUserFavorites(userFavorites)
-                .setDeliveryAddress("street, no. 1");
+                .setUserFavorites(userFavorites);
 
         return user;
     }
