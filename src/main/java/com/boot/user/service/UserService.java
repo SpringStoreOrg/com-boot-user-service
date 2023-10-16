@@ -199,6 +199,9 @@ public class UserService {
     @Transactional
     public void changeUserPassword(ChangeUserPasswordDTO changeUserPasswordDTO)
             throws  EntityNotFoundException, UnableToModifyDataException {
+        if (!changeUserPasswordDTO.getNewPassword().contentEquals(changeUserPasswordDTO.getConfirmedNewPassword())) {
+            throw new EntityNotFoundException("Passwords do not match!");
+        }
 
         PasswordResetToken token = passwordResetTokenRepository.findByResetToken(changeUserPasswordDTO.getToken());
 
@@ -207,14 +210,10 @@ public class UserService {
                 throw new EntityNotFoundException("Token Expired!");
             }
 
-            CreateUserDTO userDto = getUserByEmail(token.getUser().getEmail(), false, true);
+            GetUserDTO userDto = getUserByEmail(token.getUser().getEmail(), false, true);
 
             if (!userDto.isVerified()) {
                 throw new UnableToModifyDataException("User was not activated!");
-            }
-
-            if (!changeUserPasswordDTO.getNewPassword().contentEquals(changeUserPasswordDTO.getConfirmedNewPassword())) {
-                throw new EntityNotFoundException("Passwords do not match!");
             }
 
             if (passwordEncoder.matches(changeUserPasswordDTO.getNewPassword(), userDto.getPassword())) {
@@ -243,7 +242,6 @@ public class UserService {
     }
 
     private boolean checkTokenAvailability(@NotNull Date date) {
-
         return !LocalDateTime.now().isBefore(Instant.ofEpochMilli(date.getTime())
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime().plusDays(1));

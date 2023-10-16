@@ -22,4 +22,6 @@ public class GetUserDTO extends CreateUserDTO{
     private List<String> roles;
 
     private List<UserFavorite> userFavorites;
+
+    private boolean verified;
 }
