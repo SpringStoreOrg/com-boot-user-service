@@ -2,33 +2,31 @@ package com.boot.user.service;
 
 
 import com.boot.user.dto.ChangeUserPasswordDTO;
-import com.boot.user.dto.UserDTO;
+import com.boot.user.dto.CreateUserDTO;
+import com.boot.user.dto.GetUserDTO;
 import com.boot.user.exception.EmailAlreadyUsedException;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.exception.UnableToModifyDataException;
-import com.boot.user.model.ConfirmationToken;
-import com.boot.user.model.CustomerMessage;
-import com.boot.user.model.PasswordResetToken;
-import com.boot.user.model.User;
+import com.boot.user.model.*;
 import com.boot.user.repository.*;
-import com.boot.user.validator.TokenValidator;
-import com.boot.user.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-
-import static com.boot.user.model.User.dtoToUserEntity;
-import static com.boot.user.model.User.userEntityToDto;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -38,10 +36,6 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
-
-    private final UserValidator userValidator;
-
-    private final TokenValidator tokenValidator;
 
     private final ConfirmationTokenRepository confirmationTokenRepository;
 
@@ -53,11 +47,13 @@ public class UserService {
 
     private final CustomerMessageRepository customerMessageRepository;
 
+    private final ModelMapper modelMapper;
+
     @Value("${activated.users.regex}")
     private String activatedUsersRegex;
 
     @Transactional
-    public UserDTO addUser(@NotNull UserDTO userDTO) {
+    public CreateUserDTO addUser(@NotNull CreateUserDTO userDTO) {
         log.info("addUser - process started");
 
         if(userRepository.existsByEmail(userDTO.getEmail())){
@@ -66,16 +62,16 @@ public class UserService {
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
-        User inputUser = dtoToUserEntity(userDTO);
+        User inputUser = modelMapper.map(userDTO, User.class);
 
         inputUser.setRoleList(roleRepository.findAllInList(Arrays.asList("ACCESS", "CREATE_ORDER")));
 
         if (inputUser.getEmail().matches(activatedUsersRegex)) {
-            inputUser.setActivated(true);
+            inputUser.setVerified(true);
         }
         User user = userRepository.save(inputUser);
 
-        if (!inputUser.isActivated()) {
+        if (!inputUser.isVerified()) {
             ConfirmationToken confirmationToken = new ConfirmationToken(user);
 
             confirmationTokenRepository.save(confirmationToken);
@@ -83,7 +79,10 @@ public class UserService {
             emailSenderService.sendConfirmationEmail(user, confirmationToken);
         }
 
-        return userEntityToDto(user);
+        GetUserDTO result = modelMapper.map(user, GetUserDTO.class);
+        result.setRoles(getRolesForUser(user));
+
+        return result;
     }
 
     @Transactional
@@ -91,15 +90,15 @@ public class UserService {
         ConfirmationToken token = confirmationTokenRepository.findByToken(confirmationToken);
 
         if (token != null) {
-            if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
+            if (checkTokenAvailability(token.getCreatedDate())) {
                 throw new EntityNotFoundException("Token Expired!");
             }
             User user = userRepository.getUserByEmail(token.getUser().getEmail());
 
-            if (user.isActivated()) {
+            if (user.isVerified()) {
                 throw new UnableToModifyDataException("User was already confirmed!");
             }
-            user.setActivated(true);
+            user.setVerified(true);
 
             userRepository.save(user);
         } else {
@@ -108,7 +107,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO updateUserByEmail(String email, @NotNull UserDTO userDTO){
+    public CreateUserDTO updateUserByEmail(String email, @NotNull CreateUserDTO userDTO){
         log.info("updateUserByEmail - process started");
 
         User user = userRepository.getUserByEmail(email);
@@ -128,46 +127,54 @@ public class UserService {
             user.setLastName(userDTO.getLastName());
         }
 
-        if(StringUtils.isNotBlank(userDTO.getDeliveryAddress())) {
-            user.setDeliveryAddress(userDTO.getDeliveryAddress());
-        }
-
         if(StringUtils.isNotBlank(userDTO.getPhoneNumber())) {
             user.setPhoneNumber(userDTO.getPhoneNumber());
         }
 
         userRepository.save(user);
 
-        return userEntityToDto(user);
+        GetUserDTO result = modelMapper.map(user, GetUserDTO.class);
+        result.setRoles(getRolesForUser(user));
+
+        return result;
     }
 
-    public List<UserDTO> getAllUsers() throws EntityNotFoundException {
+    public List<CreateUserDTO> getAllUsers() throws EntityNotFoundException {
 
         List<User> userList = userRepository.findAll();
 
         if (userList.isEmpty()) {
             throw new EntityNotFoundException("No user found in the Database!");
         }
-        List<UserDTO> userDTOList = new ArrayList<>();
+        List<CreateUserDTO> userDTOList = new ArrayList<>();
 
-        userList.forEach(u -> userDTOList.add(userEntityToDto(u)));
+        userList.forEach(u -> userDTOList.add(modelMapper.map(u, CreateUserDTO.class)));
         return userDTOList;
     }
 
-    public UserDTO getUserByEmail(String email){
+    public GetUserDTO getUserByEmail(String email, boolean includeDetails, boolean includePassword) {
         log.info("getUserByEmail - process started");
-        if (!userValidator.isEmailPresent(email)) {
+        User user = userRepository.getUserByEmail(email);
+        if (user == null) {
             throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
         }
+        GetUserDTO result = modelMapper.map(user, GetUserDTO.class);
+        result.setRoles(getRolesForUser(user));
+        if (!includePassword) {
+            result.setPassword(null);
+        }
+        if (includeDetails) {
+            result.setUserFavorites(user.getUserFavorites());
+        }
 
-        User user = userRepository.getUserByEmail(email);
-        return userEntityToDto(user);
+        return result;
     }
 
     @Transactional
-    public void deleteUserByEmail(String email){
+    public void deleteUserByEmail(String email) {
         log.info("deleteUserByEmail - process started");
-        if (!userValidator.isEmailPresent(email)) {
+
+        if (userRepository.getUserByEmail(email) == null) {
             throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
         }
 
@@ -196,13 +203,13 @@ public class UserService {
         PasswordResetToken token = passwordResetTokenRepository.findByResetToken(changeUserPasswordDTO.getToken());
 
         if (token != null) {
-            if (tokenValidator.checkTokenAvailability(token.getCreatedDate())) {
+            if (checkTokenAvailability(token.getCreatedDate())) {
                 throw new EntityNotFoundException("Token Expired!");
             }
 
-            UserDTO userDto = getUserByEmail(token.getUser().getEmail());
+            CreateUserDTO userDto = getUserByEmail(token.getUser().getEmail(), false, true);
 
-            if (!userDto.isActivated()) {
+            if (!userDto.isVerified()) {
                 throw new UnableToModifyDataException("User was not activated!");
             }
 
@@ -229,4 +236,16 @@ public class UserService {
         customerMessageRepository.save(customerMessage);
     }
 
+    private List<String> getRolesForUser(User user) {
+        return (user.getRoleList() != null)
+                ? (user.getRoleList().stream().map(Role::getName).collect(Collectors.toList()))
+                : List.of();
+    }
+
+    private boolean checkTokenAvailability(@NotNull Date date) {
+
+        return !LocalDateTime.now().isBefore(Instant.ofEpochMilli(date.getTime())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime().plusDays(1));
+    }
 }

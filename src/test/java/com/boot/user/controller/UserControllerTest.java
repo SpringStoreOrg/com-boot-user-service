@@ -1,6 +1,7 @@
 package com.boot.user.controller;
 
-import com.boot.user.dto.UserDTO;
+import com.boot.user.dto.CreateUserDTO;
+import com.boot.user.dto.GetUserDTO;
 import com.boot.user.exception.EmailAlreadyUsedException;
 import com.boot.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     void testAddUser() throws Exception {
 
-        UserDTO userDTO = getUserDTO();
+        CreateUserDTO userDTO = getCreateUserDTO();
 
         when(userService.addUser(userDTO)).thenReturn(userDTO);
 
@@ -54,12 +55,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     void testAddUserWith_invalidInput() throws Exception {
 
-        UserDTO userDTO = new UserDTO();
+        CreateUserDTO userDTO = new CreateUserDTO();
         userDTO.setFirstName("aa");
         userDTO.setLastName("bb");
         userDTO.setEmail("abc");
         userDTO.setPhoneNumber("123");
-        userDTO.setDeliveryAddress("a");
         mockMvc.perform(post("/")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(userDTO)))
@@ -69,10 +69,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                         "      {\n" +
                         "         \"fieldKey\":\"email\",\n" +
                         "         \"message\":\"Invalid Email!\"\n" +
-                        "      },\n" +
-                        "      {\n" +
-                        "         \"fieldKey\":\"deliveryAddress\",\n" +
-                        "         \"message\":\"Min Delivery address size is 8 characters!\"\n" +
                         "      },\n" +
                         "      {\n" +
                         "         \"fieldKey\":\"firstName\",\n" +
@@ -95,7 +91,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     void testAddUserWithDuplicateEmail() throws Exception {
 
-        UserDTO userDTO = getUserDTO();
+        CreateUserDTO userDTO = getCreateUserDTO();
         when(userService.addUser(userDTO)).thenThrow(new EmailAlreadyUsedException());
         mockMvc.perform(post("/")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -116,7 +112,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     void testUpdateUserByEmail() throws Exception {
 
-        UserDTO userDTO = getUserDTO();
+        CreateUserDTO userDTO = getCreateUserDTO();
         userDTO.setFirstName("newTestName");
 
         when(userService.updateUserByEmail(userDTO.getEmail(), userDTO)).thenReturn(userDTO);
@@ -127,8 +123,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .json("{\"id\":0,\"firstName\":\"newTestName\",\"lastName\":\"testLastName\"," +
-                                "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"," +
-                                "\"deliveryAddress\":\"stret, no. 1\",\"roles\":[\"ACCESS\", \"CREATE_ORDER\"],\"userFavorites\":null,\"activated\":false}"));
+                                "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"}"));
 
         verify(userService).updateUserByEmail(userDTO.getEmail(), userDTO);
     }
@@ -136,7 +131,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     void testUpdateUserByEmailInvalidEmail() throws Exception {
 
-        UserDTO userDTO = getUserDTO();
+        CreateUserDTO userDTO = getCreateUserDTO();
         userDTO.setFirstName("newTestName");
 
         mockMvc.perform(put("/" + "a")
@@ -172,8 +167,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         mockMvc.perform(get("/users")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"deliveryAddress\":\"stret, no. 1\",\"roles\":[\"ACCESS\",\"CREATE_ORDER\"],\"userFavorites\":null,\"activated\":false}," +
-                        "{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"deliveryAddress\":\"stret, no. 1\",\"roles\":[\"ACCESS\",\"CREATE_ORDER\"],\"userFavorites\":null,\"activated\":false}]"));
+                .andExpect(content().json("[{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"roles\":[\"ACCESS\",\"CREATE_ORDER\"],\"userFavorites\":null,\"verified\":false}," +
+                        "{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\",\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\",\"roles\":[\"ACCESS\",\"CREATE_ORDER\"],\"userFavorites\":null,\"verified\":false}]"));
 
         verify(userService).getAllUsers();
     }
@@ -181,26 +176,38 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     void testGetUserByEmail() throws Exception {
 
-        UserDTO userDTO = getUserDTO();
+        GetUserDTO userDTO = getUserDTO();
 
-        when(userService.getUserByEmail(userDTO.getEmail())).thenReturn(userDTO);
+        when(userService.getUserByEmail(userDTO.getEmail(), false, false)).thenReturn(userDTO);
 
         mockMvc.perform(get("/"+ userDTO.getEmail())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content()
-                        .json("{\"id\":0,\"firstName\":\"testName\",\"lastName\":\"testLastName\"," +
-                                "\"password\":\"testPassword\",\"phoneNumber\":\"0742000000\",\"email\":\"jon278@gaailer.site\"," +
-                                "\"deliveryAddress\":\"stret, no. 1\",\"roles\":[\"ACCESS\", \"CREATE_ORDER\"],\"userFavorites\":null,\"activated\":false}"));
+                        .json("{\n" +
+                                "   \"id\":0,\n" +
+                                "   \"firstName\":\"testName\",\n" +
+                                "   \"lastName\":\"testLastName\",\n" +
+                                "   \"password\":\"testPassword\",\n" +
+                                "   \"phoneNumber\":\"0742000000\",\n" +
+                                "   \"email\":\"jon278@gaailer.site\",\n" +
+                                "   \"roles\":[\n" +
+                                "      \"ACCESS\",\n" +
+                                "      \"CREATE_ORDER\"\n" +
+                                "   ],\n" +
+                                "   \"userFavorites\":null,\n" +
+                                "   \"address\":null,\n" +
+                                "   \"verified\":false\n" +
+                                "}"));
 
-        verify(userService).getUserByEmail(userDTO.getEmail());
+        verify(userService).getUserByEmail(userDTO.getEmail(), false, false);
     }
 
     @Test
     void testDeleteUserByByEmail() throws Exception {
 
-        UserDTO userDTO = getUserDTO();
+        CreateUserDTO userDTO = getUserDTO();
 
         mockMvc.perform(delete("/" + userDTO.getEmail())
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -209,16 +216,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         verify(userService).deleteUserByEmail(userDTO.getEmail());
     }
 
-    private UserDTO getUserDTO() {
-        UserDTO userDTO = new UserDTO();
+    private GetUserDTO getUserDTO() {
+        GetUserDTO userDTO = new GetUserDTO();
 
         userDTO.setFirstName("testName")
                 .setLastName("testLastName")
                 .setPhoneNumber("0742000000")
                 .setPassword("testPassword")
-                .setEmail("jon278@gaailer.site")
-                .setDeliveryAddress("stret, no. 1")
-                .setRoles(List.of("ACCESS", "CREATE_ORDER"));
+                .setEmail("jon278@gaailer.site");
+        userDTO.setRoles(List.of("ACCESS", "CREATE_ORDER"));
+
+        return userDTO;
+    }
+
+    private CreateUserDTO getCreateUserDTO() {
+        CreateUserDTO userDTO = new CreateUserDTO();
+
+        userDTO.setFirstName("testName")
+                .setLastName("testLastName")
+                .setPhoneNumber("0742000000")
+                .setPassword("testPassword")
+                .setEmail("jon278@gaailer.site");
 
         return userDTO;
     }

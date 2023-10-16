@@ -1,7 +1,7 @@
 package com.boot.user.controller;
 
-import com.boot.user.dto.UserDTO;
-import com.boot.user.exception.EmailAlreadyUsedException;
+import com.boot.user.dto.CreateUserDTO;
+import com.boot.user.dto.GetUserDTO;
 import com.boot.user.model.CustomerMessage;
 import com.boot.user.service.UserService;
 import com.boot.user.util.Constants;
@@ -20,12 +20,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
-import java.util.ArrayList;
 import java.util.List;
 
 @Validated
@@ -40,25 +38,25 @@ public class UserController {
     @Operation(summary = "Create a new user", description = "Create a new user with the given information", tags = {"user"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User created",
-                    content = @Content(schema = @Schema(implementation = UserDTO.class))),
+                    content = @Content(schema = @Schema(implementation = CreateUserDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)})
     @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> addUser(@Parameter(description = "User to add. Cannot null or empty.",
-            required = true, schema = @Schema(implementation = UserDTO.class))
-                                           @Valid @RequestBody UserDTO user) {
-        UserDTO userDTO = userService.addUser(user);
+    public ResponseEntity<CreateUserDTO> addUser(@Parameter(description = "User to add. Cannot null or empty.",
+            required = true, schema = @Schema(implementation = CreateUserDTO.class))
+                                           @Valid @RequestBody CreateUserDTO user) {
+        CreateUserDTO userDTO = userService.addUser(user);
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Update an existing user by email", description = "Update an existing user using user's email address", tags = {"user"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully updated", content = @Content(schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "200", description = "Successfully updated", content = @Content(schema = @Schema(implementation = CreateUserDTO.class))),
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content)})
     @PutMapping(value = "/{email}", consumes = {"application/json"}, produces = {"application/json"})
-    public ResponseEntity<UserDTO> updateUserByEmail(@Parameter(description = "User to be updated.",
-            required = true, schema = @Schema(implementation = UserDTO.class)) @Valid @RequestBody UserDTO userDTO,
-                                                     @Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email){
-        UserDTO user = userService.updateUserByEmail(email, userDTO);
+    public ResponseEntity<CreateUserDTO> updateUserByEmail(@Parameter(description = "User to be updated.",
+            required = true, schema = @Schema(implementation = CreateUserDTO.class)) @Valid @RequestBody CreateUserDTO userDTO,
+                                                           @Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email){
+        CreateUserDTO user = userService.updateUserByEmail(email, userDTO);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
@@ -75,22 +73,24 @@ public class UserController {
     @Operation(summary = "Get all users", tags = {"user"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users found successfully",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDTO.class))))})
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = CreateUserDTO.class))))})
     @GetMapping("/users")
     @ResponseBody
-    public ResponseEntity<List<UserDTO>> getAllUsers(){
-        List<UserDTO> userList = userService.getAllUsers();
+    public ResponseEntity<List<CreateUserDTO>> getAllUsers(){
+        List<CreateUserDTO> userList = userService.getAllUsers();
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
     @Operation(summary = "Get user by email", description = "Get a specific user by email address", tags = {"user"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User found successfully", content = @Content(schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "200", description = "User found successfully", content = @Content(schema = @Schema(implementation = CreateUserDTO.class))),
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content)})
     @GetMapping("/{email}")
     @ResponseBody
-    public ResponseEntity<UserDTO> getUserByEmail(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email){
-        UserDTO user = userService.getUserByEmail(email);
+    public ResponseEntity<GetUserDTO> getUserByEmail(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email,
+                                                     @RequestParam(value = "includeDetails", required = false, defaultValue = "false") boolean includeDetails,
+                                                     @RequestParam(value = "includePassword", required = false, defaultValue = "false") boolean includePassword){
+        GetUserDTO user = userService.getUserByEmail(email, includeDetails, includePassword);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
@@ -99,7 +99,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User successfully deleted", content = @Content()),
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content)})
     @DeleteMapping("/{email}")
-    public ResponseEntity<UserDTO> deleteUserByByEmail(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email){
+    public ResponseEntity<CreateUserDTO> deleteUserByByEmail(@Email(message = "Invalid email!", regexp = Constants.EMAIL_REGEXP) @PathVariable("email") String email){
         userService.deleteUserByEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -109,37 +109,5 @@ public class UserController {
     public ResponseEntity<String> sendEmailFromUser(@Valid @RequestBody CustomerMessage customerMessage) {
         userService.saveCustomerMessage(customerMessage);
         return new ResponseEntity<>("Customer Message saved!", HttpStatus.OK);
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException exception) {
-        log.error(exception.getMessage(), exception);
-        ErrorResponse error = new ErrorResponse();
-        exception.getBindingResult().getFieldErrors().stream().forEach(item -> {
-            error.messages.add(new ErrorMessage(item.getField(), item.getDefaultMessage()));
-        });
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(EmailAlreadyUsedException.class)
-    public ResponseEntity<ErrorResponse> emailAlreadyUsedException(EmailAlreadyUsedException exception) {
-        log.error(exception.getMessage(), exception);
-        ErrorResponse error = new ErrorResponse();
-        error.messages.add(new ErrorMessage("email", "Email is already used"));
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
-    class ErrorResponse {
-        public List<ErrorMessage> messages = new ArrayList<>();
-    }
-
-    class ErrorMessage {
-        public String fieldKey;
-        public String message;
-
-        public ErrorMessage(String fieldKey, String message) {
-            this.fieldKey = fieldKey;
-            this.message = message;
-        }
     }
 }

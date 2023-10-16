@@ -5,17 +5,15 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.17.xsd">
 
-
-
-    <changeSet author="GeorgeT88" id="2022-11-17-19.01">
+    <changeSet author="FlorinV" id="2023-10-11-19.01">
 
         <preConditions onFail="HALT">
             <not>
-                <tableExists tableName="user"/>
+                <tableExists tableName="address"/>
             </not>
         </preConditions>
 
-        <createTable tableName="user">
+        <createTable tableName="address">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -26,22 +24,41 @@
                 <constraints nullable="false"/>
             </column>
             <column name="email" type="varchar(100)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="password" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
             <column name="phone_number" type="varchar(25)">
                 <constraints nullable="false"/>
             </column>
+            <column name="country" type="varchar(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="county" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="city" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="postal_code" type="varchar(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="street" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
             <column name="created_on" type="datetime">
                 <constraints nullable="false"/>
             </column>
-            <column name="verified" type="boolean">
+            <column name="last_updated_on" type="datetime"/>
+            <column name="user_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_updated_on" type="datetime"/>
         </createTable>
 
+        <addForeignKeyConstraint
+                baseTableName="address"
+                baseColumnNames="user_id"
+                constraintName="address_fk"
+                referencedTableName="user"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
     </changeSet>
 </databaseChangeLog>

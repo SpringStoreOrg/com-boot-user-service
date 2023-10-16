@@ -18,7 +18,7 @@ import java.util.List;
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class CreateUserDTO {
 
 	@Schema(description = "Unique identifier of the user.",
 			example = "1")
@@ -52,19 +52,7 @@ public class UserDTO {
 			example = "jellofirsthand@gmail.com")
 	@Email(message = "Invalid Email!")
 	private String email;
-
-	@Schema(description = "Address line of the contact.",
-			example = "888 Constantine Ave, #54")
-	@Size(min = 3, message = "Min Delivery address size is 8 characters!")
-	@Size(max = 300, message = "Max Delivery address size is 300 characters!")
-	private String deliveryAddress;
-
-	@Schema(description = "User role",
-			example = "USER")
-	private List<String> roles;
-
-	private List<UserFavorite> userFavorites;
 	
-	private boolean isActivated;
+	private boolean verified;
 
 }

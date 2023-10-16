@@ -1,7 +1,6 @@
 package com.boot.user.model;
 
 
-import com.boot.user.dto.UserDTO;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -9,14 +8,10 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @Accessors(chain = true)
@@ -51,9 +46,6 @@ public class User implements Serializable {
 	private String email;
 
 	@Column
-	private String deliveryAddress;
-
-	@Column
 	private LocalDateTime createdOn;
 
 	@Column
@@ -70,7 +62,10 @@ public class User implements Serializable {
   	private transient List<UserFavorite> userFavorites;
 
 	@Column
-	private boolean isActivated;
+	private boolean verified;
+
+	@OneToOne(mappedBy = "user")
+	private Address address;
 
 	@PrePersist
 	public void create(){
@@ -81,38 +76,6 @@ public class User implements Serializable {
 	@PreUpdate
 	public void update(){
 		this.lastUpdatedOn = LocalDateTime.now();
-	}
-
-	public static UserDTO userEntityToDto(@NotNull User user) {
-		return new UserDTO()
-				.setId(user.getId())
-				.setFirstName(user.getFirstName())
-				.setLastName(user.getLastName())
-				.setPassword(user.getPassword())
-				.setPhoneNumber(user.getPhoneNumber())
-				.setEmail(user.getEmail())
-				.setDeliveryAddress(user.getDeliveryAddress())
-				.setRoles(user.getRoleList()!=null
-						?user.getRoleList().stream()
-						.map(item->item.getName())
-						.collect(Collectors.toList())
-						:List.of())
-				.setUserFavorites(user.getUserFavorites())
-				.setActivated(user.isActivated());
-
-	}
-
-	public static User dtoToUserEntity(@NotNull UserDTO userDto) {
-		return new User()
-				.setId(userDto.getId())
-				.setFirstName(userDto.getFirstName())
-				.setLastName(userDto.getLastName())
-				.setPassword(userDto.getPassword())
-				.setPhoneNumber(userDto.getPhoneNumber())
-				.setDeliveryAddress(userDto.getDeliveryAddress())
-				.setEmail(userDto.getEmail())
-				.setUserFavorites(userDto.getUserFavorites())
-				.setActivated(userDto.isActivated());
 	}
 
 }
