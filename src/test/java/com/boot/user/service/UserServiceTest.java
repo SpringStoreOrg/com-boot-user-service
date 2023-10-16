@@ -103,7 +103,7 @@ class UserServiceTest {
     void testAddUserActivated() {
 
         String testEmail = "test1234@springstore-test.com";
-        CreateUserDTO userDTO = getUserDTO();
+        GetUserDTO userDTO = getUserDTO();
         userDTO.setEmail(testEmail);
 
         User user = getUser();
@@ -123,7 +123,6 @@ class UserServiceTest {
         verify(userRepository).save(user);
 
         verifyNoInteractions(confirmationTokenRepository, emailSenderService);
-
         userDTO.setVerified(true);
         assertEquals(userDTO, savedUser);
     }
@@ -441,17 +440,13 @@ class UserServiceTest {
         String newPassword = "testNewPassword";
         String invaldNewPassword = "testNewPassword123";
         String testConfirmationToken = "testConfirmationToken";
-        PasswordResetToken passwordResetToken = getPasswordResetToken();
-
-        when(passwordReserTokenRepository.findByResetToken(any())).thenReturn(passwordResetToken);
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user.setVerified(true));
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 userService.changeUserPassword(changeUserPassword(testConfirmationToken,newPassword,invaldNewPassword)));
 
         assertEquals("Passwords do not match!", exception.getMessage());
 
-        verifyNoInteractions(passwordEncoder);
+        verifyNoInteractions(passwordEncoder, userRepository, passwordReserTokenRepository);
     }
 
     @Test

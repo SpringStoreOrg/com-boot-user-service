@@ -1,6 +1,5 @@
 package com.boot.user.dto;
 
-import com.boot.user.model.UserFavorite;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,10 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.validation.constraints.*;
-import java.util.List;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @Data
 @ToString
@@ -52,7 +50,5 @@ public class CreateUserDTO {
 			example = "jellofirsthand@gmail.com")
 	@Email(message = "Invalid Email!")
 	private String email;
-	
-	private boolean verified;
 
 }
