@@ -1,6 +1,5 @@
 package com.boot.user.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,9 +11,9 @@ import java.util.List;
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDTO {
-	private String slug;
-	private String name;
-	private long price;
-	private List<PhotoDTO> photoLinks;
+public class PagedProductsResponseDTO {
+    private List<ProductDTO> products;
+    private int totalItems;
+    private int totalPages;
+    private int currentPage;
 }

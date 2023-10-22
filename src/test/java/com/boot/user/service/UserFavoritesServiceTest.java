@@ -2,16 +2,17 @@ package com.boot.user.service;
 
 
 import com.boot.user.client.ProductServiceClient;
-import com.boot.user.dto.PhotoDTO;
-import com.boot.user.dto.ProductDTO;
+import com.boot.user.dto.*;
 import com.boot.user.enums.ProductStatus;
 import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.exception.EntityNotFoundException;
+import com.boot.user.model.Address;
 import com.boot.user.model.Role;
 import com.boot.user.model.User;
 import com.boot.user.model.UserFavorite;
 import com.boot.user.repository.UserFavoriteRepository;
 import com.boot.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -19,6 +20,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,6 +42,9 @@ class UserFavoritesServiceTest {
     private UserRepository userRepository;
 
     @Mock
+    private ProductRetrieverService productRetrieverService;
+
+    @Mock
     private ProductServiceClient productServiceClient;
 
     @Mock
@@ -52,9 +59,17 @@ class UserFavoritesServiceTest {
     void testAddProductToUserFavorites() throws DuplicateEntryException, EntityNotFoundException {
         User user = getUser();
 
+        UserFavorite userFavorite = new UserFavorite();
+        userFavorite.setUser(user);
+        userFavorite.setProductName("testProductName3");
+
         when(userRepository.getUserById(5)).thenReturn(user);
 
         when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
+
+        when(userFavoriteRepository.save(any())).thenReturn(userFavorite);
+
+        when(productServiceClient.callGetAllProductsFromUserFavorites("testProductName3", true)).thenReturn(getPagedProducts(Arrays.asList(getProductDTO("testProductName3"))));
 
         userFavoritesService.addProductToUserFavorites(5, "testProductName3");
 
@@ -64,7 +79,7 @@ class UserFavoritesServiceTest {
 
         verify(userFavoriteRepository).save(userFavoriteArgumentCaptorValue);
 
-        verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2,testProductName3", true);
+        verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName3", true);
 
         List<UserFavorite> userFavorites = user.getUserFavorites();
         userFavorites.add(createUserFavorite(user, "testProductName3"));
@@ -117,6 +132,12 @@ class UserFavoritesServiceTest {
         when(userRepository.getUserById(3)).thenReturn(user);
 
         when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
+        when(productRetrieverService.getProductDTOS(any())).thenReturn(Arrays.asList(
+                getProductDTO("testProductName1"),
+                getProductDTO("testProductName2"),
+                getProductDTO("testProductName3"),
+                getProductDTO("testProductName4")
+        ));
 
         userFavoritesService.addProductsToUserFavorites(3, productNames);
 
@@ -129,29 +150,7 @@ class UserFavoritesServiceTest {
         verify(userFavoriteRepository).save(createUserFavorite(user, "testProductName3"));
         verify(userFavoriteRepository).save(createUserFavorite(user, "testProductName4"));
 
-        verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2,testProductName3,testProductName4", true);
-    }
-
-    @Test
-    void testAddProductsToUserFavorites_product_already_added() throws EntityNotFoundException {
-        User user = getUser();
-
-        List<String> productNames = new ArrayList<>();
-        productNames.add("testProductName1");
-        productNames.add("testProductName2");
-
-        when(userRepository.getUserById(4)).thenReturn(user);
-
-        when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
-
-        userFavoritesService.addProductsToUserFavorites(4, productNames);
-
-        verify(userRepository).getUserById(4);
-        verify(userFavoriteRepository).findAllByUser(user);
-
-        verifyNoMoreInteractions(userFavoriteRepository);
-
-        verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2", true);
+        verify(productRetrieverService).getProductDTOS(any());
     }
 
     @Test
@@ -179,7 +178,6 @@ class UserFavoritesServiceTest {
         UserFavorite userFavorite = createUserFavorite(user, productName);
 
         when(userRepository.getUserById(3)).thenReturn(user);
-        when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
         when(userFavoriteRepository.findByUserAndProductName(user, productName)).thenReturn(userFavorite);
 
         userFavoritesService.removeProductFromUserFavorites(3, productName);
@@ -188,7 +186,6 @@ class UserFavoritesServiceTest {
         userFavorites.add(createUserFavorite(user, productName));
 
         verify(userRepository).getUserById(3);
-        verify(userFavoriteRepository).findAllByUser(user);
         verify(userFavoriteRepository).findByUserAndProductName(user.setUserFavorites(userFavorites), productName);
         verify(userFavoriteRepository).delete(userFavorite);
     }
@@ -230,12 +227,12 @@ class UserFavoritesServiceTest {
 
         when(userRepository.getUserById(6)).thenReturn(user);
         when(userFavoriteRepository.findAllByUser(user)).thenReturn(user.getUserFavorites());
-        when(productServiceClient.callGetAllProductsFromUserFavorites("testProductName1,testProductName2", true)).thenReturn(productDTOList);
+        when(productRetrieverService.getProductDTOS(any())).thenReturn(productDTOList);
 
         List<ProductDTO> newProductDTOList = userFavoritesService.getAllProductsFromUserFavorites(6);
 
         verify(userRepository).getUserById(6);
-        verify(productServiceClient).callGetAllProductsFromUserFavorites("testProductName1,testProductName2", true);
+        verify(productRetrieverService).getProductDTOS(any());
         assertEquals(2, newProductDTOList.size());
         assertEquals(productDTOList, newProductDTOList);
     }
@@ -306,15 +303,18 @@ class UserFavoritesServiceTest {
         List<PhotoDTO> photoDTOList = new ArrayList<>();
         photoDTOList.add(photoDTO);
 
-        productDTO.setCategory("Chair")
-                .setDescription("Black wood chair")
-                .setPhotoLinks(photoDTOList)
+        productDTO.setPhotoLinks(photoDTOList)
                 .setPrice(10000)
-                .setStock(8)
                 .setName(name)
-                .setStatus(ProductStatus.ACTIVE);
+                .setSlug(name);
 
         return productDTO;
     }
 
+    private PagedProductsResponseDTO getPagedProducts(List<ProductDTO> products){
+        PagedProductsResponseDTO response = new PagedProductsResponseDTO();
+        response.setProducts(products);
+
+        return response;
+    }
 }

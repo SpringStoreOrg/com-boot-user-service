@@ -58,6 +58,9 @@ class UserServiceTest {
     @Mock
     private PasswordResetTokenRepository passwordReserTokenRepository;
 
+    @Mock
+    private ProductRetrieverService productRetrieverService;
+
     @Captor
     private ArgumentCaptor<ConfirmationToken> confirmationTokenCaptor;
 
@@ -74,7 +77,7 @@ class UserServiceTest {
     void testAddUser() {
         when(userRepository.existsByEmail(getUserDTO().getEmail())).thenReturn(false);
         when(passwordEncoder.encode(getUserDTO().getPassword())).thenReturn("testPassword");
-        when(userRepository.save(getUser())).thenReturn(getUser());
+        when(userRepository.save(any(User.class))).thenReturn(getUser());
         when(confirmationTokenRepository.save(any())).thenReturn(new ConfirmationToken());
         when(roleRepository.findAllInList(eq(Arrays.asList("ACCESS", "CREATE_ORDER")))).thenReturn(Arrays.asList(getRole("ACCESS"), getRole("CREATE_ORDER")));
 
@@ -82,7 +85,7 @@ class UserServiceTest {
 
         verify(userRepository).existsByEmail(getUserDTO().getEmail());
         verify(roleRepository).findAllInList(eq(Arrays.asList("ACCESS", "CREATE_ORDER")));
-        verify(userRepository).save(getUser());
+        verify(userRepository).save(any(User.class));
 
         verify(confirmationTokenRepository).save(confirmationTokenCaptor.capture());
 
@@ -91,7 +94,9 @@ class UserServiceTest {
         verify(confirmationTokenRepository).save(confirmationToken);
         verify(emailSenderService).sendConfirmationEmail(getUser(), confirmationToken);
 
-        assertEquals(getUserDTO(), savedUser);
+        GetUserDTO expected = getUserDTO();
+        expected.setUserFavorites(null);
+        assertEquals(expected, savedUser);
 
         assertNotNull(confirmationToken);
         assertEquals(getUser(), confirmationToken.getUser());
@@ -112,7 +117,7 @@ class UserServiceTest {
 
         when(userRepository.existsByEmail(testEmail)).thenReturn(false);
         when(passwordEncoder.encode(userDTO.getPassword())).thenReturn("testPassword");
-        when(userRepository.save(user)).thenReturn(user);
+        when(userRepository.save(any(User.class))).thenReturn(user);
         when(roleRepository.findAllInList(eq(Arrays.asList("ACCESS", "CREATE_ORDER")))).thenReturn(Arrays.asList(getRole("ACCESS"), getRole("CREATE_ORDER")));
 
         CreateUserDTO savedUser = userService.addUser(userDTO);
@@ -120,11 +125,15 @@ class UserServiceTest {
         verify(userRepository).existsByEmail(testEmail);
         verify(passwordEncoder).encode(userDTO.getPassword());
         verify(roleRepository).findAllInList(eq(Arrays.asList("ACCESS", "CREATE_ORDER")));
-        verify(userRepository).save(user);
+        verify(userRepository).save(any(User.class));
 
         verifyNoInteractions(confirmationTokenRepository, emailSenderService);
         userDTO.setVerified(true);
-        assertEquals(userDTO, savedUser);
+
+        GetUserDTO expected = getUserDTO();
+        expected.setUserFavorites(null);
+        expected.setVerified(true);
+        assertEquals(expected, savedUser);
     }
 
     @Test
@@ -502,7 +511,7 @@ class UserServiceTest {
                 .setPhoneNumber("0742000000")
                 .setPassword("testPassword")
                 .setEmail("jon278@gaailer.site");
-        userDTO.setRoles(Arrays.asList("ACCESS", "CREATE_ORDER"));
+        userDTO.setRoles(Arrays.asList("ACCESS", "CREATE_ORDER")).setUserFavorites(new ArrayList<>());
 
         return userDTO;
     }

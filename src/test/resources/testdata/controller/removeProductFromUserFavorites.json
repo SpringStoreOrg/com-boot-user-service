@@ -1,44 +1,32 @@
 [
   {
-    "id": 2,
+    "slug": "green-wood-chair-2",
     "name": "Green wood Chair 2",
-    "description": "Best green wood Chair",
     "price": 10000,
     "photoLinks": [
       {
         "image": "test.trewredqw.com"
       }
-    ],
-    "category": "Chair",
-    "stock": 12,
-    "status": "ACTIVE"
+    ]
   },
   {
-    "id": 3,
+    "slug": "green-wood-chair-3",
     "name": "Green wood Chair 3",
-    "description": "Best green wood Chair",
     "price": 10000,
     "photoLinks": [
       {
         "image": "test.trewredqw.com"
       }
-    ],
-    "category": "Chair",
-    "stock": 12,
-    "status": "ACTIVE"
+    ]
   },
   {
-    "id": 4,
+    "slug": "green-wood-chair-4",
     "name": "Green wood Chair 4",
-    "description": "Best green wood Chair",
     "price": 10000,
     "photoLinks": [
       {
         "image": "test.trewredqw.com"
       }
-    ],
-    "category": "Chair",
-    "stock": 12,
-    "status": "ACTIVE"
+    ]
   }
 ]

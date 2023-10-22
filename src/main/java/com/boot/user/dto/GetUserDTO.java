@@ -21,7 +21,7 @@ public class GetUserDTO extends CreateUserDTO{
             example = "USER")
     private List<String> roles;
 
-    private List<UserFavorite> userFavorites;
+    private List<ProductDTO> userFavorites;
 
     private boolean verified;
 }

@@ -2,13 +2,11 @@ package com.boot.user.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,11 +39,10 @@ public class User implements Serializable {
 	@Column
 	private String phoneNumber;
 
-	@Size(min = 3, max = 50)
 	@Column(unique = true)
 	private String email;
 
-	@Column
+	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdOn;
 
 	@Column
@@ -57,9 +54,8 @@ public class User implements Serializable {
 			inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private List<Role> roleList;
 
-	@JsonManagedReference
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY,  cascade = { CascadeType.ALL })
-  	private transient List<UserFavorite> userFavorites;
+  	private List<UserFavorite> userFavorites;
 
 	@Column
 	private boolean verified;
