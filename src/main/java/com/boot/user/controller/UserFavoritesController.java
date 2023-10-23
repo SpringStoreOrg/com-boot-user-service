@@ -29,10 +29,10 @@ public class UserFavoritesController {
 
     @Operation(summary = "Add product to user favorites", description = "Add a product to user favorites list", tags = {"userFavorites"})
     @PostMapping ("/{productName}")
-    public ResponseEntity<List<ProductDTO>> addProductToUserFavorites(@Size(min = 2, max = 30, message = "Product Name size has to be between 2 and 30 characters!") @PathVariable("productName") String productName, @RequestHeader(value = USER_ID_HEADER) long userId)
+    public ResponseEntity<ProductDTO> addProductToUserFavorites(@Size(min = 2, max = 30, message = "Product Name size has to be between 2 and 30 characters!") @PathVariable("productName") String productName, @RequestHeader(value = USER_ID_HEADER) long userId)
             throws DuplicateEntryException{
-        List<ProductDTO> productList = userFavoritesService.addProductToUserFavorites(userId, productName);
-        return new ResponseEntity<>(productList, HttpStatus.OK);
+        ProductDTO product = userFavoritesService.addProductToUserFavorites(userId, productName);
+        return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
     @Operation(summary = "Add products to user favorites", description = "Add a list of products to user favorites list", tags = {"userFavorites"})
@@ -45,8 +45,8 @@ public class UserFavoritesController {
     @Operation(summary = "Remove product from user favorites", description = "Remove a product from the user favorites list", tags = {"userFavorites"})
     @DeleteMapping("/{productName}")
     public ResponseEntity<List<ProductDTO>> removeProductFromUserFavorites(@Size(min = 2, max = 30, message = "Product Name size has to be between 2 and 30 characters!") @PathVariable("productName") String productName, @RequestHeader(value = USER_ID_HEADER) long userId){
-        List<ProductDTO> productList = userFavoritesService.removeProductFromUserFavorites(userId, productName);
-        return new ResponseEntity<>(productList, HttpStatus.OK);
+        userFavoritesService.removeProductFromUserFavorites(userId, productName);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(summary = "Get all products from user favorites", tags = {"userFavorites"})

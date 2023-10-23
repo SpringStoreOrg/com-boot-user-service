@@ -2,7 +2,6 @@ package com.boot.user.controller;
 
 import com.boot.user.dto.PhotoDTO;
 import com.boot.user.dto.ProductDTO;
-import com.boot.user.enums.ProductStatus;
 import com.boot.user.service.UserFavoritesService;
 import com.boot.user.testDataUtils.TestDataUtils;
 import com.boot.user.util.Constants;
@@ -12,15 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -51,11 +46,7 @@ public class UserFavoritesControllerTest {
     void testAddProductToUserFavorites() throws Exception {
         ProductDTO productDTO = getProductDTO(1, "Green wood Chair 1");
 
-        when(userFavoritesService.addProductToUserFavorites(3, productDTO.getName())).thenReturn(Arrays.asList(
-                getProductDTO(1, "Green wood Chair 1"),
-                getProductDTO(2, "Green wood Chair 2"),
-                getProductDTO(3, "Green wood Chair 3"),
-                getProductDTO(4, "Green wood Chair 4")));
+        when(userFavoritesService.addProductToUserFavorites(3, productDTO.getName())).thenReturn(productDTO);
 
         mockMvc.perform(post("/userFavorites/" + productDTO.getName())
                 .header(Constants.USER_ID_HEADER, 3)
@@ -69,13 +60,6 @@ public class UserFavoritesControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {"a", "asdkasdjlasjkdalskdjasldakjdalkdjaslk"})
     void testAddProductToUserFavorites_invalidProductName(String productName) throws Exception {
-
-        when(userFavoritesService.addProductToUserFavorites(3, productName)).thenReturn(Arrays.asList(
-                getProductDTO(1, "Green wood Chair 1"),
-                getProductDTO(2, "Green wood Chair 2"),
-                getProductDTO(3, "Green wood Chair 3"),
-                getProductDTO(4, "Green wood Chair 4")));
-
         mockMvc.perform(post("/userFavorites/" +  productName)
                 .header(Constants.USER_ID_HEADER, 3)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -108,16 +92,10 @@ public class UserFavoritesControllerTest {
     void testRemoveProductToUserFavorites() throws Exception {
         ProductDTO productDTO = getProductDTO(1, "Green wood Chair 1");
 
-        when(userFavoritesService.removeProductFromUserFavorites(4, productDTO.getName())).thenReturn(Arrays.asList(
-                getProductDTO(2, "Green wood Chair 2"),
-                getProductDTO(3, "Green wood Chair 3"),
-                getProductDTO(4, "Green wood Chair 4")));
-
         mockMvc.perform(delete("/userFavorites/" + productDTO.getName())
                         .header(Constants.USER_ID_HEADER, 4)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk())
-                .andExpect(content().json(TestDataUtils.readFileAsString("./src/test/resources/testdata/controller/removeProductFromUserFavorites.json")));
+                .andExpect(status().isOk());
 
         verify(userFavoritesService).removeProductFromUserFavorites(4, productDTO.getName());
     }
@@ -148,15 +126,15 @@ public class UserFavoritesControllerTest {
         List<PhotoDTO> photoDTOList = new ArrayList<>();
         photoDTOList.add(photoDTO);
 
-        productDTO.setId(id)
+        productDTO.setSlug(getSlug(productName))
                 .setName(productName)
-                .setCategory("Chair")
-                .setDescription("Best green wood Chair")
                 .setPhotoLinks(photoDTOList)
-                .setPrice(10000)
-                .setStatus(ProductStatus.ACTIVE)
-                .setStock(12);
+                .setPrice(10000);
 
         return productDTO;
+    }
+
+    public static String getSlug(String name) {
+        return name.toLowerCase().replace(" ", "-");
     }
 }

@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService{
 
     private final UserRepository userRepository;
 
@@ -46,6 +46,8 @@ public class UserService {
     private final RoleRepository roleRepository;
 
     private final CustomerMessageRepository customerMessageRepository;
+
+    private final ProductRetrieverService productRetrieverService;
 
     private final ModelMapper modelMapper;
 
@@ -164,7 +166,7 @@ public class UserService {
             result.setPassword(null);
         }
         if (includeDetails) {
-            result.setUserFavorites(user.getUserFavorites());
+            result.setUserFavorites(productRetrieverService.getProductDTOS(user));
         }
 
         return result;
