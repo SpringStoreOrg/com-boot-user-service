@@ -2,9 +2,5 @@
   "slug":"green-wood-chair-1",
   "name":"Green wood Chair 1",
   "price":10000,
-  "photoLinks":[
-    {
-      "image":"test.trewredqw.com"
-    }
-  ]
+  "images":["test.trewredqw.com"]
 }
