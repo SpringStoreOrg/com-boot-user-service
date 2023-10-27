@@ -3,30 +3,18 @@
     "slug": "green-wood-chair-1",
     "name": "Green wood Chair 1",
     "price": 10000,
-    "photoLinks": [
-      {
-        "image": "test.trewredqw.com"
-      }
-    ]
+    "images":["test.trewredqw.com"]
   },
   {
     "slug": "green-wood-chair-2",
     "name": "Green wood Chair 2",
     "price": 10000,
-    "photoLinks": [
-      {
-        "image": "test.trewredqw.com"
-      }
-    ]
+    "images":["test.trewredqw.com"]
   },
   {
     "slug": "green-wood-chair-3",
     "name": "Green wood Chair 3",
     "price": 10000,
-    "photoLinks": [
-      {
-        "image": "test.trewredqw.com"
-      }
-    ]
+    "images":["test.trewredqw.com"]
   }
 ]

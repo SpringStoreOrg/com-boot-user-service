@@ -120,15 +120,9 @@ public class UserFavoritesControllerTest {
     private ProductDTO getProductDTO(long id, String productName) {
         ProductDTO productDTO = new ProductDTO();
 
-        PhotoDTO  photoDTO = new PhotoDTO();
-        photoDTO.setImage("test.trewredqw.com");
-
-        List<PhotoDTO> photoDTOList = new ArrayList<>();
-        photoDTOList.add(photoDTO);
-
         productDTO.setSlug(getSlug(productName))
                 .setName(productName)
-                .setPhotoLinks(photoDTOList)
+                .setImages(Arrays.asList("test.trewredqw.com"))
                 .setPrice(10000);
 
         return productDTO;

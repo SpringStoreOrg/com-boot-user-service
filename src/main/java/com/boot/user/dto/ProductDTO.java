@@ -16,5 +16,5 @@ public class ProductDTO {
 	private String slug;
 	private String name;
 	private long price;
-	private List<PhotoDTO> photoLinks;
+	private List<String> images;
 }
