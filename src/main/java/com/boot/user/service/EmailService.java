@@ -52,7 +52,7 @@ public class EmailService {
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
-            mimeMessageHelper.setSubject("SpringStore confirmation Email");
+            mimeMessageHelper.setSubject("Fractal Wood Stories confirmare email");
             mimeMessageHelper.setFrom("noreply@springwebstore.com");
             mimeMessageHelper.setTo(user.getEmail());
             email.setEmailContent(geContentFromTemplate(email.getModel(), CONFIRMATION_EMAIL_TEMPLATE));
@@ -82,7 +82,7 @@ public class EmailService {
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
-            mimeMessageHelper.setSubject("Password Reset Request");
+            mimeMessageHelper.setSubject("Fractal Wood Stories reseteaza parola");
             mimeMessageHelper.setFrom("noreply@springwebstore.com");
             mimeMessageHelper.setTo(user.getEmail());
             email.setEmailContent(geContentFromTemplate(email.getModel(), RESET_PASSWORD_EMAIL_TEMPLATE));
