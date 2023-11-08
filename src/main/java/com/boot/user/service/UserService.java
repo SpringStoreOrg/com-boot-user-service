@@ -89,6 +89,7 @@ public class UserService{
 
     @Transactional
     public void confirmUserAccount(String confirmationToken){
+        log.info("confirmUserAccount - process started");
         ConfirmationToken token = confirmationTokenRepository.findByToken(confirmationToken);
 
         if (token != null) {

@@ -42,9 +42,9 @@ public class EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put("firstName", user.getFirstName());
         model.put("lastName", user.getLastName());
-        model.put("path", userServiceUrl + Constants.CONFIRM_USER_ACCOUNT);
+        model.put("path", "http://localhost:3000/account-confirmation/");
         model.put("confirmationToken", confirmationToken.getToken());
-        model.put("signature", "www.springStore.com");
+        model.put("signature", "www.fractalStories.com");
         email.setModel(model);
 
         MimeMessage mimeMessage = emailSender.createMimeMessage();
