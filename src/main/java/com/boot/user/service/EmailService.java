@@ -71,10 +71,10 @@ public class EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put("firstName", user.getFirstName());
         model.put("lastName", user.getLastName());
-        model.put("path", userServiceUrl + Constants.PASSWORD_RESET_EMAIL);
+        model.put("path", "http://localhost:3000/new-password/");
         model.put("passwordResetToken", passwordResetToken.getResetToken());
         model.put("location", "Cluj");
-        model.put("signature", "www.springStore.com");
+        model.put("signature", "www.fractalStories.com");
         email.setModel(model);
 
         MimeMessage mimeMessage = emailSender.createMimeMessage();

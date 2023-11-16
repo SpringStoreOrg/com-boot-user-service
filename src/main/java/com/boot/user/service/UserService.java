@@ -134,6 +134,10 @@ public class UserService{
             user.setPhoneNumber(userDTO.getPhoneNumber());
         }
 
+        if(StringUtils.isNotBlank(userDTO.getPassword())) {
+            user.setPassword(userDTO.getPassword());
+        }
+
         userRepository.save(user);
 
         GetUserDTO result = modelMapper.map(user, GetUserDTO.class);
