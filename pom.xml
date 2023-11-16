@@ -22,6 +22,7 @@
         <sonar.organization>springstoreorg</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.exclusions>**/client/*,**/dto/*,**/exception/*,**/model/*,**/config/*</sonar.exclusions>
+        <docker.io.publish>false</docker.io.publish>
     </properties>
 
     <dependencies>
@@ -184,8 +185,14 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <image>
-                        <name>spring-store/${project.artifactId}</name>
+                        <name>fractalwoodstories/${project.artifactId}:1.0.0</name>
                     </image>
+                    <docker>
+                        <publishRegistry>
+                            <username>${docker.io.username}</username>
+                            <password>${docker.io.password}</password>
+                        </publishRegistry>
+                    </docker>
                 </configuration>
             </plugin>
             <plugin>
