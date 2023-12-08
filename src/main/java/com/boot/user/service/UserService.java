@@ -1,6 +1,8 @@
 package com.boot.user.service;
 
 
+import com.boot.user.client.CartServiceClient;
+import com.boot.user.client.ProductServiceClient;
 import com.boot.user.dto.ChangeUserPasswordDTO;
 import com.boot.user.dto.CreateUserDTO;
 import com.boot.user.dto.GetUserDTO;
@@ -14,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +52,8 @@ public class UserService{
     private final CustomerMessageRepository customerMessageRepository;
 
     private final ProductRetrieverService productRetrieverService;
+
+    private final CartServiceClient cartServiceClient;
 
     private final ModelMapper modelMapper;
 
@@ -179,13 +185,19 @@ public class UserService{
 
     @Transactional
     public void deleteUserByEmail(String email) {
-        log.info("deleteUserByEmail - process started");
+        User user = userRepository.getUserByEmail(email);
 
-        if (userRepository.getUserByEmail(email) == null) {
+        if (user == null) {
             throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
         }
 
-        userRepository.deleteByEmail(email);
+        ResponseEntity response = cartServiceClient.deleteCartByUserId(user.getId());
+        log.info("deleteCartByUserId - process started");
+
+        if (response.getStatusCode().name().equals(HttpStatus.OK.name())) {
+            userRepository.deleteByEmail(email);
+            log.info("deleteUserByEmail - process started");
+        }
     }
 
     @Transactional
