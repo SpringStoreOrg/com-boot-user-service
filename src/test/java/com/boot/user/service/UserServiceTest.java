@@ -1,6 +1,7 @@
 package com.boot.user.service;
 
 
+import com.boot.user.client.CartServiceClient;
 import com.boot.user.dto.AddressDTO;
 import com.boot.user.dto.ChangeUserPasswordDTO;
 import com.boot.user.dto.CreateUserDTO;
@@ -23,6 +24,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -60,6 +65,9 @@ class UserServiceTest {
 
     @Mock
     private ProductRetrieverService productRetrieverService;
+
+    @Mock
+    private CartServiceClient cartServiceClient;
 
     @Captor
     private ArgumentCaptor<ConfirmationToken> confirmationTokenCaptor;
@@ -139,10 +147,10 @@ class UserServiceTest {
     @Test
     void testAddUserAlreadyExists() {
         when(userRepository.existsByEmail(getUserDTO().getEmail())).thenReturn(true);
-        try{
+        try {
             userService.addUser(getUserDTO());
             fail("Exception should have been thrown");
-        }catch (EmailAlreadyUsedException e){
+        } catch (EmailAlreadyUsedException e) {
             verify(userRepository).existsByEmail(getUserDTO().getEmail());
             verifyNoMoreInteractions(userRepository);
             verifyNoInteractions(confirmationTokenRepository, emailSenderService);
@@ -317,11 +325,19 @@ class UserServiceTest {
 
     @Test
     void testDeleteUserByEmail() throws EntityNotFoundException {
-        User user = getUser();
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.APPLICATION_JSON);
 
+        ResponseEntity<?> responseEntity = new ResponseEntity<>(
+                "some response body",
+                header,
+                HttpStatus.OK);
+
+        User user = getUser();
         String email = user.getEmail();
 
         when(userRepository.getUserByEmail(email)).thenReturn(user);
+        when(cartServiceClient.deleteCartByUserId(user.getId())).thenReturn(responseEntity);
 
         userService.deleteUserByEmail(email);
 
@@ -383,7 +399,7 @@ class UserServiceTest {
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user.setVerified(true));
         when(passwordEncoder.matches(any(), any())).thenReturn(false);
 
-        userService.changeUserPassword(changeUserPassword(passwordResetToken.getResetToken(),newPassword,newPassword));
+        userService.changeUserPassword(changeUserPassword(passwordResetToken.getResetToken(), newPassword, newPassword));
 
         verify(passwordReserTokenRepository).findByResetToken(passwordResetToken.getResetToken());
         verify(passwordEncoder).matches(newPassword, user.getPassword());
@@ -399,7 +415,7 @@ class UserServiceTest {
         String testConfirmationToken = "testConfirmationToken";
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userService.changeUserPassword(changeUserPassword(testConfirmationToken,newPassword,newPassword)));
+                userService.changeUserPassword(changeUserPassword(testConfirmationToken, newPassword, newPassword)));
 
         assertEquals("Token not found!", exception.getMessage());
 
@@ -417,7 +433,7 @@ class UserServiceTest {
 
         when(passwordReserTokenRepository.findByResetToken(any())).thenReturn(passwordResetToken);
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userService.changeUserPassword(changeUserPassword(testConfirmationToken,newPassword,newPassword)));
+                userService.changeUserPassword(changeUserPassword(testConfirmationToken, newPassword, newPassword)));
 
         assertEquals("Token Expired!", exception.getMessage());
         verifyNoInteractions(passwordEncoder);
@@ -435,7 +451,7 @@ class UserServiceTest {
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
 
         UnableToModifyDataException exception = assertThrows(UnableToModifyDataException.class, () ->
-                userService.changeUserPassword(changeUserPassword(testConfirmationToken,newPassword,newPassword)));
+                userService.changeUserPassword(changeUserPassword(testConfirmationToken, newPassword, newPassword)));
 
         assertEquals("User was not activated!", exception.getMessage());
 
@@ -451,7 +467,7 @@ class UserServiceTest {
         String testConfirmationToken = "testConfirmationToken";
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userService.changeUserPassword(changeUserPassword(testConfirmationToken,newPassword,invaldNewPassword)));
+                userService.changeUserPassword(changeUserPassword(testConfirmationToken, newPassword, invaldNewPassword)));
 
         assertEquals("Passwords do not match!", exception.getMessage());
 
@@ -472,7 +488,7 @@ class UserServiceTest {
         when(passwordEncoder.matches(invalidNewPassword, getUser().getPassword())).thenReturn(true);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                userService.changeUserPassword(changeUserPassword(testConfirmationToken,invalidNewPassword,invalidNewPassword)));
+                userService.changeUserPassword(changeUserPassword(testConfirmationToken, invalidNewPassword, invalidNewPassword)));
 
         assertEquals("Please select another password, this one was already used last time!", exception.getMessage());
     }
@@ -529,7 +545,7 @@ class UserServiceTest {
         return user;
     }
 
-    private ChangeUserPasswordDTO changeUserPassword(String token, String newPassword, String confirmedNewPassword){
+    private ChangeUserPasswordDTO changeUserPassword(String token, String newPassword, String confirmedNewPassword) {
         ChangeUserPasswordDTO changeUserPasswordDTO = new ChangeUserPasswordDTO();
         changeUserPasswordDTO.setToken(token);
         changeUserPasswordDTO.setNewPassword(newPassword);
@@ -538,14 +554,14 @@ class UserServiceTest {
         return changeUserPasswordDTO;
     }
 
-    private Role getRole(String name){
+    private Role getRole(String name) {
         Role role = new Role();
         role.setName(name);
 
         return role;
     }
 
-    private ModelMapper getModelMapper(){
+    private ModelMapper getModelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.typeMap(User.class, CreateUserDTO.class);
         modelMapper.typeMap(User.class, GetUserDTO.class);
