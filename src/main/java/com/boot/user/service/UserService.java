@@ -2,7 +2,6 @@ package com.boot.user.service;
 
 
 import com.boot.user.client.CartServiceClient;
-import com.boot.user.client.ProductServiceClient;
 import com.boot.user.dto.ChangeUserPasswordDTO;
 import com.boot.user.dto.CreateUserDTO;
 import com.boot.user.dto.GetUserDTO;
@@ -195,7 +194,7 @@ public class UserService{
         log.info("deleteCartByUserId - process started");
 
         if (response.getStatusCode().name().equals(HttpStatus.OK.name())) {
-            userRepository.deleteByEmail(email);
+            userRepository.deleteUserByEmail(email);
             log.info("deleteUserByEmail - process started");
         }
     }

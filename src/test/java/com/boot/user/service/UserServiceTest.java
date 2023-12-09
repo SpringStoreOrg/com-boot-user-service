@@ -325,7 +325,7 @@ class UserServiceTest {
 
         userService.deleteUserByEmail(email);
 
-        verify(userRepository).deleteByEmail(email);
+        verify(userRepository).deleteUserByEmail(email);
     }
 
     @Test
