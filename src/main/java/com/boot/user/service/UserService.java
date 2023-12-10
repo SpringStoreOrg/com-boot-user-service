@@ -1,8 +1,10 @@
 package com.boot.user.service;
 
 
+import com.boot.user.client.CartServiceClient;
 import com.boot.user.dto.ChangeUserPasswordDTO;
 import com.boot.user.dto.CreateUserDTO;
+import com.boot.user.dto.CustomerMessageDTO;
 import com.boot.user.dto.GetUserDTO;
 import com.boot.user.exception.EmailAlreadyUsedException;
 import com.boot.user.exception.EntityNotFoundException;
@@ -14,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +52,8 @@ public class UserService{
     private final CustomerMessageRepository customerMessageRepository;
 
     private final ProductRetrieverService productRetrieverService;
+
+    private final CartServiceClient cartServiceClient;
 
     private final ModelMapper modelMapper;
 
@@ -179,13 +185,20 @@ public class UserService{
 
     @Transactional
     public void deleteUserByEmail(String email) {
-        log.info("deleteUserByEmail - process started");
+        log.info("deleteCartByUserId - process started");
+        User user = userRepository.getUserByEmail(email);
 
-        if (userRepository.getUserByEmail(email) == null) {
+        if (user == null) {
             throw new EntityNotFoundException("Email: " + email + " not found in the Database!");
         }
 
-        userRepository.deleteByEmail(email);
+        ResponseEntity response = cartServiceClient.deleteCartByUserId(user.getId());
+
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            userRepository.deleteUserByEmail(email);
+            log.info("deleteUserByEmail - successfully deleted");
+        }
     }
 
     @Transactional
@@ -236,10 +249,12 @@ public class UserService{
     }
 
     @Transactional
-    public void saveCustomerMessage(@NotNull CustomerMessage customerMessage) {
+    public void saveCustomerMessage(@NotNull CustomerMessageDTO customerMessage) {
         log.info("customerMessage - process started");
 
-        customerMessageRepository.save(customerMessage);
+        CustomerMessage message = modelMapper.map(customerMessage, CustomerMessage.class);
+
+        customerMessageRepository.save(message);
     }
 
     private List<String> getRolesForUser(User user) {

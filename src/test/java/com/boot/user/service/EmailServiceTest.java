@@ -45,7 +45,7 @@ import static org.mockito.Mockito.*;
         emailService.sendConfirmationEmail(user, confirmationToken);
 
         assertNotNull(confirmationToken);
-        verify(mimeMessage).setSubject("SpringStore confirmation Email");
+        verify(mimeMessage).setSubject("Fractal Wood Stories confirmare email");
     }
 
     @Test
@@ -58,7 +58,7 @@ import static org.mockito.Mockito.*;
         emailService.sendPasswordResetEmail(user, resetToken);
 
         assertNotNull(resetToken);
-        verify(mimeMessage).setSubject("Password Reset Request");
+        verify(mimeMessage).setSubject("Fractal Wood Stories reseteaza parola");
     }
 
     private UserFavorite createUserFavorite(User user, String productName){

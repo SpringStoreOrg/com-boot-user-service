@@ -1,6 +1,7 @@
 package com.boot.user.controller;
 
 import com.boot.user.dto.CreateUserDTO;
+import com.boot.user.dto.CustomerMessageDTO;
 import com.boot.user.dto.GetUserDTO;
 import com.boot.user.model.CustomerMessage;
 import com.boot.user.service.UserService;
@@ -106,7 +107,7 @@ public class UserController {
 
     @Operation(summary = "Save customer message", tags = {"customerMessage"})
     @PostMapping(value = "/customerMessage")
-    public ResponseEntity<String> sendEmailFromUser(@Valid @RequestBody CustomerMessage customerMessage) {
+    public ResponseEntity<String> sendEmailFromUser(@Valid @RequestBody CustomerMessageDTO customerMessage) {
         userService.saveCustomerMessage(customerMessage);
         return new ResponseEntity<>("Customer Message saved!", HttpStatus.OK);
     }
