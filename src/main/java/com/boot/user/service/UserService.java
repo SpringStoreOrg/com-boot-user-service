@@ -4,6 +4,7 @@ package com.boot.user.service;
 import com.boot.user.client.CartServiceClient;
 import com.boot.user.dto.ChangeUserPasswordDTO;
 import com.boot.user.dto.CreateUserDTO;
+import com.boot.user.dto.CustomerMessageDTO;
 import com.boot.user.dto.GetUserDTO;
 import com.boot.user.exception.EmailAlreadyUsedException;
 import com.boot.user.exception.EntityNotFoundException;
@@ -248,10 +249,12 @@ public class UserService{
     }
 
     @Transactional
-    public void saveCustomerMessage(@NotNull CustomerMessage customerMessage) {
+    public void saveCustomerMessage(@NotNull CustomerMessageDTO customerMessage) {
         log.info("customerMessage - process started");
 
-        customerMessageRepository.save(customerMessage);
+        CustomerMessage message = modelMapper.map(customerMessage, CustomerMessage.class);
+
+        customerMessageRepository.save(message);
     }
 
     private List<String> getRolesForUser(User user) {
