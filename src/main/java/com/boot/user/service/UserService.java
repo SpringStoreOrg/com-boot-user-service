@@ -184,6 +184,7 @@ public class UserService{
 
     @Transactional
     public void deleteUserByEmail(String email) {
+        log.info("deleteCartByUserId - process started");
         User user = userRepository.getUserByEmail(email);
 
         if (user == null) {
@@ -191,11 +192,11 @@ public class UserService{
         }
 
         ResponseEntity response = cartServiceClient.deleteCartByUserId(user.getId());
-        log.info("deleteCartByUserId - process started");
 
-        if (response.getStatusCode().name().equals(HttpStatus.OK.name())) {
+
+        if (response.getStatusCode().is2xxSuccessful()) {
             userRepository.deleteUserByEmail(email);
-            log.info("deleteUserByEmail - process started");
+            log.info("deleteUserByEmail - successfully deleted");
         }
     }
 
