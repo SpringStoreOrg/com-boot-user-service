@@ -1,6 +1,5 @@
 package com.boot.user.controller;
 
-import com.boot.user.dto.PhotoDTO;
 import com.boot.user.dto.ProductDTO;
 import com.boot.user.service.UserFavoritesService;
 import com.boot.user.testDataUtils.TestDataUtils;
@@ -19,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;

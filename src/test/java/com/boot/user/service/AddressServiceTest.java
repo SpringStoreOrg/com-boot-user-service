@@ -5,7 +5,6 @@ import com.boot.user.dto.CreateUserDTO;
 import com.boot.user.dto.GetUserDTO;
 import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.model.Address;
-import com.boot.user.model.ConfirmationToken;
 import com.boot.user.model.User;
 import com.boot.user.repository.AddressRepository;
 import com.boot.user.repository.UserRepository;
@@ -20,8 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

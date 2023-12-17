@@ -3,7 +3,6 @@ package com.boot.user.controller;
 import com.boot.user.dto.CreateUserDTO;
 import com.boot.user.dto.CustomerMessageDTO;
 import com.boot.user.dto.GetUserDTO;
-import com.boot.user.model.CustomerMessage;
 import com.boot.user.service.UserService;
 import com.boot.user.util.Constants;
 import io.swagger.v3.oas.annotations.Operation;
