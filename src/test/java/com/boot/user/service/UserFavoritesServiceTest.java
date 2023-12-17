@@ -3,10 +3,8 @@ package com.boot.user.service;
 
 import com.boot.user.client.ProductServiceClient;
 import com.boot.user.dto.*;
-import com.boot.user.enums.ProductStatus;
 import com.boot.user.exception.DuplicateEntryException;
 import com.boot.user.exception.EntityNotFoundException;
-import com.boot.user.model.Address;
 import com.boot.user.model.Role;
 import com.boot.user.model.User;
 import com.boot.user.model.UserFavorite;

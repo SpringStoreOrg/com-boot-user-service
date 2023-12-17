@@ -2,7 +2,6 @@ package com.boot.user.controller;
 
 import com.boot.user.dto.ProductDTO;
 import com.boot.user.exception.DuplicateEntryException;
-import com.boot.user.exception.EntityNotFoundException;
 import com.boot.user.service.UserFavoritesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

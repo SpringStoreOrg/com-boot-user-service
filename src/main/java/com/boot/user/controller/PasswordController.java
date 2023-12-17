@@ -1,8 +1,6 @@
 package com.boot.user.controller;
 
 import com.boot.user.dto.ChangeUserPasswordDTO;
-import com.boot.user.exception.EntityNotFoundException;
-import com.boot.user.exception.UnableToModifyDataException;
 import com.boot.user.service.UserService;
 import com.boot.user.util.Constants;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,9 +1,7 @@
 package com.boot.user.controller;
 
 import com.boot.user.dto.AddressDTO;
-import com.boot.user.dto.CreateUserDTO;
 import com.boot.user.service.AddressService;
-import com.boot.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

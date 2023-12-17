@@ -4,7 +4,6 @@ import com.boot.user.model.ConfirmationToken;
 import com.boot.user.model.Email;
 import com.boot.user.model.PasswordResetToken;
 import com.boot.user.model.User;
-import com.boot.user.util.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.app.VelocityEngine;
