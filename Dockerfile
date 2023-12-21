@@ -1,3 +1,3 @@
-FROM eclipse-temurin:17-jdk-alpine
+FROM openjdk:11
 COPY ./target/*.jar user-service.jar
 ENTRYPOINT ["java","-jar","user-service.jar"]
