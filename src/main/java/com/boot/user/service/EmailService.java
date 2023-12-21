@@ -41,7 +41,7 @@ public class EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put("firstName", user.getFirstName());
         model.put("lastName", user.getLastName());
-        model.put("path", "http://localhost:3000/account-confirmation/");
+        model.put("path", "https://calypso-binar.com/account-confirmation/");
         model.put("confirmationToken", confirmationToken.getToken());
         model.put("signature", "www.fractalStories.com");
         email.setModel(model);
@@ -70,7 +70,7 @@ public class EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put("firstName", user.getFirstName());
         model.put("lastName", user.getLastName());
-        model.put("path", "http://localhost:3000/new-password/");
+        model.put("path", "https://calypso-binar.com/new-password/");
         model.put("passwordResetToken", passwordResetToken.getResetToken());
         model.put("location", "Cluj");
         model.put("signature", "www.fractalStories.com");
