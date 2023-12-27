@@ -45,7 +45,7 @@ import static org.mockito.Mockito.*;
         emailService.sendConfirmationEmail(user, confirmationToken);
 
         assertNotNull(confirmationToken);
-        verify(mimeMessage).setSubject("Fractal Wood Stories confirmare email");
+        verify(mimeMessage).setSubject("FractalWoodStories confirmare email");
     }
 
     @Test
