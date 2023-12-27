@@ -58,7 +58,7 @@ import static org.mockito.Mockito.*;
         emailService.sendPasswordResetEmail(user, resetToken);
 
         assertNotNull(resetToken);
-        verify(mimeMessage).setSubject("Fractal Wood Stories reseteaza parola");
+        verify(mimeMessage).setSubject("FractalWoodStories reseteaza parola");
     }
 
     private UserFavorite createUserFavorite(User user, String productName){
