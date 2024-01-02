@@ -19,7 +19,7 @@ pipeline {
         }
         stage('Docker push') {
             steps {
-                echo 'TODO'
+                echo 'TODO2'
             }
         }
     }
