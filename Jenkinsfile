@@ -12,7 +12,12 @@ pipeline {
                 echo 'TODO'
             }
         }
-        stage('Docker') {
+        stage('Docker build') {
+            steps {
+                echo 'TODO'
+            }
+        }
+        stage('Docker push') {
             steps {
                 echo 'TODO'
             }
