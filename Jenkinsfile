@@ -11,6 +11,7 @@ pipeline {
             steps {
                 sh 'java -version'
                 sh 'which java'
+                sh 'env'
             }
         }
         stage('Maven') {
