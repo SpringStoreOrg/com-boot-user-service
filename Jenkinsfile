@@ -7,6 +7,11 @@ pipeline {
     }
 
     stages {
+        stage('java check') {
+            steps {
+                sh 'java -version'
+            }
+        }
         stage('Maven') {
             steps {
                 sh 'mvn package'
