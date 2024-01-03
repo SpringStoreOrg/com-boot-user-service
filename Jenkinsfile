@@ -1,10 +1,15 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'microsoft-jdk-11.0.21'
+        maven 'maven-3.9.6'
+    }
+
     stages {
         stage('Maven') {
             steps {
-                echo 'TODO'
+                sh 'mvn package'
             }
         }
         stage('Tests') {
