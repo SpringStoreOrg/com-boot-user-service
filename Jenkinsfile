@@ -22,7 +22,7 @@ pipeline {
         stage('Docker push') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'fractalwoodstories-docker-hub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    def shortGitCommit = env.GIT_COMMIT[0..7]
+                    shortGitCommit = env.GIT_COMMIT[0..7]
                     sh """
                         docker tag fractalwoodstories/user-service:arm64-latest fractalwoodstories/user-service:arm64-${shortGitCommit}
                         docker login -u ${USERNAME} -p ${PASSWORD}
