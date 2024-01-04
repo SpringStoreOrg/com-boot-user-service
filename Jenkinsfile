@@ -6,7 +6,8 @@ pipeline {
             steps {
                 sh 'mvn package  -DskipTests=true'
             }
-        }stage('Maven Tests') {
+        }
+        stage('Maven Tests') {
              steps {
                  sh 'mvn test'
              }
