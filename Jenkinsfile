@@ -10,10 +10,11 @@ pipeline {
         stage('Docker') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'fractalwoodstories-docker-hub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh '''
+                    sh """
                         docker build . -t fractalwoodstories/user-service:arm64-latest
+                        docker login -u ${USERNAME} -p ${PASSWORD}
                         docker push fractalwoodstories/user-service:arm64-latest
-                    '''
+                    """
                 }
             }
         }
