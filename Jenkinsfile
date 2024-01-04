@@ -21,15 +21,17 @@ pipeline {
         }
         stage('Docker push') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'fractalwoodstories-docker-hub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    shortGitCommit = env.GIT_COMMIT[0..7]
-                    sh """
-                        docker tag fractalwoodstories/user-service:arm64-latest fractalwoodstories/user-service:arm64-${shortGitCommit}
-                        docker login -u ${USERNAME} -p ${PASSWORD}
-                        docker push fractalwoodstories/user-service:arm64-latest
-                        docker push fractalwoodstories/user-service:arm64-${shortGitCommit}
-                        docker logout
-                    """
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'fractalwoodstories-docker-hub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        shortGitCommit = env.GIT_COMMIT[0..7]
+                        sh """
+                            docker tag fractalwoodstories/user-service:arm64-latest fractalwoodstories/user-service:arm64-${shortGitCommit}
+                            docker login -u ${USERNAME} -p ${PASSWORD}
+                            docker push fractalwoodstories/user-service:arm64-latest
+                            docker push fractalwoodstories/user-service:arm64-${shortGitCommit}
+                            docker logout
+                        """
+                    }
                 }
             }
         }
