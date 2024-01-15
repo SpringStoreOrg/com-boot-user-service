@@ -295,7 +295,7 @@ class UserFavoritesServiceTest {
     private ProductDTO getProductDTO(String name) {
         ProductDTO productDTO = new ProductDTO();
 
-        productDTO.setImages(Arrays.asList("test.trewredqw.com"))
+        productDTO.setThumbnail("test.trewredqw.com")
                 .setPrice(10000)
                 .setName(name)
                 .setSlug(name);

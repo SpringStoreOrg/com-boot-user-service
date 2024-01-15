@@ -120,7 +120,7 @@ public class UserFavoritesControllerTest {
 
         productDTO.setSlug(getSlug(productName))
                 .setName(productName)
-                .setImages(Arrays.asList("test.trewredqw.com"))
+                .setThumbnail("test.trewredqw.com")
                 .setPrice(10000);
 
         return productDTO;
