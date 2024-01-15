@@ -13,6 +13,10 @@
             <column name="user_id" valueComputed="(select id from user where email = 'jellofirsthand@gaa1iler.site')"/>
             <column name="role_id" valueComputed="(select id from role where name = 'CREATE_ORDER')"/>
         </insert>
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(select id from user where email = 'jellofirsthand@gaa1iler.site')"/>
+            <column name="role_id" valueComputed="(select id from role where name = 'CREATE_PRODUCT')"/>
+        </insert>
 
         <insert tableName="user_role">
             <column name="user_id" valueComputed="(select id from user where email = 'skilletcheek@gaa1iler.site')"/>
